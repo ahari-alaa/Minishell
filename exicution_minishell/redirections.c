@@ -1,3 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirections.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
+/*   Updated: 2025/04/20 18:08:25 by maskour          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+
 #include "minishell.h"
 
 static int open_file(char  *file, int mode)
@@ -84,12 +97,12 @@ char *get_rundem_name()
 		count_str = ft_itoi(count);
 		if (!count_str)
 			exit(1);
-		filename = ft_strjin(base, "_");
+		filename = ft_strjoin(base, "_");
 		tmp = ft_strjoin(filename,count_str);
 		free(filename);
 		free(count_str);
 		filename = tmp;
-		fd = open (filename, O_WRONLY| O_CREAT | O_EXCL | 0600);
+		fd = open (filename, O_WRONLY| O_CREAT | O_EXCL, 0600);
 		if (fd != -1)
 		{
 			close (fd);

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex_util.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/20 17:01:59 by maskour           #+#    #+#             */
+/*   Updated: 2025/04/20 17:25:28 by maskour          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 
 #include "minishell.h"
 
@@ -76,7 +88,7 @@ char	*find_path(char *cmd, char **env)
 	path_env = get_path_from_env(env);
 	if (!path_env)
 		return (NULL);
-	direct = ft_split(path_env, ':');
+	direct = ft_split_up(path_env, ':');
 	if (!direct)
 		return (NULL);
 	result = search_path_dirs(cmd, direct);
