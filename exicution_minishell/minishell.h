@@ -15,6 +15,7 @@
 # include <termios.h> //
 # include <curses.h> //
 # include <term.h> //
+# include <limits.h>
 
 char	*find_path(char *cmd, char **env);
 
