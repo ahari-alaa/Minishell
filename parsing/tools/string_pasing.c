@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:16:06 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/20 05:36:14 by ahari            ###   ########.fr       */
+/*   Updated: 2025/04/21 18:44:47 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,17 +51,6 @@ t_token_type get_token_type(const char *s)
         return TOKEN_APPEND;
     else
         return TOKEN_WORD;
-}
-
-t_token	*new_token(char *val, t_token_type type)
-{
-    t_token *token = malloc(sizeof(t_token));
-    if (!token)
-        return NULL;
-    token->value = val;
-    token->type = type;
-    token->next = NULL;
-    return token;
 }
 
 void add_token(t_token **head, t_token *new)

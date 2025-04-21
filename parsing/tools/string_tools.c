@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free_file.c                                        :+:      :+:    :+:   */
+/*   string_tools.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:47 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/20 06:09:11 by ahari            ###   ########.fr       */
+/*   Updated: 2025/04/21 18:56:22 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ char	*ft_strncpy(char *dest, const char *src, size_t n)
 	return (dest);
 }
 
-char *ft_strndup(const char *s, size_t n)
+char    *ft_strndup(const char *s, size_t n)
 {
 
     char *dup = malloc(n + 1);
@@ -48,19 +48,6 @@ char *ft_strndup(const char *s, size_t n)
     return dup;
 }
 
-void free_tokens(t_token *tokens, char *input)
-{
-    t_token *temp;
-
-    while (tokens)
-    {
-        temp = tokens;
-        tokens = tokens->next;
-        free(temp->value);
-        free(temp);
-    }
-    free(input);
-}
 char    *ft_strdup(const char *s1)
 {
     size_t len = 0;
@@ -83,48 +70,31 @@ char    *ft_strdup(const char *s1)
     dup[i] = '\0';
     return dup;
 }
-/*-------------------for testing----------------------*/
-
-void print_token_type(t_token_type type)
+void	ft_putchar_fd(char c, int fd)
 {
-    switch (type)
+	if (fd >= 0)
+		write(fd, &c, 1);
+}
+
+void ft_putstr_fd(char *s, int fd, char c)
+{
+    int i;
+
+    if (!s)
+        return;
+    i = 0;
+    while (s[i])
     {
-        case TOKEN_WORD:
-            printf("TOKEN_WORD");
-            break;
-        case TOKEN_PIPE:
-            printf("TOKEN_PIPE");
-            break;
-        case TOKEN_REDIRECT_IN:
-            printf("TOKEN_REDIRECT_IN");
-            break;
-        case TOKEN_REDIRECT_OUT:
-            printf("TOKEN_REDIRECT_OUT");
-            break;
-        case TOKEN_APPEND:
-            printf("TOKEN_APPEND");
-            break;
-        case TOKEN_HEREDOC:
-            printf("TOKEN_HEREDOC");
-            break;
-        case TOKEN_NULL:
-            printf("TOKEN_NULL");
-            break;
-        default:
-            printf("UNKNOWN_TOKEN");
-            break;
+        if (s[i] == '%' && s[i + 1] == 'c')
+        {
+            ft_putchar_fd(c, fd);
+            i += 2;
+        }
+        else
+        {
+            ft_putchar_fd(s[i], fd);
+            i++;
+        }
     }
 }
 
-void print_tokens(t_token *head)
-{
-    t_token *current = head;
-
-    while (current)
-    {
-        printf("Token: %s  Type: ", current->value);
-        print_token_type(current->type);
-        printf("\n");
-        current = current->next;
-    }
-}
