@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/04/24 17:05:35 by maskour          ###   ########.fr       */
+/*   Updated: 2025/04/24 20:55:37 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,5 +166,5 @@ int redirections(t_cmd *cmd)
 			function_herdoc(files);
 		i++;
 	}
-	return(0);
+	return(1);
 }
