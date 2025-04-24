@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/04/24 11:50:31 by maskour          ###   ########.fr       */
+/*   Updated: 2025/04/24 17:05:35 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ static void rederect_input (t_file *file)
 		close(fd);
 		exit(1);
 	}
+	close(fd);
 }
 // write in file >
 static void rederect_output(t_file *file)
@@ -56,6 +57,7 @@ static void rederect_output(t_file *file)
 		close(fd);
 		exit(1);
 	}
+	close(fd);
 }
 // add in file >>
 
@@ -73,6 +75,7 @@ static void rederect_add_to_file(t_file *file)
 		close(fd);
 		exit(1);
 	}
+	close(fd);
 }
 static void *get_rundem_name()
 {
@@ -147,30 +150,20 @@ int redirections(t_cmd *cmd)
 	t_file *files;
 	while (i < cmd->file_count)
 	{
+		printf("%d\n", cmd->file_count);
 		files = &cmd->files[i];
 		/// this for the input file
 		if (files->type == TOKEN_REDIRECT_IN)
-		{
 			rederect_input(files);
-		}
 		///this for the output file
 		else if (files->type == TOKEN_REDIRECT_OUT)
-		{
 			rederect_output(files);
-			i++;
-		}
 		/// this for the add for the output file or creat it if it's not exist
 		else if (files->type == TOKEN_APPEND)
-		{
 			rederect_add_to_file(files);
-			i++;
-		}
 		//this for herdoc
 		else if (files->type == TOKEN_HEREDOC)
-		{
 			function_herdoc(files);
-			i++;
-		}
 		i++;
 	}
 	return(0);
