@@ -17,25 +17,29 @@ int main(void)
         }
         if (*input)
             add_history(input);
-        tokens = string_tokens(input);
+        tokens = check_quoted(input);
         if (!tokens)
-        {
-            free(input);
             continue ;
-        }
         commands = parse_commands(tokens);
         if (commands)
         {
             int i = 0;
             while (commands[i])
             {
+                printf("aaa");
                 printf("Command #%d:\n", i + 1);
+                if (!commands[i])
+                {
+                    printf("Error: Command is NULL\n");
+                    break ;
+                }
                 print_command_with_files(commands[i]);
                 i++;
             }
-            free_cmd(*commands);
         }
-        free_tokens(tokens, input); 
+        
+            //  free_cmd(*commands);
+        free_tokens(tokens, input);
     }
     return (0);
 }

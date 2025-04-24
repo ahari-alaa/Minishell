@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:16:06 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/21 18:44:47 by ahari            ###   ########.fr       */
+/*   Updated: 2025/04/24 15:00:41 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,16 @@ int	ft_isalpha(char c)
 {
 	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 }
+size_t	ft_strlen(const char *s)
+{
+	size_t	i;
+	i = 0;
+	while (s[i])
+	{
+		i++;
+	}
+	return (i);
+}
 
 int ft_strcmp(const char *s1, const char *s2)
 {
@@ -34,7 +44,7 @@ int ft_strcmp(const char *s1, const char *s2)
 
 int is_operator(const char s)
 {
-    return (s == '|' || s == '<' || s == '>' || s == '\'' || s == '\"');
+    return (s == '|' || s == '<' || s == '>' || s == '\\' || s == ';');
 }
 
 t_token_type get_token_type(const char *s)

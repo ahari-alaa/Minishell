@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/22 00:15:02 by ahari            ###   ########.fr       */
+/*   Updated: 2025/04/24 16:06:56 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,5 +141,18 @@ t_cmd **parse_commands(t_token *tokens)
         i++;
     }
     cmd_list[cmd_count] = NULL;
+    i = 0;
+    int count = 0;
+    while (cmd_list[i])
+    {
+        if(cmd_list[i]->files->type == TOKEN_HEREDOC)
+            count++;
+        i++;
+    }
+    if(count > 24)
+    {
+        ft_putstr_fd("minishell: maximum here-document count exceeded\n", 2, 0);
+        return (free_cmd_list(cmd_list, i), NULL);
+    }
     return cmd_list;
 }
