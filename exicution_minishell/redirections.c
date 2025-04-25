@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/04/24 20:55:37 by maskour          ###   ########.fr       */
+/*   Updated: 2025/04/25 15:37:05 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@ static void rederect_input (t_file *file)
 	fd = open_file(file->name,0);
 	if (fd == -1)
 	{
-		close(fd);
+		perror("minishell:open");
 		exit(1);
 	}
 	if(dup2(fd,0) == -1)
 	{
 		close(fd);
+		perror("minishell:dup2");
 		exit(1);
 	}
 	close(fd);
@@ -142,11 +143,11 @@ static void function_herdoc(t_file *file)
 	dup2(fd,0);
 	close(fd);
 }
-int redirections(t_cmd *cmd)
+void redirections(t_cmd *cmd)
 {
 	int i = 0;
 	if (!cmd)
-		return (0);
+		return ;
 	t_file *files;
 	while (i < cmd->file_count)
 	{
@@ -166,5 +167,4 @@ int redirections(t_cmd *cmd)
 			function_herdoc(files);
 		i++;
 	}
-	return(1);
 }
