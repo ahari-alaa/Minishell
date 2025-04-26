@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/20 06:31:14 by ahari            ###   ########.fr       */
+/*   Updated: 2025/04/21 23:31:13 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <termios.h> //
 #include <curses.h> //
 #include <term.h> //
+#include <string.h>
 
 
 typedef enum e_token_type
@@ -39,6 +40,7 @@ typedef enum e_token_type
 	TOKEN_NULL,        // for empty or errors
 } t_token_type;
 
+
 typedef struct s_token
 {
 	char            *value;         // the actual string (e.g. "ls", ">", "file.txt")
@@ -46,23 +48,52 @@ typedef struct s_token
 	struct s_token  *next;          // pointer to next token
 }   t_token;
 
+typedef struct s_file
+{
+	char			*name; // name of the file
+	t_token_type	type;// file type
+}	t_file;
+
+typedef struct s_cmd
+{
+	char		**cmd; // command name
+	t_file		*files; // files associated with the command
+	int			file_count; // number of files
+}	t_cmd;
 
 /*---------------function for free--------------------*/
 void			free_tokens(t_token *tokens, char *input);
+void    		free_cmd(t_cmd *cmd);
+void    		free_cmd_array(char **cmd);
+void    		free_files(t_file *files, int file_count);
+void			free_cmd_list(t_cmd **cmd_list, int count);
+
+/*-----------------for print--------------------------*/
 void			print_tokens(t_token *head);
+void			print_command_with_files(t_cmd *cmd);
+
+/*---------------function for create------------------*/
+t_cmd    		*init_cmd(void);
+t_file			*init_mfile(void);
+
+/*---------------cmd----------------------------------*/
+t_cmd			**parse_commands(t_token *tokens);
+int				ft_isredirect(t_token_type type);
+int				count_args(t_token *token);
 
 /*------------ tools for parsing ----------------*/
-char    		**ft_split(char *str);
+void			ft_putstr_fd(char *s, int fd, char c);
 int     		ft_isspace(char c);
 int     		is_operator(const char s);
+char    		**ft_split(char *str);
 char			*ft_strndup(const char *s1, size_t size);
 char			*ft_strdup(const char *s1);
 char			*ft_strncpy(char *dest, const char *src, size_t n);
 
 /*--------------this function for tockens------------*/
-t_token			*new_token(char *val, t_token_type type);
 void			add_token(t_token **head, t_token *new);
 t_token_type	get_token_type(const char *s);
+t_token			*new_token(char *val, t_token_type type);
 
 /*---------------parsing parts-----------------------*/
 t_token			*string_tokens(char *str);
