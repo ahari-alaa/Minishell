@@ -1,0 +1,30 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_unset.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/26 16:51:36 by maskour           #+#    #+#             */
+/*   Updated: 2025/05/06 20:56:37 by maskour          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../minishell.h"
+
+void ft_unset(t_cmd **cmd, t_env *env)
+{
+    t_env *current = env;
+    int i = 1;
+    t_cmd *current_cmd = *cmd;
+    while (current_cmd->cmd[i])
+    {
+        while (current != NULL || current->next != NULL)
+        {
+            if(!ft_strcmp(current->data_env, current_cmd->cmd[i]))
+                free(current->data_env);
+            current = current->next;
+        }
+        i++;
+    }
+}
