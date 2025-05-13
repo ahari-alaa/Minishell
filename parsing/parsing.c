@@ -67,9 +67,7 @@ t_token *check_quoted(char *str)
 {
     t_token *head;
     t_token *current;
-    int count;
 
-    count = 0;
     head = string_tokens(str);
     current = head;
     if (!head)

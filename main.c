@@ -6,7 +6,7 @@ int main(void)
 {
     char        *input;
     t_token     *tokens;
-    t_cmd       **commands;
+    t_cmd       *commands;
     while (1)
     {
         input = readline("minishell$ ");
@@ -21,23 +21,20 @@ int main(void)
         if (!tokens)
             continue ;
         commands = parse_commands(tokens);
+        commands = expand_cmd_list(commands);
         if (commands)
         {
-            int i = 0;
-            while (commands[i])
+            t_cmd *current = commands;
+            int i = 1;
+            
+            while (current)
             {
-                printf("aaa");
-                printf("Command #%d:\n", i + 1);
-                if (!commands[i])
-                {
-                    printf("Error: Command is NULL\n");
-                    break ;
-                }
-                print_command_with_files(commands[i]);
+                printf("Command #%d:\n", i);
+                print_command_with_files(current);
+                current = current->next;
                 i++;
             }
         }
-        
             //  free_cmd(*commands);
         free_tokens(tokens, input);
     }
