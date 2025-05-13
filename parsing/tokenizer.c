@@ -48,7 +48,7 @@ t_token *handle_word_with_quotes(char *str, int *i, t_token **head)
                 quote_type = 0;
             }
             (*i)++;
-            continue;
+            continue ;
         }
         if (!in_quotes && (ft_isspace(str[*i]) || is_operator(str[*i])))
             break;

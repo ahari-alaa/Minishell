@@ -44,6 +44,7 @@ typedef struct s_token
 {
 	char            *value;         // the actual string (e.g. "ls", ">", "file.txt")
 	t_token_type    type;           // type of token
+	char            quote_type;  // '\"', '\'', or 0 (no quotes)
 	struct s_token  *next;          // pointer to next token
 }   t_token;
 
@@ -110,5 +111,11 @@ t_token			*new_token(char *val, t_token_type type);
 /*---------------parsing parts-----------------------*/
 t_token			*string_tokens(char *str);
 
-
+// typedef struct s_token
+// {
+//     char            *value;
+//     int             type;
+//     char            quote_type;  // '\"', '\'', or 0 (no quotes)
+//     struct s_token  *next;
+// }   t_token;
 #endif
