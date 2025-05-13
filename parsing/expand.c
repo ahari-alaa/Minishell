@@ -79,7 +79,7 @@ char *found_env(char *cmd)
 		char *temp = malloc(ft_strlen(cmd));
 		if (!temp)
 			return NULL;
-		ft_strncpy(temp, cmd + 1, ft_strlen(cmd) - 1);
+		ft_strncpy(temp, cmd + 1, ft_strlen(cmd) - 2);
 		free(cmd);
 		return temp;
 	}
