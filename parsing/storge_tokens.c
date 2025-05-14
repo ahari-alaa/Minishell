@@ -68,7 +68,7 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
         {
             if (!current->next || current->next->type != TOKEN_WORD)
             {
-                ft_putstr_fd("bash: syntax error near unexpected token `", 2, 0);
+                ft_putstr_fd("./minishell: syntax error near unexpected token `", 2, 0);
                 if (current->next && current->next->value)
                     ft_putstr_fd(current->next->value, 2, 0);
                 else
@@ -103,12 +103,14 @@ static t_cmd *parse_single_command(t_token **tokens)
         return NULL;
 
     cmd->cmd = malloc(sizeof(char *) * (argc + 1));
+    if (!cmd->cmd)
+        return (free(cmd), NULL);
     cmd->files = malloc(sizeof(t_file) * (argc + 1));
-    if (!cmd->cmd || !cmd->files)
-        return (NULL);
+    if (!cmd->files)
+        return (free(cmd->cmd), free(cmd), NULL);
 
     if (!parse_arguments(cmd, tokens) || !parse_redirections(cmd, &start))
-        return (NULL);
+        return (free(cmd),NULL);
 
     while (*tokens && (*tokens)->type != TOKEN_PIPE)
         *tokens = (*tokens)->next;
