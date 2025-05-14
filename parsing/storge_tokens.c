@@ -105,10 +105,10 @@ static t_cmd *parse_single_command(t_token **tokens)
     cmd->cmd = malloc(sizeof(char *) * (argc + 1));
     cmd->files = malloc(sizeof(t_file) * (argc + 1));
     if (!cmd->cmd || !cmd->files)
-        return (free_cmd(cmd), NULL);
+        return (NULL);
 
     if (!parse_arguments(cmd, tokens) || !parse_redirections(cmd, &start))
-        return (free_cmd(cmd), NULL);
+        return (NULL);
 
     while (*tokens && (*tokens)->type != TOKEN_PIPE)
         *tokens = (*tokens)->next;
