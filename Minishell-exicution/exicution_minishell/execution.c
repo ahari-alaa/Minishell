@@ -6,13 +6,36 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/05 15:51:56 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/14 21:34:33 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../minishell.h"
-
+static char **convert(t_env *env_list)
+{
+    int count = 0;
+    int i = 0;
+    char **env_arry;
+    t_env *current = env_list;
+    while (current)
+    {
+        count++;
+        current = current->next;
+    }
+    env_arry = malloc(sizeof(char*) * (count + 1));
+    if (!env_arry)
+        return (NULL);
+    current = env_list;
+    while (i < count)
+    {
+        env_arry[i] = current->data_env;
+        current = current->next;
+        i++;/* code */
+    }
+    env_arry[count] = NULL;
+    return (env_arry);    
+}
 void	ft_putstr_fd_up(char *s, int fd)
 {
 	size_t	len;
@@ -29,13 +52,13 @@ static void handle_cmd_errors(char *cmd_path)
 {
     if(cmd_path)
 	{
-	 ft_putstr_fd_up("minishell: ", 2);
+	    ft_putstr_fd_up("minishell: ", 2);
         ft_putstr_fd_up(cmd_path, 2);
         ft_putstr_fd_up(": execution failed\n", 2);
         free(cmd_path);
 	}
 	else
-	    ft_putstr_fd_up("minishell: command error\n", 2);
+	    ft_putstr_fd_up("minishell-1: command error\n", 2);
     exit(1);
 }
 
@@ -90,7 +113,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
         }
 
         pid = fork();
-        if (pid == 0) {
+        if (pid == 0) 
+        {
             // Child process
             if (i > 0) {
                 dup2(prev_pipe, STDIN_FILENO);
@@ -123,7 +147,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
                 close(pipes[1]);
             }
         }
-        else {
+        else 
+        {
             perror("minishell: fork");
             exit(1);
         }
@@ -135,19 +160,23 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
     while (wait(NULL) > 0);
 }
 
-int exicut(t_cmd **cmd, char **env)
+int exicut(t_cmd **cmd, t_env *env_list)
 {
     int cmd_count = 0;
     if (!cmd || !*cmd)
         return (1);
-    
-    while (cmd[cmd_count])
+    t_cmd *current = *cmd;
+    char **env = convert(env_list);
+    while (current)
+    {
         cmd_count++;
+        current = current->next;
+    }
     if (cmd_count == 1)
     {
         if (is_builtin(cmd[0]->cmd[0]))
         {
-            execut_bultin(cmd, env);
+            env_list = execut_bultin(cmd, env_list);
             return (0);
         }
         execute_single_command(cmd, env);

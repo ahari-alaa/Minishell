@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   storge_tokens.c                                    :+:      :+:    :+:   */
+/*   store_tokens.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/24 16:06:56 by ahari            ###   ########.fr       */
+/*   Updated: 2025/05/13 16:00:00 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,40 +14,44 @@
 
 static int count_commands(t_token *tokens)
 {
-    int     count;
-    t_token *current;
-    
-    count = 1;
-    current = tokens;
-    while (current)
+    int count = 1;
+    while (tokens)
     {
-        if (current->type == TOKEN_PIPE)
+        if (tokens->type == TOKEN_PIPE)
             count++;
-        current = current->next;
+        tokens = tokens->next;
     }
-    return (count);
+    return count;
 }
 
 static int parse_arguments(t_cmd *cmd, t_token **tokens)
 {
-    int     arg_i;
-    t_token *current;
-    
-    arg_i = 0;
-    current = *tokens;
+    int arg_i = 0;
+    t_token *current = *tokens;
+
     while (current && current->type != TOKEN_PIPE)
     {
         if (current->type == TOKEN_WORD)
         {
-            cmd->cmd[arg_i] = ft_strdup(current->value);
-            if (!cmd->cmd[arg_i])
-                return 0;
-            arg_i++;
+            cmd->cmd[arg_i++] = ft_strdup(current->value);
         }
-        else if (ft_isredirect(current->type) && current->next)
-            current = current->next;
+        else if (ft_isredirect(current->type))
+        {
+            if (!current->next || current->next->type != TOKEN_WORD)
+            {
+                ft_putstr_fd("bash: syntax error near unexpected token `", 2, 0);
+                if (current->next && current->next->value)
+                    ft_putstr_fd(current->next->value, 2, 0);
+                else
+                    ft_putstr_fd("newline", 2, 0);
+                ft_putstr_fd("'\n", 2, 0);
+                return 0;
+            }
+            current = current->next; // Skip the filename
+        }
         current = current->next;
     }
+
     cmd->cmd[arg_i] = NULL;
     *tokens = current;
     return 1;
@@ -55,22 +59,17 @@ static int parse_arguments(t_cmd *cmd, t_token **tokens)
 
 static int parse_redirections(t_cmd *cmd, t_token **tokens)
 {
-    t_file *file;
     t_token *current = *tokens;
+    t_file *file;
 
     while (current && current->type != TOKEN_PIPE)
     {
         if (ft_isredirect(current->type))
         {
-            if (!current->next)
+            if (!current->next || current->next->type != TOKEN_WORD)
             {
-                ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2, 0);
-                return 0;
-            }
-            if (current->next->type != TOKEN_WORD)
-            {
-                ft_putstr_fd("bash: syntax error near unexpected token `", 2, 0);
-                if (current->next->value)
+                ft_putstr_fd("./minishell: syntax error near unexpected token `", 2, 0);
+                if (current->next && current->next->value)
                     ft_putstr_fd(current->next->value, 2, 0);
                 else
                     ft_putstr_fd("newline", 2, 0);
@@ -79,8 +78,8 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
             }
             file = init_mfile();
             if (!file)
-                return (0);
-            file->name = ft_strdup(current->next->value);
+                return 0;
+            file->name = ft_strdup(current->next->value); // Quotes preserved
             file->type = current->type;
             if (!file->name)
                 return (free(file), 0);
@@ -90,69 +89,67 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
         }
         current = current->next;
     }
-    *tokens = *tokens;
-    return (1);
+    return 1;
 }
 
 static t_cmd *parse_single_command(t_token **tokens)
 {
-    t_cmd   *cmd;
-    t_token *token_start;
-    int     argc;
+    t_cmd *cmd;
+    t_token *start = *tokens;
+    int argc = count_args(start);
 
-    token_start = *tokens;
     cmd = init_cmd();
     if (!cmd)
-        return (NULL);
-    argc = count_args(token_start);
+        return NULL;
+
     cmd->cmd = malloc(sizeof(char *) * (argc + 1));
+    if (!cmd->cmd)
+        return (free(cmd), NULL);
     cmd->files = malloc(sizeof(t_file) * (argc + 1));
-    if (!cmd->cmd || !cmd->files)
-        return (free_cmd(cmd), NULL);
-    if (!parse_arguments(cmd, tokens) || 
-        !parse_redirections(cmd, &token_start))
-        return (free_cmd(cmd), NULL);
+    if (!cmd->files)
+        return (free(cmd->cmd), free(cmd), NULL);
+
+    if (!parse_arguments(cmd, tokens) || !parse_redirections(cmd, &start))
+        return (free(cmd),NULL);
+
     while (*tokens && (*tokens)->type != TOKEN_PIPE)
         *tokens = (*tokens)->next;
-    return (cmd);
+
+    cmd->next = NULL;
+    return cmd;
 }
 
-t_cmd **parse_commands(t_token *tokens)
+t_cmd *parse_commands(t_token *tokens)
 {
-    int     cmd_count;
-    int     i;
-    t_cmd   **cmd_list;
+    t_cmd *cmd_head = NULL;
+    t_cmd *current = NULL;
+    t_cmd *new_cmd;
+    int cmd_count = count_commands(tokens);
+    int i = 0;
 
-    i = 0;
-    cmd_count = count_commands(tokens);
-    cmd_list = malloc(sizeof(t_cmd *) * (cmd_count + 1));
-    if (!cmd_list)
-        return (NULL);
     while (i < cmd_count)
     {
-        cmd_list[i] = parse_single_command(&tokens);
-        if (!cmd_list[i])
-            return (free_cmd_list(cmd_list, i), NULL);
-        if (tokens && tokens->type == TOKEN_PIPE && tokens->next)
+        new_cmd = parse_single_command(&tokens);
+        if (!new_cmd)
+            return free_cmd_list(cmd_head), NULL;
+
+        if (!cmd_head)
+            cmd_head = new_cmd;
+        else
+            current->next = new_cmd;
+        current = new_cmd;
+
+        if (tokens && tokens->type == TOKEN_PIPE)
+        {
+            if (!tokens->next)
+            {
+                ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2, 0);
+                return free_cmd_list(cmd_head), NULL;
+            }
             tokens = tokens->next;
-        else if (tokens && tokens->type == TOKEN_PIPE && !tokens->next)
-            return (free_cmd_list(cmd_list, i),
-                ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2, 0), NULL);
+        }
         i++;
     }
-    cmd_list[cmd_count] = NULL;
-    i = 0;
-    int count = 0;
-    while (cmd_list[i])
-    {
-        if(cmd_list[i]->files->type == TOKEN_HEREDOC)
-            count++;
-        i++;
-    }
-    if(count > 24)
-    {
-        ft_putstr_fd("minishell: maximum here-document count exceeded\n", 2, 0);
-        return (free_cmd_list(cmd_list, i), NULL);
-    }
-    return cmd_list;
+
+    return cmd_head;
 }

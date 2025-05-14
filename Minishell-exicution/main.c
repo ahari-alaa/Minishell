@@ -1,14 +1,30 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
+/*   Updated: 2025/05/14 20:08:07 by maskour          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+
+
 #include "minishell.h"
 
-
-// this the main is just for testing
+// this main for marge
 int main(int ac,char **av,char **env)
 {
     (void)ac;
     (void)av;
     char        *input;
     t_token     *tokens;
-    t_cmd       **commands;
+    t_cmd       *commands;
+    t_env *env_list;
+    
+    env_list = file_inv(env);
     while (1)
     {
         input = readline("minishell$ ");
@@ -19,27 +35,30 @@ int main(int ac,char **av,char **env)
         }
         if (*input)
             add_history(input);
-        tokens = string_tokens(input);
+        tokens = check_quoted(input);
         if (!tokens)
-        {
-            free(input);
             continue ;
-        }
         commands = parse_commands(tokens);
+        commands = expand_cmd_list(commands);
         if (commands)
         {
-            int i = 0;
-            while (commands[i])
+            t_cmd *current = commands;
+            int i = 1;
+            
+            while (current)
             {
-                printf("Command #%d:\n", i + 1);
-                print_command_with_files(commands[i]);
+                printf("Command #%d:\n", i);
+                print_command_with_files(current);
+                current = current->next;
                 i++;
             }
         }
-        exicut(commands, env);
-        free_cmd(*commands);
-        free_tokens(tokens, input); 
+        exicut(&commands, env_list);
+        free_tokens(tokens, input);
     }
+    //free the env
+    
+    // free_env_list(env_list);
     return (0);
 }
 

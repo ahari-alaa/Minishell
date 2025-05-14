@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/04/25 15:37:05 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/14 22:10:43 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,8 +131,9 @@ static void function_herdoc(t_file *file)
 	while(1)
 	{
 		line = readline("heredoc> ");
-		if (!line || ft_strcmp(line, file->name) == 0)
+		if (!line || !ft_strcmp(line, file->name))
 			break;
+		write(fd,">",1);
 		write(fd, line,ft_strlen(line));
 		write(fd,"\n", 1);
 		free(line);
@@ -151,7 +152,6 @@ void redirections(t_cmd *cmd)
 	t_file *files;
 	while (i < cmd->file_count)
 	{
-		printf("%d\n", cmd->file_count);
 		files = &cmd->files[i];
 		/// this for the input file
 		if (files->type == TOKEN_REDIRECT_IN)
