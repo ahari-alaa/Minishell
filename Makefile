@@ -1,7 +1,7 @@
 CC = cc 
 CFLAGS = -Wall -Wextra -Werror 
 SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c \
-			./parsing/tools/string_tools.c  ./parsing/tools/free_tools.c    ./parsing/tools/print_file.c\
+			./parsing/tools/string_tools.c  ./parsing/tools/free_tools.c    ./parsing/tools/print_file.c ./parsing/tools/tools.c\
 			./parsing/parsing.c             ./parsing/storge_tokens.c     ./parsing/tokenizer.c ./parsing/expand.c  main.c
 
 FLAGS= -lreadline

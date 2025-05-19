@@ -6,7 +6,7 @@ int main(void)
 {
     char        *input;
     t_token     *tokens;
-    t_cmd       *commands;
+     t_cmd       *commands;
     while (1)
     {
         input = readline("minishell$ ");
@@ -21,7 +21,18 @@ int main(void)
         if (!tokens)
             continue ;
         commands = parse_commands(tokens);
+        if (!commands)
+        {
+            free_tokens(tokens, input);
+            continue ;
+        }
         commands = expand_cmd_list(commands);
+        if (!commands)
+        {
+            free_cmd_list(commands);
+            free_tokens(tokens, input);
+            continue ;
+        }
         if (commands)
         {
             t_cmd *current = commands;
@@ -35,7 +46,8 @@ int main(void)
                 i++;
             }
         }
-            //  free_cmd(*commands);
+        if(commands)
+            free_cmd_list(commands);
         free_tokens(tokens, input);
     }
     return (0);
