@@ -104,6 +104,8 @@ char			*ft_strncpy(char *dest, const char *src, size_t n);
 char			*ft_strcat(char *dest, const char *src);
 char			*ft_substr(const char *s, unsigned int start, size_t len);
 char			*ft_itoa(int n);
+char			*ft_strjoin(char const *s1, char const *s2);
+char			*ft_strcpy(char *dest, const char *src);
 
 /*--------------this function for tockens------------*/
 void			add_token(t_token **head, t_token *new);
