@@ -22,19 +22,6 @@ int is_valid_var_char(char c)
 	return (ft_isalnum(c) || c == '_');
 }
 
-int count_quotes(char *str, int start)
-{
-	int count = 0;
-	int i = start;
-	
-	while (str[i] == '"')
-	{
-		count++;
-		i++;
-	}
-	return count;
-}
-
 int get_var_name_length(char *str, int start)
 {
 	int len = 0;
@@ -113,26 +100,6 @@ char *handle_env_var(char *cmd, int pos)
 	return new_cmd;
 }
 
-char *handle_quoted_var(char *cmd, int pos, int in_quotes)
-{
-	int quote_pos = pos + 1;
-	int quote_count = count_quotes(cmd, quote_pos);
-	int var_start = quote_pos + quote_count;
-	int var_len = get_var_name_length(cmd, var_start);
-	char *new_cmd;
-	if (quote_count > 0 && var_len > 0 && in_quotes)
-	{
-		char *literal = create_literal_var(cmd, var_start, var_len);
-		if (!literal)
-			return NULL;
-		int skip_len = 1 + quote_count + var_len;
-		new_cmd = build_new_command(cmd, pos, literal, skip_len);
-		free(literal);
-		return new_cmd;
-	}	
-	return NULL;
-}
-
 char *found_env(char *cmd)
 {
 	int pos = 0;
@@ -161,7 +128,7 @@ char *found_env(char *cmd)
 			int i = pos + 1;
 			while (cmd[i] == '"')
 				i++;
-			if (cmd[i] == '\0' || (!ft_isalnum(cmd[i]) && cmd[i] != '_' && 
+			if (cmd[i] == '\0' || (!is_valid_var_char(cmd[i]) && 
 					cmd[i] != '?' && cmd[i] != '0' && cmd[i] != '$'))
 			{
 				pos++;
@@ -213,9 +180,6 @@ char *found_env(char *cmd)
 	free(cmd);
 	return result;
 }
-
-
-
 
 t_cmd *expand_cmd(t_cmd *cmd)
 {
