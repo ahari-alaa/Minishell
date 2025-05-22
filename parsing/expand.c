@@ -12,7 +12,6 @@
 
 #include "../minishell.h"
 
-
 char *ft_exit_status(char *cmd)
 {
 	return cmd;
@@ -20,10 +19,8 @@ char *ft_exit_status(char *cmd)
 
 char *found_env(char *cmd)
 {
-	int i = 0;
 	int j = 0;
 	char *new_cmd;
-
 	if (!cmd)
 		return NULL;
 	if (cmd[0] == '\'')
@@ -50,7 +47,7 @@ char *found_env(char *cmd)
 			ft_strcat(new_cmd, cmd + j + 2);
 			free(exit_status);
 			free(cmd);
-			return new_cmd;
+			return found_env(new_cmd);
 		}
 		if (cmd[j] == '$' && cmd[j + 1] == '0')
 		{
@@ -66,7 +63,7 @@ char *found_env(char *cmd)
 			ft_strcat(new_cmd, cmd + j + 2);
 			free(name);
 			free(cmd);
-			return new_cmd;
+			return found_env(new_cmd);
 		}
 		if (cmd[j] == '$' && cmd[j + 1] == '$')
 		{
@@ -82,11 +79,11 @@ char *found_env(char *cmd)
 			ft_strcat(new_cmd, cmd + j + 2);
 			free(pid);
 			free(cmd);
-			return new_cmd;
+			return found_env(new_cmd);
 		}
 		if (cmd[j] == '$')
 		{
-			i = j + 1;
+			int i = j + 1;
 			int quote_count = 0;
 			while (cmd[i] == '"')
 			{
@@ -126,7 +123,7 @@ char *found_env(char *cmd)
 				temp[j] = '\0';
 				ft_strcat(temp, cmd + i);
 				free(cmd);
-				return temp;
+				return found_env(temp);
 			}
 			new_cmd = malloc(j + ft_strlen(value) + ft_strlen(cmd + i) + 1);
 			if (!new_cmd)
@@ -135,14 +132,15 @@ char *found_env(char *cmd)
 			new_cmd[j] = '\0';
 			ft_strcat(new_cmd, value);
 			ft_strcat(new_cmd, cmd + i);
-			char *result = found_env(new_cmd);
-			return result;
+			free(cmd);
+			return found_env(new_cmd);
 		}
 		j++;
 	}
 	char *returned_cmd = ft_strdup(cmd);
 	if (!returned_cmd)
 		return (free(cmd), NULL);
+	free(cmd);
 	return returned_cmd;
 }
 
