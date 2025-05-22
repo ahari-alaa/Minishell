@@ -33,6 +33,13 @@ int main(void)
             free_tokens(tokens, input);
             continue ;
         }
+        commands = unquote_cmd_list(commands);
+        if (!commands)
+        {
+            free_cmd_list(commands);
+            free_tokens(tokens, input);
+            continue ;
+        }
         if (commands)
         {
             t_cmd *current = commands;

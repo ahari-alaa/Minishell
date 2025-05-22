@@ -86,6 +86,7 @@ int				ft_isredirect(t_token_type type);
 int				count_args(t_token *token);
 t_token			*check_quoted(char *str);
 t_cmd			*expand_cmd_list(t_cmd *cmd_head);
+t_cmd *unquote_cmd_list(t_cmd *cmd_head);
 
 /*------------ tools for parsing ----------------*/
 int				is_quote(char c);
