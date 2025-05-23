@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/22 11:43:42 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/23 20:35:30 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,10 +167,20 @@ static void function_herdoc(t_file *file)
 		free(line);
 	}
 	close(fd);
-	fd = open(filename,O_RDONLY);
+	fd = open(filename, O_RDONLY);
+	if (fd == -1)
+	{
+		ft_putstr_fd_up("minishell: dup2", 2);
+		unlink(filename);
+		free(filename);
+		exit (1);
+	}
 	unlink(filename);// delet the fd after opening 
+	free(filename);
 	dup2(fd,0);
 	close(fd);
+	signal(SIGINT, handler_sig);
+    signal(SIGQUIT, handler_sig);
 }
 
 void redirections(t_cmd *cmd)

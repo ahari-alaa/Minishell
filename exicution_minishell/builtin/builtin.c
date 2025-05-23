@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:48:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/22 12:15:51 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/23 20:29:07 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ int is_builtin(char *command)
 
 t_env *execut_bultin(t_cmd **cmd, t_env *env_list)
 {
-
     if (ft_strcmp(cmd[0]->cmd[0], "cd") == 0)
         env_list = ft_cd(cmd, env_list);
     else if (ft_strcmp(cmd[0]->cmd[0], "echo") == 0)

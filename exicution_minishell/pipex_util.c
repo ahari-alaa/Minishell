@@ -6,12 +6,13 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:59 by maskour           #+#    #+#             */
-/*   Updated: 2025/04/25 18:47:24 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/23 20:29:07 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../minishell.h"
+
 static void	free_split(char **str)
 {
 	int	i;
