@@ -6,46 +6,36 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/23 20:42:49 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/24 13:55:23 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../minishell.h"
+
 static char **convert(t_env *env_list)
 {
     int count = 0;
-    int i = -1;
+    int i = 0;
     char **env_arry;
     t_env *current = env_list;
-
-    // Count environment variables
     while (current)
     {
         count++;
         current = current->next;
     }
-
-    env_arry = malloc (sizeof(char *) * (count + 1));
+    env_arry = malloc(sizeof(char*) * (count + 1));
     if (!env_arry)
         return (NULL);
-
     current = env_list;
-    while (++i < count && current)
+    while (i < count)
     {
-        env_arry[i] = ft_strdup(current->data_env); // Make a copy instead of direct assignment
-        if (!env_arry[i])
-        {
-            // Cleanup if allocation fails
-            while (--i >= 0)
-                free(env_arry[i]);
-            free(env_arry);
-            return (NULL);
-        }
+        env_arry[i] = current->data_env;
         current = current->next;
+        i++;/* code */
     }
     env_arry[count] = NULL;
-    return (env_arry);
+    return (env_arry);    
 }
 void	ft_putstr_fd_up(char *s, int fd)
 {
@@ -173,8 +163,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
     }
     
     // Cleanup
-    if (prev_pipe != -1) 
-        close(prev_pipe);
+    if (prev_pipe != -1) close(prev_pipe);
     while (wait(NULL) > 0);
 }
 
@@ -185,8 +174,6 @@ int exicut(t_cmd **cmd, t_env *env_list)
         return (1);
     t_cmd *current = *cmd;
     char **env = convert(env_list);
-    if (!env)
-        return (1);
     while (current)
     {
         cmd_count++;
@@ -203,5 +190,6 @@ int exicut(t_cmd **cmd, t_env *env_list)
     }
     else
         execute_pipeline(cmd, cmd_count,env);
+    free(env);
     return (0);
 }
