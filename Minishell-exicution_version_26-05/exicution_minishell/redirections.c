@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 18:19:46 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/26 22:30:06 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,19 +133,22 @@ static void *get_rundem_name(void)
         if (!tmp)
             return (NULL);
 
-        filename = tmp;
+        filename = tmp; // take ownership
+        // Don't free(tmp)!
+
         fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
         if (fd != -1)
         {
             close(fd);
-            return (filename);
+            return (filename); // caller must free this
         }
-        
+
         free(filename);
         count++;
     }
     return (NULL);
 }
+
 // static void function_herdoc(t_file *file)
 // {
 // 	char *filename = get_rundem_name();//THIS TO CREAT RANDEM FILE;
@@ -292,19 +295,21 @@ static int function_herdoc(t_file *file)
     char *line;
     printf("delimiter is : %s\n", file->name);
     while (1) {
-        free(line);
         line = readline("> ");
         if (!line)
             break;
-        if (ft_strcmp(line, file->name))
+        if (!ft_strcmp(line, file->name))
         {
+            free(filename);
             free(line);
             return (1);
         }
         write(fd, line, ft_strlen(line));
         write(fd, "\n", 1);
+        free(line);
     }
-    free(line);
+    if (line)
+        free (line);
     close(fd);
 
     fd = open(filename, O_RDONLY);
