@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/28 16:09:39 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/28 22:04:50 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,7 @@
 //UPDATE  put the PWD
 //UPDate OLDPWD
 //GO TO THE DIRECTION USE GETDR AND GETENV FUNCTIONS
-static int count_cmd(t_cmd **cmd)
-{
-    int i= 0;
-    if (!cmd || !cmd[0] || !cmd[0]->cmd)
-        return (0);
-    while (cmd[0]->cmd[i])
-        i++;
-    return (i);
-}
+
 static void update_env_var(t_env *data_env, char *key, char *dest)
 {
     t_env *current = data_env;
@@ -47,15 +39,9 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env)
     char pwd_update[PATH_MAX]; // Buffer for new PWD
     char oldpwd_update[PATH_MAX]; // Buffer for old PWD
     char *path = NULL;
-    int arg_count = count_cmd(cmd);
     t_cmd *cmd_path = *cmd;
     if (!cmd_path->cmd[1])
         return (data_env);
-    // if (arg_count > 1)
-    // {
-    //     ft_putstr_fd_up("minishell: cd: too many arguments\n", 2);
-    //     return (data_env);
-    // }
 
     // Save current directory in oldpwd_update
     if (!getcwd(oldpwd_update, PATH_MAX))
@@ -65,7 +51,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env)
     }
 
     // Determine path to change to
-    if (arg_count == 0 && (cmd_path->cmd[1] && !ft_strcmp(cmd_path->cmd[1], "~")))
+    if (cmd_path->cmd[1] && !ft_strcmp(cmd_path->cmd[1], "~"))
         {
             path = search_env(data_env,"HOME");
             printf("%s\n", path);
@@ -93,8 +79,6 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env)
     {
         ft_putstr_fd_up("minishell: cd: ", 2);
         perror(path);
-        if ((cmd_path->cmd[1] && (!ft_strcmp(cmd_path->cmd[1], "~") || !ft_strcmp(cmd_path->cmd[1], "-"))))
-            free(path);
         return(data_env);
     }
 
@@ -115,7 +99,5 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env)
         ft_putstr_fd_up(pwd_update, 1); // Should print new directory (OLDPWD)
         ft_putstr_fd_up("\n", 1);
     }
-    if ((cmd_path->cmd[1] && (!ft_strcmp(cmd_path->cmd[1], "~") || !ft_strcmp(cmd_path->cmd[1], "-"))))
-        free(path);
     return (data_env);
 }

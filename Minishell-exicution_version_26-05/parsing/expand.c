@@ -3,26 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/05/13 12:15:00 by ahari            ###   ########.fr       */
+/*   Updated: 2025/05/28 23:26:12 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char *ft_exit_status(void)
+static char *ft_exit_status(t_shell *exit_stat)
 {
-	return ft_itoa(0);
+	return ft_itoa(exit_stat->exit_status);
 }
 
-int is_valid_var_char(char c)
+static int is_valid_var_char(char c)
 {
 	return (ft_isalnum(c) || c == '_');
 }
 
-int get_var_name_length(char *str, int start)
+static int get_var_name_length(char *str, int start)
 {
 	int len = 0;
 
@@ -31,7 +31,7 @@ int get_var_name_length(char *str, int start)
 	return len;
 }
 
-char *build_new_command(char *cmd, int pos, char *replacement, int skip_len)
+static char *build_new_command(char *cmd, int pos, char *replacement, int skip_len)
 {
 	char *new_cmd;
 	int new_len = ft_strlen(cmd) - skip_len + ft_strlen(replacement);
@@ -46,13 +46,13 @@ char *build_new_command(char *cmd, int pos, char *replacement, int skip_len)
 	return new_cmd;
 }
 
-char *handle_special_var(char *cmd, int pos)
+static char *handle_spcial_var(char *cmd, int pos,t_shell *exited)
 {
 	char *replacement = NULL;
 	char *new_cmd;
 
 	if (cmd[pos + 1] == '?')
-		replacement = ft_exit_status();
+		replacement = ft_exit_status(exited);
 	else if (cmd[pos + 1] == '0')
 		replacement = ft_strdup("./minishell");
 	else if (cmd[pos + 1] == '$')
@@ -66,7 +66,7 @@ char *handle_special_var(char *cmd, int pos)
 	return new_cmd;
 }
 
-char *handle_env_var(char *cmd, int pos)
+static char *handle_env_var(char *cmd, int pos)
 {
 	int var_start = pos + 1;
 	int var_len = get_var_name_length(cmd, var_start);
@@ -83,7 +83,7 @@ char *handle_env_var(char *cmd, int pos)
 	return new_cmd;
 }
 
-char *found_env(char *cmd)
+static char *found_env(char *cmd, t_shell *shell_ctx)
 {
 	int pos = 0;
 	int in_single_quotes = 0;
@@ -118,11 +118,11 @@ char *found_env(char *cmd)
 				continue;
 			}
 			if (cmd[pos + 1] == '?' || cmd[pos + 1] == '0' || cmd[pos + 1] == '$')
-				new_cmd = handle_special_var(cmd, pos);
+				new_cmd = handle_spcial_var(cmd, pos, shell_ctx);
 			else
 				new_cmd = handle_env_var(cmd, pos);
 			if (new_cmd)
-				return (free(cmd), found_env(new_cmd));
+				return (free(cmd), found_env(new_cmd, shell_ctx));
 		}
 		pos++;
 	}
@@ -130,7 +130,7 @@ char *found_env(char *cmd)
 	return (free(cmd), result);
 }
 
-t_cmd *expand_cmd(t_cmd *cmd)
+static t_cmd *expand_cmd(t_cmd *cmd, t_shell *shell_ctx)
 {
 	int i = 0;
 
@@ -138,7 +138,7 @@ t_cmd *expand_cmd(t_cmd *cmd)
 		return NULL;
 	while (cmd->cmd[i])
 	{
-		char *expanded = found_env(ft_strdup(cmd->cmd[i]));
+		char *expanded = found_env(ft_strdup(cmd->cmd[i]),shell_ctx);
 		if (!expanded)
 			return NULL;
 		free(cmd->cmd[i]);
@@ -148,7 +148,7 @@ t_cmd *expand_cmd(t_cmd *cmd)
 	return cmd;
 }
 
-t_cmd *expand_file(t_cmd *cmd)
+static t_cmd *expand_file(t_cmd *cmd, t_shell *shell_ctx)
 {
 	int i = 0;
 
@@ -156,7 +156,7 @@ t_cmd *expand_file(t_cmd *cmd)
 		return NULL;
 	while (i < cmd->file_count)
 	{
-		char *expanded = found_env(ft_strdup(cmd->files[i].name));
+		char *expanded = found_env(ft_strdup(cmd->files[i].name),shell_ctx);
 		if (!expanded)
 		{
 			write(2, "minishell: ", 12);
@@ -171,15 +171,15 @@ t_cmd *expand_file(t_cmd *cmd)
 	return cmd;
 }
 
-t_cmd *expand_cmd_list(t_cmd *cmd_head)
+t_cmd *expand_cmd_list(t_cmd *cmd_head, t_shell *shell_ctx)
 {
 	t_cmd *current = cmd_head;
 
 	while (current)
 	{
-		if (!expand_cmd(current))
+		if (!expand_cmd(current,shell_ctx))
 			return NULL;
-		if (!expand_file(current))
+		if (!expand_file(current,shell_ctx))
 			return NULL;
 		current = current->next;
 	}

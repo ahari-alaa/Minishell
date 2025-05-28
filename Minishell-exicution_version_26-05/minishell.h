@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/05/26 22:07:50 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/28 23:20:52 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,10 @@ typedef struct s_env
 	char *data_env;//this the path like use/bin....
 	struct s_env *next; /* data */
 }t_env;
-
+typedef struct s_shell
+{
+    int exit_status;
+} t_shell;
 /*---------------function for free--------------------*/
 void			free_tokens(t_token *tokens, char *input);
 void			free_cmd(t_cmd *cmd);
@@ -102,7 +105,7 @@ t_cmd			*parse_commands(t_token *tokens);
 int				ft_isredirect(t_token_type type);
 int				count_args(t_token *token);
 t_token			*check_quoted(char *str);
-t_cmd			*expand_cmd_list(t_cmd *cmd_head);
+t_cmd *expand_cmd_list(t_cmd *cmd_head, t_shell *shell_ctx);
 t_cmd			*unquote_cmd_list(t_cmd *cmd_head);
 
 /*------------ tools for parsing ----------------*/
@@ -156,7 +159,7 @@ char	*ft_strstr(const char *haystack, const char *needle);
 
 char	*ft_strtrim(char const *s1, char const *set);
 /*---------------exicution_util-----------------------*/
-int exicut(t_cmd **cmd, t_env *env_list);
+int exicut(t_cmd **cmd, t_env *env_list, t_shell *shell_ctx);
 // int execute_single_command(t_cmd **cmd, char **envp);
 int redirections(t_cmd *cmd);
 char	*find_path(char *cmd, char **env);

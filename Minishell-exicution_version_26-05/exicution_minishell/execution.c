@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 18:17:52 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/28 23:37:05 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,10 +108,13 @@ static void cmd_process(t_cmd *cmd, char **env)
         return ;
 	}
     if(execve(cmd_path,cmd->cmd, env) == -1)
-        handle_cmd_errors(cmd_path);
+        {
+            handle_cmd_errors(cmd_path);
+            free(cmd_path);
+        }
 }
 
-static void execute_single_command(t_cmd **cmd, char **envp)
+static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 {
     pid_t id;
     int status;
@@ -124,14 +127,23 @@ static void execute_single_command(t_cmd **cmd, char **envp)
         exit(0);
     }
     else if (id > 0)
+    {
         waitpid(id, &status, 0);
-    else
+        if (WIFEXITED(status))
+            shell_ctx->exit_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            shell_ctx->exit_status = 128 + WTERMSIG(status);
+        else
+            shell_ctx->exit_status = 1;
+        }
+        else
         {
             perror("fork fild");
             return ;
         }
+
 }
-static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
+static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *shell_ctx)
 {
     if (!cmds || cmd_count <= 0)
         return;
@@ -139,6 +151,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
     int pipes[2];
     pid_t pid;
     int prev_pipe = -1;
+    pid_t last_pid = -1;
     int i = 0;
 
     while (i < cmd_count && cmds[i] != NULL)
@@ -215,6 +228,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
                 close(pipes[1]);
                 prev_pipe = pipes[0];
             }
+            last_pid = pid;
         }
         else {
             perror("minishell: fork");
@@ -228,9 +242,20 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
         close(prev_pipe);
 
     // Wait for all child processes
-    while (wait(NULL) > 0);
+    int wstatus = 0;
+    pid_t wpid;
+    while ((wpid = wait(&wstatus)) > 0) {
+        if (wpid == last_pid) {
+            if (WIFEXITED(wstatus))
+                shell_ctx->exit_status = WEXITSTATUS(wstatus);
+            else if (WIFSIGNALED(wstatus))
+                shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
+            else
+                shell_ctx->exit_status = 1;
+        }
+    }
 }
-int exicut(t_cmd **cmd, t_env *env_list)
+int exicut(t_cmd **cmd, t_env *env_list, t_shell *shell_ctx)
 {
     int cmd_count = 0;
     if (!cmd || !*cmd)
@@ -256,7 +281,7 @@ int exicut(t_cmd **cmd, t_env *env_list)
             free_env(env);
             return (0);
         }
-        execute_single_command(cmd, env);
+        execute_single_command(cmd, env, shell_ctx);
     }
     else
     {
@@ -274,7 +299,7 @@ int exicut(t_cmd **cmd, t_env *env_list)
             current = current->next;
         }
         cmd_arr[cmd_count] = NULL;
-        execute_pipeline(cmd_arr, cmd_count, env);
+        execute_pipeline(cmd_arr, cmd_count, env, shell_ctx);
         free(cmd_arr);
     }
     free_env(env);
