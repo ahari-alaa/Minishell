@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 22:12:09 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/28 16:09:39 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,11 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env)
     t_cmd *cmd_path = *cmd;
     if (!cmd_path->cmd[1])
         return (data_env);
-    if (arg_count > 1)
-    {
-        ft_putstr_fd_up("minishell: cd: too many arguments\n", 2);
-        return (data_env);
-    }
+    // if (arg_count > 1)
+    // {
+    //     ft_putstr_fd_up("minishell: cd: too many arguments\n", 2);
+    //     return (data_env);
+    // }
 
     // Save current directory in oldpwd_update
     if (!getcwd(oldpwd_update, PATH_MAX))
