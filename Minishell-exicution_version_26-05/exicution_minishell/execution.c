@@ -6,12 +6,22 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/28 23:37:05 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/29 13:25:00 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../minishell.h"
+static void ignore_sigint(void)
+{
+    signal(SIGINT, SIG_IGN);
+}
+
+static void restore_sigint(void)
+{
+    write(1, "\n", 1);
+    signal(SIGINT, SIG_IGN);
+}
 static void free_env(char **env)
 {
     if (!env)
@@ -118,30 +128,34 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 {
     pid_t id;
     int status;
+    
+    ignore_sigint();  // Ignore SIGINT in parent while child is running
     id = fork();
-    // printf("single_command\n");
     if (id == 0)
     {
-        signal(SIGQUIT, handler_sig);
-        cmd_process(*cmd,envp);
+        // Child process - restore default SIGINT handler
+        signal(SIGINT, SIG_DFL);
+        signal(SIGQUIT, SIG_DFL);
+        cmd_process(*cmd, envp);
         exit(0);
     }
     else if (id > 0)
     {
         waitpid(id, &status, 0);
+        restore_sigint();  // Restore SIGINT handler in parent
+        
         if (WIFEXITED(status))
             shell_ctx->exit_status = WEXITSTATUS(status);
         else if (WIFSIGNALED(status))
             shell_ctx->exit_status = 128 + WTERMSIG(status);
         else
             shell_ctx->exit_status = 1;
-        }
-        else
-        {
-            perror("fork fild");
-            return ;
-        }
-
+    }
+    else
+    {
+        perror("fork failed");
+        restore_sigint();
+    }
 }
 static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *shell_ctx)
 {

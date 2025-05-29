@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/28 23:38:20 by maskour          ###   ########.fr       */
+/*   Updated: 2025/05/29 13:29:09 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 
 #include "minishell.h"
 // this main for marge
+void ff(void)
+{
+    system("leaks minishell");
+}
 int main(int ac,char **av,char **env)
 {
     (void)ac;
@@ -29,15 +33,13 @@ int main(int ac,char **av,char **env)
     shell_ctx = malloc (sizeof(t_shell));
     if(!shell_ctx)
         exit(1);
-    shell_ctx->exit_status = 0;  
+    shell_ctx->exit_status = 0; 
+    atexit(ff); 
     while (1)
     {
         input = readline("minishell$ ");
         if (!input)
-        {
-
-
-            
+        {            
             printf("exit\n");
             break ;
         }
