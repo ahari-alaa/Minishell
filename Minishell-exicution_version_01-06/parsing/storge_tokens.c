@@ -94,7 +94,17 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
     }
     return 1;
 }
-
+//add this just to test it 
+static int count_redirections(t_token *start) {
+    int count = 0;
+    t_token *current = start;
+    while (current && current->type != TOKEN_PIPE) {
+        if (ft_isredirect(current->type))
+            count++;
+        current = current->next;
+    }
+    return count;
+}
 static t_cmd *parse_single_command(t_token **tokens)
 {
     t_cmd *cmd;
@@ -107,7 +117,11 @@ static t_cmd *parse_single_command(t_token **tokens)
     cmd->cmd = malloc(sizeof(char *) * (argc + 1));
     if (!cmd->cmd)
         return (free(cmd), NULL);
-    cmd->files = malloc(sizeof(t_file) * (argc + 1));
+    // i'm add this to test is the problem solvde 
+    int redir_count = count_redirections(start);
+cmd->files = malloc(sizeof(t_file) * (redir_count + 1));
+    //this is the real alocatoin
+    // cmd->files = malloc(sizeof(t_file) * (argc + 1));
     if (!cmd->files)
         return (free(cmd->cmd), free(cmd), NULL);
     if (!parse_arguments(cmd, tokens) || !parse_redirections(cmd, &start))
