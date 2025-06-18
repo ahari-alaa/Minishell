@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/05/28 23:26:12 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/18 16:36:44 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static char *handle_spcial_var(char *cmd, int pos,t_shell *exited)
 	else if (cmd[pos + 1] == '0')
 		replacement = ft_strdup("./minishell");
 	else if (cmd[pos + 1] == '$')
-		replacement = ft_itoa(getpid());
+		replacement = ft_strdup("$");
 	else
 		return NULL;
 	if (!replacement)

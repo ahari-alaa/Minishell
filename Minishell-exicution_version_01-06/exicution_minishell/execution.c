@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/29 13:25:00 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/18 16:16:50 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,9 +112,9 @@ static void cmd_process(t_cmd *cmd, char **env)
     cmd_path = find_path(cmd->cmd[0], env);
     if (!cmd_path)
     {
-		ft_putstr_fd_up("minishell:2 ", 2);
+		ft_putstr_fd_up("minishell:", 2);
     	ft_putstr_fd_up(cmd->cmd[0], 2);
-    	ft_putstr_fd_up(": command not found\n", 2);
+    	ft_putstr_fd_up("command not found\n", 2);
         return ;
 	}
     if(execve(cmd_path,cmd->cmd, env) == -1)

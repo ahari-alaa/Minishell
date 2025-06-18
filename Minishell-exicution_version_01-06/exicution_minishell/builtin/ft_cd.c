@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/28 22:04:50 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/18 16:37:28 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env)
         perror("minishell: cd");
         return (data_env);
     }
-
     // Determine path to change to
     if (cmd_path->cmd[1] && !ft_strcmp(cmd_path->cmd[1], "~"))
         {

@@ -6,11 +6,84 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 17:39:24 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 22:15:46 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/18 20:22:55 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+t_env *new_env(char *data_env)
+{
+    t_env *node;
+    node = malloc(sizeof(t_env));
+    if (!node)
+        return (NULL);
+    node->data_env = ft_strdup(data_env);
+    if (!node->data_env)
+    {
+        free(node);
+        return (NULL);
+    }
+    node->next = NULL;
+    return (node);
+}
+
+static t_env *default_env(t_env *env_list)
+{
+    t_env *tail = NULL;
+    t_env *new = NULL;
+    char cwd[1024];
+    char pwd_entry[1100];
+    // PWD
+    if (getcwd(cwd, sizeof(cwd))) 
+    {
+       ft_strcpy(pwd_entry, "PWD=");
+       ft_strcat(pwd_entry, cwd);
+        new = new_env(pwd_entry);
+        if (!new)
+            return NULL;
+        env_list = tail = new;
+    }
+    // SHLVL
+    new = new_env("SHLVL=1");
+    if (!new) {
+        // Free the previous node(s)
+        while (env_list) {
+            t_env *tmp = env_list;
+            env_list = env_list->next;
+            free(tmp->data_env);
+            free(tmp);
+        }
+        return NULL;
+    }
+    tail->next = new;
+    tail = new;
+    // _
+    new = new_env("_=/usr/bin/env");
+    if (!new) {
+        while (env_list) {
+            t_env *tmp = env_list;
+            env_list = env_list->next;
+            free(tmp->data_env);
+            free(tmp);
+        }
+        return NULL;
+    }
+    tail->next = new;
+    tail = new;
+    // PATH
+    new = new_env("PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin");
+    if (!new) {
+        while (env_list) {
+            t_env *tmp = env_list;
+            env_list = env_list->next;
+            free(tmp->data_env);
+            free(tmp);
+        }
+        return NULL;
+    }
+    tail->next = new;
+    return env_list;
+}
 
 void free_env_list(t_env *env_list)
 {
@@ -36,21 +109,7 @@ char *search_env(t_env *env, const char *key)
     }
     return (NULL);
 }
-t_env *new_env(char *data_env)
-{
-    t_env *node;
-    node = malloc(sizeof(t_env));
-    if (!node)
-        return (NULL);
-    node->data_env = ft_strdup(data_env);
-    if (!node->data_env)
-    {
-        free(node);
-        return (NULL);
-    }
-    node->next = NULL;
-    return (node);
-}
+
 void add_env(t_env **env_list, t_env *new_node)
 {
     t_env *tmp;
@@ -64,13 +123,15 @@ void add_env(t_env **env_list, t_env *new_node)
         tmp->next = new_node;
     }
 }
+
 t_env *file_inv(char **env)
 {
     t_env *env_list = NULL;
     t_env *new = NULL;
     int i = 0;
-    if (!env)
-        return NULL;
+    if (!env || !env[0])
+        return default_env(env_list);
+    
     while(env[i])
     {
         new = new_env(env[i]);

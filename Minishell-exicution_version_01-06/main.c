@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/01 15:00:45 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/18 20:21:55 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,13 @@
 // {
 //     system("leaks minishell");
 // }
+static void print_env_list(t_env *env) {
+    while (env) {
+        printf("%s\n", env->data_env);
+        env = env->next;
+    }
+}
+
 int main(int ac,char **av,char **env)
 {
     (void)ac;
@@ -27,6 +34,7 @@ int main(int ac,char **av,char **env)
     t_cmd       *commands;
     t_env *env_list;
     env_list = file_inv(env);
+    print_env_list(env_list);
     signal(SIGINT, handler_sig); 
     signal(SIGQUIT, handler_sig); 
     t_shell *shell_ctx;

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   store_tokens.c                                     :+:      :+:    :+:   */
+/*   storge_tokens.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/05/13 16:00:00 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/18 16:32:57 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static int parse_arguments(t_cmd *cmd, t_token **tokens)
         {
             if (!current->next || current->next->type != TOKEN_WORD)
             {
-                ft_putstr_fd("bash: syntax error near unexpected token `", 2, 0);
+                ft_putstr_fd("minishell: syntax error near unexpected token `", 2, 0);
                 if (current->next && current->next->value)
                     ft_putstr_fd(current->next->value, 2, 0);
                 else
@@ -165,6 +165,5 @@ t_cmd *parse_commands(t_token *tokens)
         }
         i++;
     }
-
     return cmd_head;
 }

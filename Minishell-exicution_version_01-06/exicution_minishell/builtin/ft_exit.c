@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 19:01:03 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 19:39:10 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/18 17:23:13 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ void ft_exit(t_cmd **cmd)
         i++; 
     while(current_cmd->cmd[1][i])
     {  
-    if (!ft_isdigit(current_cmd->cmd[1][i]))
-    {
-        ft_putstr_fd_up("numeric argument required",2);
-        exit(2);
-    }
+        if (!ft_isdigit(current_cmd->cmd[1][i]))
+        {
+            ft_putstr_fd_up("numeric argument required",2);
+            exit(2);
+        }
         i++;
     }
     if (current_cmd->cmd[2] != NULL)
@@ -38,6 +38,6 @@ void ft_exit(t_cmd **cmd)
     status = ft_atoi(current_cmd->cmd[1]) % 256;
     if (status < 0)
          status +=256;
+    printf("exit");
     exit(status);
-
 }
