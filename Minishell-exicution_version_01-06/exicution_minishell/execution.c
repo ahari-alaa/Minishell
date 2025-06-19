@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 17:00:11 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 17:31:16 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,7 @@ static void ignore_sigint(void)
 
 static void restore_sigint(void)
 {
-    write(1, "\n", 1);
-    signal(SIGINT, SIG_IGN);
+    signal(SIGINT, handler_sig);
 }
 static void free_env(char **env)
 {
@@ -100,35 +99,34 @@ static void handle_cmd_errors(char *cmd_path)
 static void cmd_process(t_cmd *cmd, char **env)
 {
     char *cmd_path;
-    // char **cmd_arg;
-    // char **cmd_arg;
     if (!cmd)
     { 
         handle_cmd_errors(NULL);
-        return ;
+        exit(1); // Exit with error
     }
     if (redirections(cmd))
-        exit(1) ;
-        // that's to handel the rederections
+        exit(1); // Error in redirection
+
     if (!cmd->cmd || !cmd->cmd[0])
     {   
         handle_cmd_errors(NULL);
-        return ;
+        exit(1); // Exit with error
     }
-    // cmd_arg = split_cmd(cmd);
     cmd_path = find_path(cmd->cmd[0], env);
     if (!cmd_path)
     {
-		ft_putstr_fd_up("minishell:", 2);
-    	ft_putstr_fd_up(cmd->cmd[0], 2);
-    	ft_putstr_fd_up("command not found", 2);
-        return ;
-	}
-    if(execve(cmd_path,cmd->cmd, env) == -1)
+        ft_putstr_fd_up("minishell:", 2);
+        ft_putstr_fd_up(cmd->cmd[0], 2);
+        ft_putstr_fd_up(": command not found\n", 2);
+        exit(127); // Command not found exit code
+    }
+    if (execve(cmd_path, cmd->cmd, env) == -1)
     {
         handle_cmd_errors(cmd_path);
         free(cmd_path);
+        exit(126); // Cannot execute
     }
+    exit(0); // Should never reach here
 }
 
 static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
@@ -144,7 +142,7 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
         cmd_process(*cmd, envp);
-        exit(0);
+        shell_ctx->exit_status = 0;
     }
     else if (id > 0)
     {
@@ -221,7 +219,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
             if (!path) {
                 ft_putstr_fd_up("minishell: ", 2);
                 ft_putstr_fd_up(cmds[i]->cmd[0], 2);
-                ft_putstr_fd_up(": command not found", 2);
+                ft_putstr_fd_up(": command not found\n", 2);
                 exit(127);
             }
             // If execve succeeds, it won't return
@@ -240,7 +238,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
             // Parent process
             if (i > 0)
                 close(prev_pipe);
-            if (i < cmd_count - 1) {
+            if (i < cmd_count - 1) 
+            {
                 close(pipes[1]);
                 prev_pipe = pipes[0];
             }

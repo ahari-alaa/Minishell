@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 15:56:07 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 17:17:04 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,7 @@
 //UPDATE  put the PWD
 //UPDate OLDPWD
 //GO TO THE DIRECTION USE GETDR AND GETENV FUNCTIONS
-static void print_env_list(t_env *data_env)
-{
-    t_env *current = data_env;
-    while (current)
-    {
-        printf("%s\n", current->data_env);
-        current = current->next;
-    }
-}
+
 static void add_oldpwd (t_env *data_env)
 {
     t_env *curreent = data_env;
@@ -130,7 +122,6 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
     update_env_var(data_env, "OLDPWD=", oldpwd_update);
     // Update the pwd
     update_env_var(data_env, "PWD=", pwd_update);
-    print_env_list(data_env);
     // Print new directory if cd -
     if (cmd_path->cmd[1] && !ft_strcmp(cmd_path->cmd[1], "-"))
     {

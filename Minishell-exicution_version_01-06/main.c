@@ -6,20 +6,13 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 16:40:59 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 17:16:44 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 
 #include "minishell.h"
-
-static void print_env_list(t_env *env) {
-    while (env) {
-        printf("%s\n", env->data_env);
-        env = env->next;
-    }
-}
 
 int main(int ac,char **av,char **env)
 {
@@ -30,7 +23,6 @@ int main(int ac,char **av,char **env)
     t_cmd       *commands;
     t_env *env_list;
     env_list = file_inv(env);
-    print_env_list(env_list);
     signal(SIGINT, handler_sig); 
     signal(SIGQUIT, handler_sig); 
     t_shell *shell_ctx;
