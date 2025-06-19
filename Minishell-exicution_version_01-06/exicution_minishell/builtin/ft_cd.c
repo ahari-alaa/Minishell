@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/18 16:37:28 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 13:23:04 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static void update_env_var(t_env *data_env, char *key, char *dest)
     }
 }
 
-t_env *ft_cd(t_cmd **cmd, t_env *data_env)
+t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
 {
     char pwd_update[PATH_MAX]; // Buffer for new PWD
     char oldpwd_update[PATH_MAX]; // Buffer for old PWD

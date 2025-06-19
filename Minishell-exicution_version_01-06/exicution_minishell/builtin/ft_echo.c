@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:22 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/14 20:29:02 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 13:23:15 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int check_new_line(char *cmd)
     }
     return (1);
 }
-void ft_echo(t_cmd **cmd)
+void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
 {
     int i = 1;
     int n_nb = 0;

@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/01 20:23:46 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 13:30:31 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,15 +165,15 @@ int redirections(t_cmd *cmd);
 char	*find_path(char *cmd, char **env);
 
 /*---------------------builtins-----------------------*/
-t_env *execut_bultin(t_cmd **cmd, t_env *env_list);
+t_env *execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell);
 int is_builtin(char *command);
-t_env *ft_cd(t_cmd **cmd, t_env *data_env);
-void ft_echo(t_cmd **cmd);
-void ft_env(t_env *env_list);
-void ft_exit(t_cmd **cmd);
-void ft_pwd();
-t_env *ft_unset(t_cmd **cmd, t_env *env);
-void ft_export(t_cmd **cmd, t_env **envp);
+t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx);
+void ft_echo(t_cmd **cmd, t_shell *shell_ctx);
+void ft_env(t_env *env_list, t_shell *shell_ctx);
+void ft_exit(t_cmd **cmd, t_shell *shell);
+void ft_pwd(t_shell *shell_ctx);
+t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx);
+void ft_export(t_cmd **cmd, t_env **envp, t_shell *shell);
 
 /*---------------builtins-utils-----------------------*/
 char *search_env(t_env *env, const char *key);

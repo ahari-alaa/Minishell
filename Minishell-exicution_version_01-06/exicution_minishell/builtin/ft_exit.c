@@ -6,19 +6,20 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 19:01:03 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/18 17:23:13 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 13:08:45 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void ft_exit(t_cmd **cmd)
+void ft_exit(t_cmd **cmd, t_shell *shell)
 {
-    int status = 0;
+    int status = shell->exit_status;
     int i = 0;
     t_cmd *current_cmd = *cmd;
+    printf("exit\n");
     if (!current_cmd->cmd[1])
-        exit(0);
+        exit(shell->exit_status);
     if (current_cmd->cmd[1][i] == '+' || current_cmd->cmd[1][i] == '-')
         i++; 
     while(current_cmd->cmd[1][i])

@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/18 16:16:50 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 13:11:57 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,7 +291,7 @@ int exicut(t_cmd **cmd, t_env *env_list, t_shell *shell_ctx)
     {
         if (is_builtin((*cmd)->cmd[0]))
         {
-            env_list = execut_bultin(cmd, env_list);
+            env_list = execut_bultin(cmd, env_list, shell_ctx);
             free_env(env);
             return (0);
         }

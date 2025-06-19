@@ -6,13 +6,13 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:36 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 17:14:37 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 13:24:56 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-t_env *ft_unset(t_cmd **cmd, t_env *env)
+t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
 {
     t_env *current;
     t_env *prev;

@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:50:12 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/01 22:56:38 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 13:24:28 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,7 +268,7 @@ static void handle_export(t_env **env, char *cmd) {
 }
 
 // Export global function
-void ft_export(t_cmd **cmd_ptr, t_env **envp) // NOTE: envp is a pointer to pointer!
+void ft_export(t_cmd **cmd_ptr, t_env **envp, t_shell *shell) // NOTE: envp is a pointer to pointer!
 {
     t_cmd *cmd;
     int i;
