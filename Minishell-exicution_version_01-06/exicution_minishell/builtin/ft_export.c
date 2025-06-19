@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:50:12 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 13:24:28 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 15:07:49 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,9 +277,11 @@ void ft_export(t_cmd **cmd_ptr, t_env **envp, t_shell *shell) // NOTE: envp is a
 
     i = 1;
     cmd = *cmd_ptr;
-    if (cmd->cmd[0] && cmd->cmd[1] == NULL) {
+    if (cmd->cmd[0] && cmd->cmd[1] == NULL) 
+    {
         if (!cmd->cmd[1])
             sort_and_display_env(envp);
+        shell->exit_status = 0;
  // pass pointer value
         return;
     }
@@ -294,6 +296,7 @@ void ft_export(t_cmd **cmd_ptr, t_env **envp, t_shell *shell) // NOTE: envp is a
             handle_export(envp, cmd->cmd[i]);
         i++;
     }
+    shell->exit_status = 0;
 }
 // Check if the key is valid
 // static int is_valid_key(char *key) 

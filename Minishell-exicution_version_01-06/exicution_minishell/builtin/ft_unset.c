@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:36 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 13:24:56 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 15:08:20 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,5 +47,6 @@ t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
         }
         i++;
     }
+    shell_ctx->exit_status = 0;
     return (env);
 }

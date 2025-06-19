@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 17:39:24 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/18 20:22:55 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 15:18:21 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,11 @@ t_env *file_inv(char **env)
     while(env[i])
     {
         new = new_env(env[i]);
+        if (!ft_strncmp(env[i], "OLDPWD=", 7))
+        {
+            i++;
+            continue;
+        }
         if (!new)
         {
             free_env_list(env_list);

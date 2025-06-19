@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:17 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 13:23:26 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 15:08:42 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,4 +19,5 @@ void ft_env(t_env *env_list, t_shell *shell_ctx)
         printf("%s\n",env->data_env);
         env = env->next;
     }
+    shell_ctx->exit_status = 0;
 }

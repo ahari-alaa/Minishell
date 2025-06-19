@@ -6,18 +6,14 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/18 20:21:55 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 16:40:59 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 
 #include "minishell.h"
-// this main for marge
-// void ff(void)
-// {
-//     system("leaks minishell");
-// }
+
 static void print_env_list(t_env *env) {
     while (env) {
         printf("%s\n", env->data_env);
@@ -92,7 +88,7 @@ int main(int ac,char **av,char **env)
                 i++;
             }
         }
-        exicut(&commands, env_list,shell_ctx);
+        exicut(&commands, &env_list, shell_ctx);
         if(commands)
             free_cmd_list(commands);
         free_tokens(tokens, input);

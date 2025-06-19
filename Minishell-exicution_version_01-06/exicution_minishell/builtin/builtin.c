@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:48:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 13:21:57 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 15:04:51 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,18 @@ int is_builtin(char *command)
 t_env *execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell)
 {
     if (ft_strcmp(cmd[0]->cmd[0], "cd") == 0)
-        env_list = ft_cd(cmd, env_list, &shell->exit_status);
+        env_list = ft_cd(cmd, env_list, shell);
     else if (ft_strcmp(cmd[0]->cmd[0], "echo") == 0)
-        ft_echo(cmd, &shell->exit_status);
+        ft_echo(cmd, shell);
     else if(ft_strcmp(cmd[0]->cmd[0], "exit") == 0)
         ft_exit(cmd, shell);
     else if (ft_strcmp(cmd[0]->cmd[0], "export") == 0)
-     ft_export(cmd, &env_list, &shell->exit_status);
+     ft_export(cmd, &env_list, shell);
     else if (ft_strcmp(cmd[0]->cmd[0], "unset") == 0)
-        env_list = ft_unset(cmd, env_list, &shell->exit_status);
+        env_list = ft_unset(cmd, env_list, shell);
     else if (ft_strcmp(cmd[0]->cmd[0], "env") == 0)
-        ft_env(env_list, &shell->exit_status);
+        ft_env(env_list, shell);
     else if (ft_strcmp(cmd[0]->cmd[0], "pwd") == 0)
-        ft_pwd(&shell->exit_status);
+        ft_pwd(shell);
     return(env_list);
 }

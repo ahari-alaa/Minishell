@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/19 13:30:31 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 16:41:41 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,7 @@ char	*ft_strstr(const char *haystack, const char *needle);
 
 char	*ft_strtrim(char const *s1, char const *set);
 /*---------------exicution_util-----------------------*/
-int exicut(t_cmd **cmd, t_env *env_list, t_shell *shell_ctx);
+int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx);
 // int execute_single_command(t_cmd **cmd, char **envp);
 int redirections(t_cmd *cmd);
 char	*find_path(char *cmd, char **env);

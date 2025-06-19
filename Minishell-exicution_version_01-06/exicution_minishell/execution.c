@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 13:11:57 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 17:00:11 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,14 @@ static char **convert(t_env *env_list)
     int i = -1;
     char **env_arry;
     t_env *current = env_list;
-
+    if (!env_list)
+    {
+        env_arry = malloc(sizeof(char *) * 1);
+        if (!env_arry)
+            return NULL;
+        env_arry[0] = NULL;
+        return env_arry;
+    }
     // Count environment variables
     while (current)
     {
@@ -86,7 +93,7 @@ static void handle_cmd_errors(char *cmd_path)
 	{
 	    ft_putstr_fd_up("minishell: 1", 2);
         ft_putstr_fd_up(cmd_path, 2);
-        ft_putstr_fd_up(": execution failed\n", 2);
+        ft_putstr_fd_up(": execution failed", 2);
 	}
 }
 
@@ -114,14 +121,14 @@ static void cmd_process(t_cmd *cmd, char **env)
     {
 		ft_putstr_fd_up("minishell:", 2);
     	ft_putstr_fd_up(cmd->cmd[0], 2);
-    	ft_putstr_fd_up("command not found\n", 2);
+    	ft_putstr_fd_up("command not found", 2);
         return ;
 	}
     if(execve(cmd_path,cmd->cmd, env) == -1)
-        {
-            handle_cmd_errors(cmd_path);
-            free(cmd_path);
-        }
+    {
+        handle_cmd_errors(cmd_path);
+        free(cmd_path);
+    }
 }
 
 static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
@@ -143,7 +150,6 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
     {
         waitpid(id, &status, 0);
         restore_sigint();  // Restore SIGINT handler in parent
-        
         if (WIFEXITED(status))
             shell_ctx->exit_status = WEXITSTATUS(status);
         else if (WIFSIGNALED(status))
@@ -205,30 +211,26 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
                 ft_putstr_fd_up("minishell: empty command\n", 2);
                 exit(127);
             }
-
             // Handle redirections
             if (redirections(cmds[i]))
             {
                 exit(1);  // Redirection failed
             }
-
             // Find and execute command
             char *path = find_path(cmds[i]->cmd[0], env);
             if (!path) {
                 ft_putstr_fd_up("minishell: ", 2);
                 ft_putstr_fd_up(cmds[i]->cmd[0], 2);
-                ft_putstr_fd_up(": command not found\n", 2);
+                ft_putstr_fd_up(": command not found", 2);
                 exit(127);
             }
-
             // If execve succeeds, it won't return
             if (execve(path, cmds[i]->cmd, env) == -1)
             {
              handle_cmd_errors(path);
              free(path);
-             exit(126);   
+             exit(126);
             }
-            
             // If we get here, execve failed
             perror("minishell: execve");
             free(path);
@@ -269,13 +271,13 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
         }
     }
 }
-int exicut(t_cmd **cmd, t_env *env_list, t_shell *shell_ctx)
+int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
 {
     int cmd_count = 0;
-    if (!cmd || !*cmd)
+    if (!cmd || !*cmd || !env_list)
         return (1);
     t_cmd *current = *cmd;
-    char **env = convert(env_list);
+    char **env = convert(*env_list);
     if (!env)
         return (1);
 
@@ -291,7 +293,7 @@ int exicut(t_cmd **cmd, t_env *env_list, t_shell *shell_ctx)
     {
         if (is_builtin((*cmd)->cmd[0]))
         {
-            env_list = execut_bultin(cmd, env_list, shell_ctx);
+            *env_list = execut_bultin(cmd, *env_list, shell_ctx);
             free_env(env);
             return (0);
         }

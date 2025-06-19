@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:22 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 13:23:15 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/19 15:06:31 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,9 @@ void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
     int i = 1;
     int n_nb = 0;
     t_cmd *current_cmd = *cmd;
+    
     if (nb_args(current_cmd->cmd) > 1)
     {
-
         while (current_cmd->cmd[i] && check_new_line(current_cmd->cmd[i]))
         {
             n_nb = 1;
@@ -58,4 +58,5 @@ void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
     }
     if (n_nb == 0)
         printf("\n");
+    shell_ctx->exit_status = 0;
 }
