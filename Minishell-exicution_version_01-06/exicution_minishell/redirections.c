@@ -24,68 +24,68 @@ static int open_file(char *file, int mode)
     return (fd);
 }
 
-// static void *get_rundem_name(char *file_name)
-// {
-//     char *base = "tmp";
-//     char *filename;
-//     int fd;
-//     char *count_str;
-//     char *tmp;
+static void *get_rundem_name(char *file_name)
+{
+    // char *base = "tmp";
+    char *filename;
+    int fd;
+    char *count_str;
+    char *tmp;
 
-//     // First attempt with base name
-//     filename = ft_strdup(file_name);
-//     if (!filename)
-//         return (NULL);
+    // First attempt with base name
+    filename = ft_strdup(file_name);
+    if (!filename)
+        return (NULL);
 
-//     fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
-//     if (fd != -1)
-//     {
-//         close(fd);
-//         return (filename);
-//     }
-//     free(filename);
+    fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    if (fd != -1)
+    {
+        close(fd);
+        return (filename);
+    }
+    free(filename);
 
-//     // Try with numbered suffixes
-//     int count = 0;
-//     while (count < 1000)
-//     {
-//         count_str = ft_itoa(count);
-//         if (!count_str)
-//             return (NULL);
+    // Try with numbered suffixes
+    int count = 0;
+    while (count < 1000)
+    {
+        count_str = ft_itoa(count);
+        if (!count_str)
+            return (NULL);
 
-//         filename = ft_strjoin(file_name, "_");
-//         if (!filename)
-//         {
-//             free(count_str);
-//             return (NULL);
-//         }
+        filename = ft_strjoin(file_name, "_");
+        if (!filename)
+        {
+            free(count_str);
+            return (NULL);
+        }
 
-//         tmp = ft_strjoin(filename, count_str);
-//         free(filename);
-//         free(count_str);
+        tmp = ft_strjoin(filename, count_str);
+        free(filename);
+        free(count_str);
         
-//         if (!tmp)
-//             return (NULL);
+        if (!tmp)
+            return (NULL);
 
-//         filename = tmp; // take ownership
-//         // Don't free(tmp)!
+        filename = tmp; // take ownership
+        // Don't free(tmp)!
 
-//         fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
-//         if (fd != -1)
-//         {
-//             close(fd);
-//             return (filename); // caller must free this
-//         }
+        fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
+        if (fd != -1)
+        {
+            close(fd);
+            return (filename); // caller must free this
+        }
 
-//         free(filename);
-//         count++;
-//     }
-//     return (NULL);
-// }
+        free(filename);
+        count++;
+    }
+    return (NULL);
+}
 
 static int function_herdoc(t_file *file)
 {
-    char *filename = file->name;
+    char *filename = get_rundem_name(file->name);
     if (!filename) {
         perror("minishell: cannot create temporary file");
         return (1);
@@ -123,20 +123,16 @@ static int function_herdoc(t_file *file)
 int redirections(t_cmd *cmd)
 {
     if (!cmd || cmd->file_count <= 0)
-        return 0; // Nothing to do, considered success
-
+        return 0;
     int original_stdin = dup(STDIN_FILENO);
     int original_stdout = dup(STDOUT_FILENO);
     if (original_stdin == -1 || original_stdout == -1) {
         perror("minishell: dup");
         return 1;
     }
-
     int last_in_fd = -1;
     int last_out_fd = -1;
     int i;
-
-    // Only process the last heredoc so only it is prompted
     int last_heredoc_idx = -1;
     for (i = 0; i < cmd->file_count; ++i) {
         if (cmd->files[i].type == TOKEN_HEREDOC)
@@ -147,29 +143,27 @@ int redirections(t_cmd *cmd)
             goto cleanup;
         }
     }
-
-    // Second: track the last input/output redirection (but don't dup2 yet)
-    for (i = 0; i < cmd->file_count; ++i) {
+    i = -1;
+    while (++i < cmd->file_count) 
+    {
         t_file *file = &cmd->files[i];
-
-        // Input redirections: only open, keep the last one
         if (file->type == TOKEN_REDIRECT_IN) {
             if (last_in_fd != -1) close(last_in_fd);
             last_in_fd = open_file(file->name, 0);
             if (last_in_fd == -1) {
-                perror("minishell");
+                perror("minishell1");
                 goto cleanup;
             }
         }
         else if (file->type == TOKEN_HEREDOC) {
             if (last_in_fd != -1) close(last_in_fd);
             last_in_fd = open(file->name, O_RDONLY);
-            if (last_in_fd == -1) {
-                perror("minishell");
+            if (last_in_fd == -1) 
+            {
+                // perror("minishell2");
                 goto cleanup;
             }
         }
-
         // Output redirections: only open, keep the last one
         else if (file->type == TOKEN_REDIRECT_OUT) {
             if (last_out_fd != -1) close(last_out_fd);
@@ -188,8 +182,6 @@ int redirections(t_cmd *cmd)
             }
         }
     }
-
-    // Now, apply the last input redirection (if any)
     if (last_in_fd != -1) {
         if (dup2(last_in_fd, STDIN_FILENO) == -1) {
             perror("minishell");
@@ -198,8 +190,6 @@ int redirections(t_cmd *cmd)
         }
         close(last_in_fd);
     }
-
-    // And the last output redirection (if any)
     if (last_out_fd != -1) {
         if (dup2(last_out_fd, STDOUT_FILENO) == -1) {
             perror("minishell");
@@ -212,7 +202,6 @@ int redirections(t_cmd *cmd)
     close(original_stdin);
     close(original_stdout);
     return 0; // Success
-
 cleanup:
     dup2(original_stdin, STDIN_FILENO);
     dup2(original_stdout, STDOUT_FILENO);
