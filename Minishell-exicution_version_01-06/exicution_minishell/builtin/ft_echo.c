@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:22 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 15:06:31 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/20 22:02:06 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,18 @@ static int nb_args(char **arg)
 static int check_new_line(char *cmd)
 {
     int i = 0;
-    
-    if (cmd[0] == '-')
-            i++;
+    if (cmd[0] != '-')
+        return 0;
+    i = 1;
+    if (!cmd[i]) // if only '-', not a valid flag
+        return 0;
     while (cmd[i])
     {
-        // printf("%c\n",cmd[i]);
         if (cmd[i] != 'n')
-            return (0);
+            return 0;
         i++;
     }
-    return (1);
+    return 1;
 }
 void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
 {

@@ -6,11 +6,24 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:36 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 15:08:20 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/20 21:59:36 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+
+int is_valid_identifier(const char *str)
+{
+    int i = 0;
+    if (!str || (!ft_isalpha(str[0]) && str[0] != '_'))
+        return 0;
+    while (str[i]) {
+        if (!ft_isalnum(str[i]) && str[i] != '_')
+            return 0;
+        i++;
+    }
+    return 1;
+}
 
 t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
 {
@@ -19,16 +32,24 @@ t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
     t_env *to_free;
     int len;
     int i = 1;
+    int error = 0;
     t_cmd *current_cmd = *cmd;
+
     while (current_cmd->cmd[i])
     {
+        if (!is_valid_identifier(current_cmd->cmd[i])) {
+            printf("unset: '%s': not a valid identifier\n", current_cmd->cmd[i]);
+            error = 1;
+            i++;
+            continue;
+        }
         len = ft_strlen(current_cmd->cmd[i]);
         current = env;
         prev = NULL;
         while (current != NULL)
         {
-            if(!ft_strncmp(current->data_env, current_cmd->cmd[i], len) && \
-                    current->data_env[len] == '=')
+            if (!ft_strncmp(current->data_env, current_cmd->cmd[i], len) &&
+                current->data_env[len] == '=')
             {
                 to_free = current;
                 if (prev == NULL)
@@ -39,7 +60,7 @@ t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
                 free(to_free->data_env);
                 free(to_free);
             }
-            else 
+            else
             {
                 prev = current;
                 current = current->next;
@@ -47,6 +68,6 @@ t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
         }
         i++;
     }
-    shell_ctx->exit_status = 0;
+    shell_ctx->exit_status = error;
     return (env);
 }
