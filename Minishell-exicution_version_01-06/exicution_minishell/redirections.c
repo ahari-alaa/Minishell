@@ -85,7 +85,7 @@ static int open_file(char *file, int mode)
 
 static int function_herdoc(t_file *file)
 {
-    char *filename = file->name;   // Don't free filename unless you strdup'ed it here
+    char *filename = file->name;
     if (!filename) {
         perror("minishell: cannot create temporary file");
         return (1);
@@ -114,16 +114,7 @@ static int function_herdoc(t_file *file)
     }
     close(fd);
 
-    fd = open(filename, O_RDONLY);
-    if (fd == -1) {
-        ft_putstr_fd_up("minishell: dup2", 2);
-        unlink(filename);
-        return (1);
-    }
-    unlink(filename);
-    dup2(fd, 0);
-    close(fd);
-
+    // Do NOT open, dup2, or unlink here!
     signal(SIGINT, handler_sig);
     signal(SIGQUIT, handler_sig);
     return (0);
@@ -140,44 +131,82 @@ int redirections(t_cmd *cmd)
         perror("minishell: dup");
         return 1;
     }
-    int i = -1;
-    while (++i < cmd->file_count) 
-    {
-        t_file *file = &cmd->files[i];
-        int fd = -1;
 
+    int last_in_fd = -1;
+    int last_out_fd = -1;
+    int i;
+
+    // Only process the last heredoc so only it is prompted
+    int last_heredoc_idx = -1;
+    for (i = 0; i < cmd->file_count; ++i) {
+        if (cmd->files[i].type == TOKEN_HEREDOC)
+            last_heredoc_idx = i;
+    }
+    if (last_heredoc_idx != -1) {
+        if (function_herdoc(&cmd->files[last_heredoc_idx])) {
+            goto cleanup;
+        }
+    }
+
+    // Second: track the last input/output redirection (but don't dup2 yet)
+    for (i = 0; i < cmd->file_count; ++i) {
+        t_file *file = &cmd->files[i];
+
+        // Input redirections: only open, keep the last one
         if (file->type == TOKEN_REDIRECT_IN) {
-            fd = open_file(file->name, 0);
-            if (fd == -1 || dup2(fd, STDIN_FILENO) == -1) {
-                if (fd != -1) close(fd);
+            if (last_in_fd != -1) close(last_in_fd);
+            last_in_fd = open_file(file->name, 0);
+            if (last_in_fd == -1) {
                 perror("minishell");
                 goto cleanup;
             }
-            close(fd);
-        }
-        else if (file->type == TOKEN_REDIRECT_OUT) {
-            fd = open_file(file->name, 1);
-            if (fd == -1 || dup2(fd, STDOUT_FILENO) == -1) {
-                if (fd != -1) close(fd);
-                perror("minishell");
-                goto cleanup;
-            }
-            close(fd);
-        }
-        else if (file->type == TOKEN_APPEND) {
-            fd = open_file(file->name, 2);
-            if (fd == -1 || dup2(fd, STDOUT_FILENO) == -1) {
-                if (fd != -1) close(fd);
-                perror("minishell");
-                goto cleanup;
-            }
-            close(fd);
         }
         else if (file->type == TOKEN_HEREDOC) {
-            if (function_herdoc(file)) {
+            if (last_in_fd != -1) close(last_in_fd);
+            last_in_fd = open(file->name, O_RDONLY);
+            if (last_in_fd == -1) {
+                perror("minishell");
                 goto cleanup;
             }
         }
+
+        // Output redirections: only open, keep the last one
+        else if (file->type == TOKEN_REDIRECT_OUT) {
+            if (last_out_fd != -1) close(last_out_fd);
+            last_out_fd = open_file(file->name, 1);
+            if (last_out_fd == -1) {
+                perror("minishell");
+                goto cleanup;
+            }
+        }
+        else if (file->type == TOKEN_APPEND) {
+            if (last_out_fd != -1) close(last_out_fd);
+            last_out_fd = open_file(file->name, 2);
+            if (last_out_fd == -1) {
+                perror("minishell");
+                goto cleanup;
+            }
+        }
+    }
+
+    // Now, apply the last input redirection (if any)
+    if (last_in_fd != -1) {
+        if (dup2(last_in_fd, STDIN_FILENO) == -1) {
+            perror("minishell");
+            close(last_in_fd);
+            goto cleanup;
+        }
+        close(last_in_fd);
+    }
+
+    // And the last output redirection (if any)
+    if (last_out_fd != -1) {
+        if (dup2(last_out_fd, STDOUT_FILENO) == -1) {
+            perror("minishell");
+            close(last_out_fd);
+            goto cleanup;
+        }
+        close(last_out_fd);
     }
 
     close(original_stdin);

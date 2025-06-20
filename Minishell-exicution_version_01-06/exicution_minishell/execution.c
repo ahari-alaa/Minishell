@@ -174,13 +174,15 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
 
     while (i < cmd_count && cmds[i] != NULL)
     {
-        if (i < cmd_count - 1 && pipe(pipes) == -1) {
+        if (i < cmd_count - 1 && pipe(pipes) == -1) 
+        {
             perror("minishell: pipe");
             exit(1);
         }
 
         pid = fork();
-        if (pid == 0) {
+        if (pid == 0) 
+        {
             // Child process
             signal(SIGQUIT, handler_sig);
             signal(SIGINT, handler_sig);
@@ -234,7 +236,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
             free(path);
             exit(126);
         }
-        else if (pid > 0) {
+        else if (pid > 0) 
+        {
             // Parent process
             if (i > 0)
                 close(prev_pipe);
@@ -245,7 +248,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
             }
             last_pid = pid;
         }
-        else {
+        else 
+        {
             perror("minishell: fork");
             exit(1);
         }
