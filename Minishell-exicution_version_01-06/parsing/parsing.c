@@ -6,77 +6,149 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/24 16:05:08 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/20 23:03:57 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static char *process_quoted_value(char *val, t_token *head)
+void free_array(char **array)
 {
-    int     len;
-    char    *new_val;
-    int     i;
-    int     j;
+    int i;
 
+    if (!array)
+        return;
     i = 0;
-    j = 0;
+    while (array[i])
+    {
+        free(array[i]);
+        i++;
+    }
+    free(array);
+}
+char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx)
+{
+    char    **strings = NULL;
+    int     i = 0, start, count = 0;
+    char    quote;
+    char    *tmp;
+
     if (!val)
-        return (print_error(head, NULL), NULL);
-    len = ft_strlen(val);
-    new_val = malloc(len + 1);
-    if (!new_val)
-        return (print_error(head, NULL), NULL);
-    while (i < len)
+        return (print_error(head, NULL, shell_ctx), NULL);
+    strings = malloc(sizeof(char *) * (ft_strlen(val) + 1));
+    if (!strings)
+        return (print_error(head, NULL, shell_ctx), NULL);
+    while (val[i])
     {
         if (val[i] == '\'' || val[i] == '\"')
         {
-            char quote = val[i];
-            new_val[j++] = val[i++];
-            while (i < len && val[i] != quote)
-                new_val[j++] = val[i++];
-            if (i < len)
-                new_val[j++] = val[i++];
+            quote = val[i];
+            i++;
+            start = i;
+            while (val[i] && val[i] != quote)
+                i++;
+            tmp = ft_substr(val, start, i - start);
+            if (!tmp)
+            {
+                free_array(strings);
+                return (print_error(head, NULL, shell_ctx), NULL);
+            }
+            if (*tmp)
+                strings[count++] = tmp;
             else
-                return (print_error(NULL, new_val), NULL);
-        } 
+                free(tmp);
+            if (val[i] == quote)
+                i++;
+        }
         else
-            new_val[j++] = val[i++];
+        {
+            start = i;
+            while (val[i] && val[i] != '\'' && val[i] != '\"')
+                i++;
+            tmp = ft_substr(val, start, i - start);
+            if (!tmp)
+            {
+                free_array(strings);
+                return (print_error(head, NULL, shell_ctx), NULL);
+            }
+            if (*tmp)
+                strings[count++] = tmp;
+            else
+                free(tmp);
+        }
     }
-    new_val[j] = '\0';
-    return new_val;
+    strings[count] = NULL;
+    return strings;
 }
 
-
-static int process_token(t_token *current, t_token *head)
+static int process_token(t_token *current,t_token *head, t_shell *shell_ctx, char **env_table)
 {
-    char *new_val;
-    char *val;
+    char **new_val = NULL;
+    char *val_cmd = NULL;
+    int i;
     
     if (current->type != TOKEN_WORD)
-        return (1); 
-    val = current->value;
-    new_val = process_quoted_value(val, head);
+        return (1);
+    new_val = process_quoted_value(current->value, head, shell_ctx);
     if (!new_val)
         return (free_tokens(head, NULL), 0);
+    i = 0;
+    while(new_val[i])
+    {
+        new_val[i] = found_env(new_val[i], env_table, shell_ctx);
+        if (!new_val[i])
+        {
+            free_array(new_val);
+            free_tokens(head, NULL);
+            return (0);
+        }
+        if (i == 0)
+            val_cmd = ft_strdup(new_val[i]);
+        else
+        {
+            char *tmp = ft_strjoin(val_cmd, new_val[i]);
+            free(val_cmd);
+            val_cmd = tmp;
+            if (!val_cmd)
+            {
+                free_array(new_val);
+                free_tokens(head, NULL);
+                return (0);
+            }
+        }
+        i++;
+    }
+    free_array(new_val);
     free(current->value);
-    current->value = new_val;
+    if (val_cmd != NULL)
+        current->value = val_cmd;
+    else
+        current->value = ft_strdup("");
+    if (!current->value)
+    {
+        free_tokens(head, NULL);
+        return (0);
+    }
     return (1);
 }
 
-t_token *check_quoted(char *str)
+t_token *check_quoted(char *str, t_shell *shell_ctx , char **env_table)
 {
     t_token *head;
     t_token *current;
 
-    head = string_tokens(str);
-    current = head;
+    head = string_tokens(str, shell_ctx);
     if (!head)
-        return (NULL);
+        return (shell_ctx->exit_status = 2, NULL);
+    current = head;
     while (current)
     {
-        if (!process_token(current, head))
+        if (!process_token(current, head, shell_ctx , env_table))
+        {
+            free_tokens(head, NULL);
+            free_char_array(env_table);
             return NULL;
+        }
         current = current->next;
     }
     return head;

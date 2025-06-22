@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tools.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 22:21:04 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 22:21:05 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/20 21:51:45 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 #include "../../minishell.h"
 
-void	print_error(t_token *head, char *val)
+void	print_error(t_token *head, char *val, t_shell *shell_ctx)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token`'\n", 2, 0);
+	shell_ctx->exit_status = 2;
 	if (head)
 		free_tokens(head, NULL);
 	if (val)

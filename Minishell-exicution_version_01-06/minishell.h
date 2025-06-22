@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/19 16:41:41 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/20 23:03:29 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 #include <curses.h> //
 #include <term.h> //
 #include <string.h>
+#include <termios.h>
 
 // #define PATH_MAX 4096
 
@@ -69,28 +70,28 @@ typedef struct s_cmd
 	struct s_cmd	*next; // pointer to next command
 }	t_cmd;
 
-
-
-
 //this struct where i str all the infermation of env
 typedef struct s_env
 {
 	char *data_env;//this the path like use/bin....
 	struct s_env *next; /* data */
 }t_env;
+
 typedef struct s_shell
 {
     int exit_status;
 } t_shell;
+
 /*---------------function for free--------------------*/
 void			free_tokens(t_token *tokens, char *input);
+void			free_char_array(char **array);
 void			free_cmd(t_cmd *cmd);
 void			free_cmd_array(char **cmd);
 void			free_files(t_file *files, int file_count);
 void			free_cmd_list(t_cmd *cmd_list);
-void			print_error(t_token *head, char *val);
+void			print_error(t_token *head, char *val, t_shell *shell_ctx);
 /*-----------------Tokenizer --------------------------*/
-t_token			*string_tokens(char *str);
+t_token			*string_tokens(char *str, t_shell *shell_ctx);
 
 /*-----------------for print--------------------------*/
 void			print_tokens(t_token *head);
@@ -101,14 +102,15 @@ t_cmd			*init_cmd(void);
 t_file			*init_mfile(void);
 
 /*---------------cmd----------------------------------*/
-t_cmd			*parse_commands(t_token *tokens);
+t_cmd			*parse_commands(t_token *tokens, t_shell *shell_ctx);
 int				ft_isredirect(t_token_type type);
 int				count_args(t_token *token);
-t_token			*check_quoted(char *str);
-t_cmd *expand_cmd_list(t_cmd *cmd_head, t_shell *shell_ctx);
-t_cmd			*unquote_cmd_list(t_cmd *cmd_head);
+t_token			*check_quoted(char *str, t_shell *shell_ctx, char **env_table);
+t_cmd			*expand_cmd_list(t_cmd *cmd_head, t_shell *shell_ctx, char **env);
+char			**convert(t_env *env_list);
 
 /*------------ tools for parsing ----------------*/
+char			*check_export_syntax(char *str);
 int				is_quote(char c);
 int				ft_isspace(char c);
 int				is_operator(const char s);
@@ -126,13 +128,15 @@ char			*ft_substr(const char *s, unsigned int start, size_t len);
 char			*ft_itoa(int n);
 // char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
+char			*found_env(char *cmd, char **env, t_shell *shell_ctx);
 
 /*--------------this function for tockens------------*/
 void			add_token(t_token **head, t_token *new);
 t_token_type	get_token_type(const char *s);
 t_token			*new_token(char *val, t_token_type type);
 
-
+//for testing
+char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx);
 
 
 

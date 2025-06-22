@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Tokenizer.c                                        :+:      :+:    :+:   */
+/*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 16:04:38 by ahari             #+#    #+#             */
-/*   Updated: 2025/04/24 16:12:36 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/20 22:50:05 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-t_token *handle_word_with_quotes(char *str, int *i, t_token **head)
+t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *shell_ctx)
 {
     int start = *i;
     int in_quotes = 0;
@@ -43,7 +43,7 @@ t_token *handle_word_with_quotes(char *str, int *i, t_token **head)
     }
     if (in_quotes)
     {
-        print_error(*head, NULL);
+        print_error(*head, NULL, shell_ctx);
         return (NULL);
     }
     val = ft_strndup(&str[start], *i - start);
@@ -81,16 +81,46 @@ t_token *handle_operator(char *str, int *i, t_token **head)
     add_token(head, new);
     return (*head);
 }
-
-t_token *string_tokens(char *str)
+void ft_putstr(char *s)
+{
+    if (s)
+        write(2, s, ft_strlen(s));
+}
+t_token *string_tokens(char *str, t_shell *shell_ctx)
 {
     t_token *head;
-    int     i;
-
-    i = 0;
     head = NULL;
-    if (str[i] == '|')
-        return (NULL);   
+    int i = 0;
+    char quote = 0;
+    while (str[i])
+    {
+        if ((str[i] == '\'' || str[i] == '"') && (quote == 0))
+            quote = str[i];
+        else if (str[i] == quote)
+            quote = 0;
+        if (!quote)
+        {
+            if (str[0] == '|'
+                || (str[i - 1] == '|' && str[i] == '|'))
+                return (write( 2 , "syntax error near unexpected token `|'\n", 40),free_tokens(head, NULL), NULL);
+            else if (str[i - 1] == ';' && str[i] == ';')
+                return (write(2, "syntax error near unexpected token `;;'\n",41),free_tokens(head, NULL), NULL);
+            else if (str[i] == '\\')
+                return (write(2, "syntax error near unexpected token `\\'\n",40),free_tokens(head, NULL), NULL);
+            else if (str[i] == ';')
+                return (write(2, "syntax error near unexpected token `;'\n",40),free_tokens(head, NULL), NULL);
+            else if (str[i] == '!')
+                return (write(2, "syntax error near unexpected token `!'\n",40),free_tokens(head, NULL), NULL);
+            else if (str[i] == '&')
+                return (write(2, "syntax error near unexpected token `&'\n",40),free_tokens(head, NULL), NULL);
+            else if (str[i - 1] == ':' && str[i] == ':')
+                return (write(2, "syntax error near unexpected token `::'\n",41),free_tokens(head, NULL), NULL);
+            else if (str[i] == '(' || str[i] == ')')
+                return (write(2, "syntax error near unexpected token `()'\n",41),free_tokens(head, NULL), NULL);
+        }
+        i++;
+    }
+    i = 0;
     while (str[i])
     {
         while (ft_isspace(str[i]))
@@ -104,8 +134,8 @@ t_token *string_tokens(char *str)
         }
         else
         {
-            if (!handle_word_with_quotes(str, &i, &head))
-                return (NULL);
+            if (!handle_word_with_quotes(str, &i, &head, shell_ctx))
+                return (free_tokens(head, NULL), NULL);
         }
     } 
     return (head);

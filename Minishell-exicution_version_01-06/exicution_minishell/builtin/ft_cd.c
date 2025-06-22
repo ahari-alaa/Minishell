@@ -6,41 +6,41 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/20 20:39:02 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/22 16:55:59 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-static void	add_oldpwd (t_env *data_env)
-{
-	t_env	*curreent;
-	t_env	*last;
-	char	*new_path;
+// static void	add_oldpwd (t_env *data_env)
+// {
+// 	t_env	*curreent;
+// 	t_env	*last;
+// 	char	*new_path;
 
-	curreent = data_env;
-	last = NULL;
-	while (curreent)
-	{
-		if (ft_strstr(curreent->data_env, "OLDPWD="))
-				return ;
-			last = curreent;
-			curreent = curreent->next;
-	}
-	new_path = ft_strjoin("OLDPWD", "=");
-	if (!new_path)
-		return ;
-	t_env *new_node = malloc(sizeof(t_env));
-	if (!new_node)
-	{
-		free(new_path);
-		return ;
-	}
-	new_node->data_env = new_path;
-	new_node->next = NULL;
-	if (last)
-		last->next = new_node;
-}
+// 	curreent = data_env;
+// 	last = NULL;
+// 	while (curreent)
+// 	{
+// 		if (ft_strstr(curreent->data_env, "OLDPWD="))
+// 				return ;
+// 			last = curreent;
+// 			curreent = curreent->next;
+// 	}
+// 	new_path = ft_strjoin("OLDPWD", "=");
+// 	if (!new_path)
+// 		return ;
+// 	t_env *new_node = malloc(sizeof(t_env));
+// 	if (!new_node)
+// 	{
+// 		free(new_path);
+// 		return ;
+// 	}
+// 	new_node->data_env = new_path;
+// 	new_node->next = NULL;
+// 	if (last)
+// 		last->next = new_node;
+// }
 
 static void update_env_var(t_env *data_env, char *key, char *dest)
 {
@@ -118,7 +118,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
 		perror("minishell: cd: getcwd error");
 		return (data_env);
 	}
-	add_oldpwd(data_env);
+	// add_oldpwd(data_env);
 	update_env_var(data_env, "OLDPWD=", oldpwd_update);
 	update_env_var(data_env, "PWD=", pwd_update);
 	if (cmd_path->cmd[1] && !ft_strcmp(cmd_path->cmd[1], "-"))

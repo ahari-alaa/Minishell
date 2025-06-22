@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   storge_tokens.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/18 16:32:57 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/20 22:04:33 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
                 else
                     ft_putstr_fd("newline", 2, 0);
                 ft_putstr_fd("'\n", 2, 0);
+                
                 return 0;
             }
             file = init_mfile();
@@ -95,10 +96,12 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
     return 1;
 }
 //add this just to test it 
-static int count_redirections(t_token *start) {
+static int count_redirections(t_token *start)
+{
     int count = 0;
     t_token *current = start;
-    while (current && current->type != TOKEN_PIPE) {
+    while (current && current->type != TOKEN_PIPE)
+    {
         if (ft_isredirect(current->type))
             count++;
         current = current->next;
@@ -108,33 +111,30 @@ static int count_redirections(t_token *start) {
 static t_cmd *parse_single_command(t_token **tokens)
 {
     t_cmd *cmd;
-    t_token *start = *tokens;
-    int argc = count_args(start);
+    t_token *start;
+    int argc;
 
+    start = *tokens;
+    argc = count_args(start);
     cmd = init_cmd();
     if (!cmd)
         return NULL;
     cmd->cmd = malloc(sizeof(char *) * (argc + 1));
     if (!cmd->cmd)
         return (free(cmd), NULL);
-    // i'm add this to test is the problem solvde 
     int redir_count = count_redirections(start);
-cmd->files = malloc(sizeof(t_file) * (redir_count + 1));
-    //this is the real alocatoin
-    // cmd->files = malloc(sizeof(t_file) * (argc + 1));
+    cmd->files = malloc(sizeof(t_file) * (redir_count + 1));
     if (!cmd->files)
         return (free(cmd->cmd), free(cmd), NULL);
     if (!parse_arguments(cmd, tokens) || !parse_redirections(cmd, &start))
         return (free(cmd),NULL);
-
     while (*tokens && (*tokens)->type != TOKEN_PIPE)
         *tokens = (*tokens)->next;
-
     cmd->next = NULL;
     return cmd;
 }
 
-t_cmd *parse_commands(t_token *tokens)
+t_cmd *parse_commands(t_token *tokens, t_shell *shell_ctx)
 {
     t_cmd *cmd_head = NULL;
     t_cmd *current = NULL;
@@ -146,20 +146,19 @@ t_cmd *parse_commands(t_token *tokens)
     {
         new_cmd = parse_single_command(&tokens);
         if (!new_cmd)
-            return free_cmd_list(cmd_head), NULL;
-
+            return (free_cmd_list(cmd_head),shell_ctx->exit_status = 2, NULL);
         if (!cmd_head)
             cmd_head = new_cmd;
         else
             current->next = new_cmd;
         current = new_cmd;
-
         if (tokens && tokens->type == TOKEN_PIPE)
         {
             if (!tokens->next)
             {
                 ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2, 0);
-                return free_cmd_list(cmd_head), NULL;
+                shell_ctx->exit_status = 2;
+                return (free_cmd_list(cmd_head), NULL);
             }
             tokens = tokens->next;
         }

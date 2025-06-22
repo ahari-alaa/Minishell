@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_pasing.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:16:06 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/18 16:24:23 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/20 22:12:16 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int ft_strcmp(const char *s1, const char *s2)
 
 int is_operator(const char s)
 {
-    return (s == '|' || s == '<' || s == '>' ||  s == ';');//dealat s == '\\'
+    return (s == '|' || s == '<' || s == '>');//dealat s == '\\'
 }
 
 t_token_type get_token_type(const char *s)

@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 17:31:16 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/21 22:36:29 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void free_env(char **env)
     }
     free(env);
 }
-static char **convert(t_env *env_list)
+char **convert(t_env *env_list)
 {
     int count = 0;
     int i = -1;
