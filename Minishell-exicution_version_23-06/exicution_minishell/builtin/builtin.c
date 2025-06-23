@@ -40,6 +40,6 @@ t_env	*execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell)
 	else if (ft_strcmp(cmd[0]->cmd[0], "env") == 0)
 		ft_env(env_list, shell);
 	else if (ft_strcmp(cmd[0]->cmd[0], "pwd") == 0)
-		ft_pwd(shell);
+		ft_pwd(shell, env_list);
 	return(env_list);
 }
