@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/22 16:53:53 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/23 12:53:09 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,6 @@
 
 #include "minishell.h"
 
-// static void remove_env_key(t_env **env, const char *key) {
-//     t_env *current = *env, *prev = NULL;
-//     int key_len = strlen(key);
-
-//     while (current) {
-//         if (!strncmp(current->data_env, key, key_len) &&
-//             (current->data_env[key_len] == '=' || current->data_env[key_len] == '\0')) 
-//         {
-//             if (prev)
-//                 prev->next = current->next;
-//             else
-//                 *env = current->next;
-
-//             free(current->data_env);
-//             free(current);
-//             return;
-//         }
-//         prev = current;
-//         current = current->next;
-//     }
-// }
 void free_char_array(char **array)
 {
     int i;
@@ -71,7 +50,7 @@ int main(int ac,char **av,char **env)
     shell_ctx->exit_status = 0; 
     while (1)
     {
-        atexit(ff);
+        // atexit(ff);
         input = readline("minishell$ ");
         if (!input)
         {            
@@ -107,7 +86,6 @@ int main(int ac,char **av,char **env)
             free_cmd_list(commands);
         free_tokens(tokens, input);
     }
-    // remove_env_key(&env_list, "OLDPWD");
     free_env_list(env_list);
     free(shell_ctx);
     return (0);
