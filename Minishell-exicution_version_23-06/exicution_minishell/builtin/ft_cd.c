@@ -64,13 +64,19 @@ static void update_env_var(t_env *data_env, char *key, char *dest)
 
 }
 
+
 t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
 {
 	char pwd_update[PATH_MAX];
 	char oldpwd_update[PATH_MAX];
 	char *path = NULL;
 	t_cmd *cmd_path;
-
+	if(access(".", F_OK | X_OK) != 0)
+	{
+		perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
+		shell_ctx->exit_status = 1;
+		return (data_env);
+	}
 	cmd_path = *cmd;
 	if (!cmd_path->cmd[1])
 	{
@@ -106,6 +112,14 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
 	}
 	else
 		path = cmd_path->cmd[1];
+	if(access(path,F_OK | X_OK) != 0)
+	{
+		ft_putstr_fd_up("minishell: cd :", 2);
+		ft_putstr_fd_up(path, 2);
+		ft_putstr_fd_up(":No such file or directory\n", 2);
+		shell_ctx->exit_status = 1;
+		return (data_env);
+	}
 	if (chdir(path) != 0)
 	{
 		ft_putstr_fd_up("minishell: cd: ", 2);
