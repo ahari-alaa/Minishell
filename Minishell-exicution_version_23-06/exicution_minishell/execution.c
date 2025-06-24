@@ -150,8 +150,12 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
         restore_sigint();  // Restore SIGINT handler in parent
         if (WIFEXITED(status))
             shell_ctx->exit_status = WEXITSTATUS(status);
-        else if (WIFSIGNALED(status))
-            shell_ctx->exit_status = 128 + WTERMSIG(status);
+       	else if (WIFSIGNALED(status))
+		{
+			shell_ctx->exit_status = 128 + WTERMSIG(status);
+			if (WTERMSIG(status) == SIGINT)
+				write (1,"\n",1);
+		}
         else
             shell_ctx->exit_status = 1;
     }
@@ -292,7 +296,11 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
             if (WIFEXITED(wstatus))
                 shell_ctx->exit_status = WEXITSTATUS(wstatus);
             else if (WIFSIGNALED(wstatus))
+	    {
                 shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
+	    	if (WTERMSIG(wstatus) == SIGINT)
+			write (1,"\n",1);
+	    }
             else
                 shell_ctx->exit_status = 1;
         }
