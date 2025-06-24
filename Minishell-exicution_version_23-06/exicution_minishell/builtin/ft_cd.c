@@ -58,7 +58,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
     {
         perror("minishell: cd2");
         shell_ctx->exit_status = 1;
-        // return (data_env);
+        return (data_env);
     }
 
     if (!ft_strcmp(cmd_path->cmd[1], "~"))
