@@ -6,11 +6,12 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 17:39:24 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/22 17:00:43 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 20:18:26 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+
 static void remove_env_key(t_env **env, const char *key) {
     t_env *current = *env, *prev = NULL;
     int key_len = strlen(key);
@@ -164,11 +165,6 @@ t_env	*file_inv(char **env)
 	while(env[i])
 	{
 		new = new_env(env[i]);
-		// if (!ft_strncmp(env[i], "OLDPWD=", 7))
-		// {
-		// 	i++;
-		// 	continue;
-		// }
 		if (!new)
 		{
 			free_env_list(env_list);

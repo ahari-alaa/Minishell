@@ -1,12 +1,6 @@
 toop + ^\
 ------------------------------------------
-minishell$ ./minishell
-minishell$ qwet
-minishell:qwet: command not found
-minishell$ cntl + d
-exit
-minishell$ echo $?
-0
+
 ------------------------------------------
 minishell$ cat | ls
 Makefile                main.c                  new_virsion

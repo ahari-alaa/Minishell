@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/25 17:00:06 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 21:29:13 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ static void ignore_sigint(void)
 
 static void restore_sigint(void)
 {
+    write(1,"\n",1);
     signal(SIGINT, handler_sig);
 }
 static void free_env(char **env)
@@ -99,10 +100,11 @@ static void handle_cmd_errors(char *cmd_path)
 static void cmd_process(t_cmd *cmd, char **env)
 {
     char *cmd_path;
-    if (!cmd)
+    if (!cmd || !cmd->cmd[0][0]) 
     { 
-        handle_cmd_errors(NULL);
-        exit(1); // Exit with error
+        ft_putstr_fd_up("minishell:", 2);
+        ft_putstr_fd_up(" command not found\n", 2);
+        exit(127); // Exit with error
     }
     if (redirections(cmd))
         exit(1); // Error in redirection
@@ -113,6 +115,7 @@ static void cmd_process(t_cmd *cmd, char **env)
         exit(1); // Exit with error
     }
     cmd_path = find_path(cmd->cmd[0], env);
+    printf("%s\n",cmd_path);
     if (!cmd_path)
     {
         ft_putstr_fd_up("minishell:", 2);
@@ -191,8 +194,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
         if (pid == 0)
         {
             // Child process
-            signal(SIGQUIT, handler_sig);
-            signal(SIGINT, handler_sig);
+            signal(SIGQUIT, SIG_DFL);
+            signal(SIGINT, SIG_DFL);
             // If not the first command, set up input from previous pipe
             if (i > 0)
             {
@@ -236,9 +239,6 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
             // Handle builtins in child process (pipeline)
             if (is_builtin(cmds[i]->cmd[0]))
             {
-                // Pass the proper arguments as your execut_bultin expects
-                // If your execut_bultin modifies env, pass &env_list, else pass env
-                // execut_bultin(&(cmds[i]), env_list, shell_ctx , 1);
                 exit(shell_ctx->exit_status);
             }
 
@@ -280,11 +280,9 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
         }
         i++;
     }
-
     // Close any remaining pipe end in parent
     if (prev_pipe != -1)
         close(prev_pipe);
-
     // Wait for all child processes
     int wstatus = 0;
     pid_t wpid;
@@ -295,16 +293,11 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
             if (WIFEXITED(wstatus))
                 shell_ctx->exit_status = WEXITSTATUS(wstatus);
             else if (WIFSIGNALED(wstatus))
-	    {
                 shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
-	    	if (WTERMSIG(wstatus) == SIGINT)
-			write (1,"\n",1);
-	    }
             else
                 shell_ctx->exit_status = 1;
         }
     }
-
     // Restore SIGINT handling in parent
     restore_sigint();
 }
@@ -335,8 +328,7 @@ int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
         execute_single_command(cmd, env, shell_ctx);
     }
     else
-    {
-        // Convert linked list to array
+    {// Convert linked list to array
         t_cmd **cmd_arr = malloc(sizeof(t_cmd *) * (cmd_count + 1));
         if (!cmd_arr) {
             free_env(env);
