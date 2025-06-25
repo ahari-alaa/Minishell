@@ -89,17 +89,9 @@ For details type `warranty'.
 cntrl + quit
 minishell$ minishell Crash
 ------------------------------------------
-minishell$ env | cat -e
-minishell$ 
+
 ------------------------------------------
-minishell$ << a | ls
-minishell: empty command
-Makefile                a_1                     a_5                     exicution_minishell     minishell.h
-TODO                    a_10                    a_6                     k                       new_virsion
-a                       a_2                     a_7                     l                       parsing
-a.out                   a_3                     a_8                     main.c                  t.c
-a_0                     a_4                     a_9                     minishell               test
-minishell$ No her_doc
+
 ------------------------------------------
 ------------------------------------------
 ------------------------------------------

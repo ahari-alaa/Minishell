@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/26 00:07:57 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/26 00:13:37 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -324,16 +324,15 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         }
     }
     j = -1;
-    while (j++ < cmd_count)
+    while (++j < cmd_count)
     {
         t_cmd *cmd = cmds[j];
         k = -1;
-        while(++k < cmd->file_count)
+        while  (++k < cmd->file_count)
         {
             if (cmd->files[k].type == TOKEN_HEREDOC)
                 unlink(cmd->files[k].name);
         }
-        
     }
     restore_sigint();
 }
