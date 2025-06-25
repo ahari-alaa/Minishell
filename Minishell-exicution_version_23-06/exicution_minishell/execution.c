@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/23 13:34:33 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 17:00:06 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ static void handle_cmd_errors(char *cmd_path)
 	{
 	    ft_putstr_fd_up("minishell: 1", 2);
         ft_putstr_fd_up(cmd_path, 2);
-        ft_putstr_fd_up(": execution failed", 2);
+        ft_putstr_fd_up(": execution failed\n", 2);
 	}
 }
 
@@ -193,7 +193,6 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
             // Child process
             signal(SIGQUIT, handler_sig);
             signal(SIGINT, handler_sig);
-
             // If not the first command, set up input from previous pipe
             if (i > 0)
             {

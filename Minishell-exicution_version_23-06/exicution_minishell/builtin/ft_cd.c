@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/22 16:55:59 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 19:05:52 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,15 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
 
     if (!getcwd(oldpwd_update, PATH_MAX))
     {
-        perror("minishell: cd2");
+            if (access(".", F_OK | X_OK) == 0)
+            {
+                 perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
+                shell_ctx->exit_status = 1;
+                return data_env;
+             }
+        // perror("minishell: cd2");
         shell_ctx->exit_status = 1;
-        return (data_env);
+        // return (data_env);
     }
 
     if (!ft_strcmp(cmd_path->cmd[1], "~"))

@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:33 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/19 15:11:03 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 15:04:15 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,4 @@ void ft_pwd(t_shell *shell_ctx, t_env *env_list)
     shell_ctx->exit_status = 1;
     perror("PWD not found in environment\n");  
     }
-    
+}   

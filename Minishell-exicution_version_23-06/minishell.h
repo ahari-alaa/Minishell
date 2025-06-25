@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/20 23:03:29 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/25 15:07:59 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx);
 void ft_echo(t_cmd **cmd, t_shell *shell_ctx);
 void ft_env(t_env *env_list, t_shell *shell_ctx);
 void ft_exit(t_cmd **cmd, t_shell *shell);
-void ft_pwd(t_shell *shell_ctx);
+void ft_pwd(t_shell *shell_ctx, t_env *env_list);
 t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx);
 void ft_export(t_cmd **cmd, t_env **envp, t_shell *shell);
 
