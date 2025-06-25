@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/23 11:45:13 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 23:51:17 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static char *get_rundem_name(char *file_name) {
 }
 
 // ----- Heredoc: prompts user, writes to temp file, updates file->name -----
-static int function_herdoc(t_file *file) {
+int function_herdoc(t_file *file) {
     char *filename = get_rundem_name(file->name);
     if (!filename) { perror("minishell: cannot create temporary file"); return 1; }
     int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);

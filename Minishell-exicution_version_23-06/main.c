@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/25 21:02:43 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 23:16:00 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,13 @@ int main(int ac,char **av,char **env)
     shell_ctx->exit_status = 0; 
     while (1)
     {
-        atexit(ff);
+        // atexit(ff);
         input = readline("minishell$ ");
         if (!input)
         {     
             write(1 ,"exit\n", 5);
             free_env_list(env_list);
-            free(shell_ctx);
+            // free(shell_ctx);
             exit(shell_ctx->exit_status) ;
         }
         if (input[0])
@@ -84,6 +84,7 @@ int main(int ac,char **av,char **env)
     }
     free_env_list(env_list);
     free(shell_ctx);
+    write(1 ,"exit\n", 5);
     return (0);
 }
 

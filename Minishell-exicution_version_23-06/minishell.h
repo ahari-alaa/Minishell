@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/25 15:07:59 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/25 23:51:26 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,12 +169,12 @@ int redirections(t_cmd *cmd);
 char	*find_path(char *cmd, char **env);
 
 /*---------------------builtins-----------------------*/
-t_env *execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell);
+t_env *execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell, int i);
 int is_builtin(char *command);
 t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx);
 void ft_echo(t_cmd **cmd, t_shell *shell_ctx);
 void ft_env(t_env *env_list, t_shell *shell_ctx);
-void ft_exit(t_cmd **cmd, t_shell *shell);
+void ft_exit(t_cmd **cmd, t_shell *shell, int j);
 void ft_pwd(t_shell *shell_ctx, t_env *env_list);
 t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx);
 void ft_export(t_cmd **cmd, t_env **envp, t_shell *shell);
@@ -189,4 +189,8 @@ void free_env_list(t_env *env_list);
 /*---------------signals-----------------------*/
 void handler_sig(int signal);
 
+
+
+
+int function_herdoc(t_file *file);
 #endif

@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/25 21:29:13 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/26 00:07:57 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void ignore_sigint(void)
 
 static void restore_sigint(void)
 {
-    write(1,"\n",1);
+    // write(1,"\n",1);
     signal(SIGINT, handler_sig);
 }
 static void free_env(char **env)
@@ -115,7 +115,7 @@ static void cmd_process(t_cmd *cmd, char **env)
         exit(1); // Exit with error
     }
     cmd_path = find_path(cmd->cmd[0], env);
-    printf("%s\n",cmd_path);
+    // printf("%s\n",cmd_path);
     if (!cmd_path)
     {
         ft_putstr_fd_up("minishell:", 2);
@@ -168,10 +168,41 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
         restore_sigint();
     }
 }
-static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *shell_ctx)
+static int is_spaces(char *s)
+{
+    if (!s)
+        return (1);
+    while (*s)
+    {
+        if (*s != ' ')
+            return (0);
+        s++;
+    }
+    return (1);
+}
+static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env_list, t_shell *shell_ctx)
 {
     if (!cmds || cmd_count <= 0)
         return;
+
+    // 1. === PRE-PROCESS: Collect heredoc input for all commands ===
+    // (DO THIS BEFORE ANY FORKING!)
+    int j;
+    int k;
+    j = -1;
+    while(++j < cmd_count)
+    {
+        t_cmd *cmd = cmds[j];
+        k = -1;
+        while (++k < cmd->file_count)
+        {
+            if (cmd->files[k].type == TOKEN_HEREDOC) // or whatever your HEREDOC type is
+            {
+                if (function_herdoc(&cmd->files[k]) != 0)
+                    return; // heredoc failed, abort pipeline
+            }
+        }
+    }
 
     int pipes[2];
     pid_t pid;
@@ -224,22 +255,20 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
                 close(prev_pipe);
             if (i < cmd_count - 1)
                 close(pipes[0]);
-
+           
             // Validate command
-            if (!cmds[i]->cmd || !cmds[i]->cmd[0])
+            if (!cmds[i]->cmd || !cmds[i]->cmd[0] || is_spaces(cmds[i]->cmd[0]))
             {
-                ft_putstr_fd_up("minishell: empty command\n", 2);
+                ft_putstr_fd_up("minishell: command not found\n", 2);
                 exit(127);
             }
-
-            // Handle redirections
-            if (redirections(cmds[i]))
-                exit(1);
 
             // Handle builtins in child process (pipeline)
             if (is_builtin(cmds[i]->cmd[0]))
             {
-                exit(shell_ctx->exit_status);
+                env_list = execut_bultin(&cmds[i], env_list,shell_ctx, 0);
+                free_env(env);
+                exit(shell_ctx->exit_status); // Don't forget to exit!
             }
 
             // External command
@@ -257,13 +286,11 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
                 free(path);
                 exit(126);
             }
-            // Should never reach here
             free(path);
             exit(126);
         }
         else if (pid > 0)
         {
-            // Parent process
             if (i > 0 && prev_pipe != -1)
                 close(prev_pipe);
             if (i < cmd_count - 1)
@@ -280,10 +307,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
         }
         i++;
     }
-    // Close any remaining pipe end in parent
     if (prev_pipe != -1)
         close(prev_pipe);
-    // Wait for all child processes
     int wstatus = 0;
     pid_t wpid;
     while ((wpid = wait(&wstatus)) > 0)
@@ -298,9 +323,21 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env,t_shell *sh
                 shell_ctx->exit_status = 1;
         }
     }
-    // Restore SIGINT handling in parent
+    j = -1;
+    while (j++ < cmd_count)
+    {
+        t_cmd *cmd = cmds[j];
+        k = -1;
+        while(++k < cmd->file_count)
+        {
+            if (cmd->files[k].type == TOKEN_HEREDOC)
+                unlink(cmd->files[k].name);
+        }
+        
+    }
     restore_sigint();
 }
+
 int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
 {
     int cmd_count = 0;
@@ -321,7 +358,7 @@ int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
     {
         if (is_builtin((*cmd)->cmd[0]))
         {
-            *env_list = execut_bultin(cmd, *env_list, shell_ctx);
+            *env_list = execut_bultin(cmd, *env_list, shell_ctx, 1);
             free_env(env);
             return (0);
         }
@@ -342,7 +379,7 @@ int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
             current = current->next;
         }
         cmd_arr[cmd_count] = NULL;
-        execute_pipeline(cmd_arr, cmd_count, env, shell_ctx);
+        execute_pipeline(cmd_arr, cmd_count, env, *env_list,shell_ctx);
         free(cmd_arr);
     }
     free_env(env);
