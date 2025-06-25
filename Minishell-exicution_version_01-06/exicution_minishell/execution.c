@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/20 18:37:53 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/22 20:47:08 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ static void handle_cmd_errors(char *cmd_path)
 {
     if(cmd_path)
 	{
-	    ft_putstr_fd_up("minishell: 1", 2);
+	    ft_putstr_fd_up("minishell: ", 2);
         ft_putstr_fd_up(cmd_path, 2);
         ft_putstr_fd_up(": execution failed", 2);
 	}
@@ -174,13 +174,15 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
 
     while (i < cmd_count && cmds[i] != NULL)
     {
-        if (i < cmd_count - 1 && pipe(pipes) == -1) {
+        if (i < cmd_count - 1 && pipe(pipes) == -1) 
+        {
             perror("minishell: pipe");
             exit(1);
         }
 
         pid = fork();
-        if (pid == 0) {
+        if (pid == 0) 
+        {
             // Child process
             signal(SIGQUIT, handler_sig);
             signal(SIGINT, handler_sig);
@@ -234,7 +236,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
             free(path);
             exit(126);
         }
-        else if (pid > 0) {
+        else if (pid > 0) 
+        {
             // Parent process
             if (i > 0)
                 close(prev_pipe);
@@ -245,7 +248,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
             }
             last_pid = pid;
         }
-        else {
+        else 
+        {
             perror("minishell: fork");
             exit(1);
         }

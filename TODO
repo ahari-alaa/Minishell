@@ -1,0 +1,71 @@
+minishell:kkskdskds: command not found
+minishell$           
+minishell$ echo $?
+258
+minishell$ 
+
+
+minishell$ export z=" "
+minishell$ $z
+minishell: : command not found
+
+
+executio
+minishell$ exit | exit
+minishell: exit: command not found
+minishell: exit: command not found
+
+
+minishell$ << a << b << c cat
+delimiter is : c
+> asjjsajjsa
+> as;as;as;
+> a
+> aaaaaaaaaaa
+> bbbbbbbbbb
+> b
+> ayo
+> moha
+> c
+asjjsajjsa
+as;as;as;
+a
+aaaaaaaaaaa
+bbbbbbbbbb
+b
+ayo
+moha
+
+
+
+
+minishell$ << a << b << c cat | << 1 << 2 << 3 cat
+delimiter is : 3
+> delimiter is : c
+> 2004h> 
+
+
+
+exit status here is 1 when use ctl + c
+<< 1 << 2 << 3 << 4 << 5 << 6 << 7 
+delimiter is : 7
+minishell$ echo $?
+130
+
+
+whene use ctl + d you need to exit in herdoc wa7d bwa7d machi d9a w7da o exit status hna hya 0 machi 1
+<< 1 << 2 << 3 << 4 << 5 << 6 << 7 
+delimiter is : 7
+> 
+minishell$ echo $?
+1
+
+
+minishell$ export x="ls -la"
+minishell$ $x
+minishell:ls -la: command not found
+minishell$ "$x"
+minishell:ls -la: command not found
+minishell$ '$x'
+minishell:ls -la: command not found
+minishell$ 
