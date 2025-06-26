@@ -333,8 +333,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
                 // if (WTERMSIG(wstatus) == SIGINT)
 				//     write (1,"Quit\n",5);
                 // else 
-                if (WTERMSIG(wstatus) == SIGQUIT)
-				    write (1,"Quit\n",5);
+        //         if (WTERMSIG(wstatus) == SIGQUIT)
+				    // write (1,"Quit\n",5);
             }
             else
                 shell_ctx->exit_status = 1;
