@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/26 00:13:37 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/26 14:43:25 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 		{
 			shell_ctx->exit_status = 128 + WTERMSIG(status);
 			if (WTERMSIG(status) == SIGINT)
-				write (1,"\n",1);
+				write (1,"Quit\n",5);
 		}
         else
             shell_ctx->exit_status = 1;
@@ -291,6 +291,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         }
         else if (pid > 0)
         {
+            // restore_sigint();
             if (i > 0 && prev_pipe != -1)
                 close(prev_pipe);
             if (i < cmd_count - 1)
@@ -318,7 +319,11 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
             if (WIFEXITED(wstatus))
                 shell_ctx->exit_status = WEXITSTATUS(wstatus);
             else if (WIFSIGNALED(wstatus))
-                shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
+            {
+                 shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
+                	if (WTERMSIG(wstatus) == SIGINT)
+				        write (1,"Quit\n",5);
+            }
             else
                 shell_ctx->exit_status = 1;
         }
@@ -334,7 +339,6 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
                 unlink(cmd->files[k].name);
         }
     }
-    restore_sigint();
 }
 
 int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
