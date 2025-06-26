@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/26 14:43:25 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/26 16:34:53 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@ static void restore_sigint(void)
     // write(1,"\n",1);
     signal(SIGINT, handler_sig);
 }
+static void restore_sigint_1(void)
+{
+    write(1,"Quit\n",5);
+    signal(SIGINT, SIG_DFL);
+}
+
 static void free_env(char **env)
 {
     if (!env)
@@ -158,6 +164,8 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 			shell_ctx->exit_status = 128 + WTERMSIG(status);
 			if (WTERMSIG(status) == SIGINT)
 				write (1,"Quit\n",5);
+            else if (WTERMSIG(status) == SIGQUIT)
+			    write (1,"Quit\n",5);
 		}
         else
             shell_ctx->exit_status = 1;
@@ -225,8 +233,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         if (pid == 0)
         {
             // Child process
-            signal(SIGQUIT, SIG_DFL);
             signal(SIGINT, SIG_DFL);
+            signal(SIGQUIT, SIG_DFL);
             // If not the first command, set up input from previous pipe
             if (i > 0)
             {
@@ -291,9 +299,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         }
         else if (pid > 0)
         {
-            // restore_sigint();
             if (i > 0 && prev_pipe != -1)
-                close(prev_pipe);
+            close(prev_pipe);
             if (i < cmd_count - 1)
             {
                 close(pipes[1]);
@@ -321,8 +328,11 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
             else if (WIFSIGNALED(wstatus))
             {
                  shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
-                	if (WTERMSIG(wstatus) == SIGINT)
-				        write (1,"Quit\n",5);
+                // if (WTERMSIG(wstatus) == SIGINT)
+				//     write (1,"Quit\n",5);
+                // else 
+                if (WTERMSIG(wstatus) == SIGQUIT)
+				    write (1,"Quit\n",5);
             }
             else
                 shell_ctx->exit_status = 1;
@@ -339,6 +349,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
                 unlink(cmd->files[k].name);
         }
     }
+    restore_sigint_1();
 }
 
 int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
