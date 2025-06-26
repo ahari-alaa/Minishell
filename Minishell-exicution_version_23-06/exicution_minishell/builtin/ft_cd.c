@@ -56,15 +56,16 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
 
     if (!getcwd(oldpwd_update, PATH_MAX))
     {
+        if (ft_strncmp(cmd_path->cmd[1],".",2) == 0)
+        {
+            
             if (access(".", F_OK | X_OK) == 0)
             {
-                 perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
-                shell_ctx->exit_status = 1;
-                return data_env;
-             }
-        // perror("minishell: cd2");
+                perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
+            }
+        }
         shell_ctx->exit_status = 1;
-        // return (data_env);
+        // return data_env;
     }
 
     if (!ft_strcmp(cmd_path->cmd[1], "~"))
