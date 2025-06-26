@@ -155,6 +155,7 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
     }
     else if (id > 0)
     {
+	signal(SIGQUIT, SIG_IGN);
         waitpid(id, &status, 0);
         restore_sigint();  // Restore SIGINT handler in parent
         if (WIFEXITED(status))
