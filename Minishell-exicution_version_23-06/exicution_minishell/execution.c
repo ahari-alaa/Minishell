@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/27 17:09:44 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/27 20:34:17 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,15 +117,14 @@ static void handle_cmd_errors(char *cmd_path)
 static void cmd_process(t_cmd *cmd, char **env)
 {
     char *cmd_path;
-    if (!cmd || !cmd->cmd[0][0]) 
-    { 
+    if (!cmd || !cmd->cmd) 
+    {
         ft_putstr_fd_up("minishell:", 2);
         ft_putstr_fd_up(" command not found\n", 2);
-        exit(127); // Exit with error
+        exit(127);
     }
     if (redirections(cmd))
         exit(1); // Error in redirection
-
     if (!cmd->cmd || !cmd->cmd[0])
     {   
         handle_cmd_errors(NULL);
@@ -142,6 +141,12 @@ static void cmd_process(t_cmd *cmd, char **env)
     }
     if (execve(cmd_path, cmd->cmd, env) == -1)
     {
+        if (!cmd->cmd[0] || cmd->cmd[0][0] == '\0') 
+        {
+            ft_putstr_fd_up("minishell:", 2);
+            ft_putstr_fd_up(" command not found\n", 2);
+            exit(127);
+        }
         handle_cmd_errors(cmd_path);
         free(cmd_path);
         exit(126); // Cannot execute
