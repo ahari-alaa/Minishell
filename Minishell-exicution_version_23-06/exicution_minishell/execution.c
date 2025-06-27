@@ -6,12 +6,23 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/27 12:08:13 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/27 17:09:44 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../minishell.h"
+static void handl_quitsig(int signal)
+{
+    if (signal == SIGINT)
+	{
+    	 write(1,"\n",1);
+  		rl_on_new_line();
+  		rl_replace_line("", 0);
+  		rl_redisplay();
+		write (1,"Quit\n",5);
+	}
+}
 static void ignore_sigint(void)
 {
     signal(SIGINT, SIG_IGN);
@@ -20,13 +31,13 @@ static void ignore_sigint(void)
 static void restore_sigint(void)
 {
     // write(1,"\n",1);
-    signal(SIGINT, handler_sig);
+    signal(SIGINT, handl_quitsig);
 }
-static void restore_sigint_1(void)
-{
-    write(1,"Quit\n",5);
-    signal(SIGINT, SIG_DFL);
-}
+// static void restore_sigint_1(void)
+// {
+//     signal(SIGINT, SIG_IGN);
+//     write(1,"Quit\n",5);
+// }
 
 static void free_env(char **env)
 {
@@ -188,7 +199,7 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
         {
             shell_ctx->exit_status = 128 + WTERMSIG(status);
             if (WTERMSIG(status) == SIGINT)
-                write(1, "\n", 1);  // Typically just newline for SIGINT
+                write(1, "Quit\n", 5);  // Typically just newline for SIGINT
             else if (WTERMSIG(status) == SIGQUIT)
                 write(1, "Quit\n", 5);
         }
@@ -328,6 +339,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         }
         else if (pid > 0)
         {
+            signal(SIGQUIT, SIG_IGN);
             if (i > 0 && prev_pipe != -1)
             close(prev_pipe);
             if (i < cmd_count - 1)
@@ -348,25 +360,67 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         close(prev_pipe);
     int wstatus = 0;
     pid_t wpid;
+    int saw_sigint = 0;
     while ((wpid = wait(&wstatus)) > 0)
     {
+        if (WIFSIGNALED(wstatus))
+        {
+            int sig = WTERMSIG(wstatus);
+            if (sig == SIGINT)
+                saw_sigint = 1;
+            if (sig == SIGQUIT)
+                write(1, "Quit: 3\n", 8);
+            shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
+        }
+
         if (wpid == last_pid)
         {
             if (WIFEXITED(wstatus))
                 shell_ctx->exit_status = WEXITSTATUS(wstatus);
             else if (WIFSIGNALED(wstatus))
-            {
-                 shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
-                // if (WTERMSIG(wstatus) == SIGINT)
-				//     write (1,"Quit\n",5);
-                // else 
-                // if (WTERMSIG(wstatus) == SIGQUIT)
-				//     write (1,"Quit\n",5);
-            }
+                shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
             else
                 shell_ctx->exit_status = 1;
         }
     }
+
+    if (saw_sigint)
+        write(1, "Quit\n", 5); 
+    // while ((wpid = wait(&wstatus)) > 0) {
+    //     if (wpid == last_pid) {
+    //         if (WIFEXITED(wstatus)) {
+    //             shell_ctx->exit_status = WEXITSTATUS(wstatus);
+    //         }
+    //         else if (WIFSIGNALED(wstatus)) {
+    //             shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
+                
+    //             // Custom signal message handling
+    //             if (WTERMSIG(wstatus) == SIGQUIT) {
+    //                 write(1, "Quit\n", 5);
+    //             }
+    //             else if (WTERMSIG(wstatus) == SIGINT) {
+    //                 // Only print newline for certain commands
+    //                 int should_print = 0;
+    //                 for (int x = 0; x < cmd_count; x++) {
+    //                     if (cmds[x]->cmd && cmds[x]->cmd[0] && 
+    //                         (strcmp(cmds[x]->cmd[0], "cat") == 0)) {
+    //                         should_print = 1;
+    //                         break;
+    //                     }
+    //                 }
+    //                 if (should_print) {
+    //                     write(1, "Quit\n", 5);
+    //                 }
+    //             }
+    //         }
+    //         else {
+    //             shell_ctx->exit_status = 1;
+    //         }
+            
+    //     }
+    // }
+    restore_sigint();
+
     j = -1;
     while (++j < cmd_count)
     {
@@ -378,7 +432,6 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
                 unlink(cmd->files[k].name);
         }
     }
-    restore_sigint_1();
 }
 
 int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
