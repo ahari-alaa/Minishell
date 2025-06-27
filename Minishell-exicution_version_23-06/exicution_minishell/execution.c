@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/26 16:34:53 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/27 12:08:13 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,39 +142,66 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 {
     pid_t id;
     int status;
+    struct termios original_termios;
     
+    // Save current terminal attributes
+    if (tcgetattr(STDIN_FILENO, &original_termios) == -1) {
+        perror("tcgetattr failed");
+        return;
+    }
+
     ignore_sigint();  // Ignore SIGINT in parent while child is running
+    
     id = fork();
     if (id == 0)
     {
         // Child process - restore default SIGINT handler
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
+        
+        // Set terminal attributes for child process if needed
+        // Modify child_termios settings if needed (e.g., disable echo, etc.)
+        // tcsetattr(STDIN_FILENO, TCSANOW, &child_termios);
+        
         cmd_process(*cmd, envp);
         shell_ctx->exit_status = 0;
+        
+        // Child exits - no need to restore original attributes as they're per-process
+        exit(0);
     }
     else if (id > 0)
     {
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
+        signal(SIGINT, SIG_IGN);
+        signal(SIGQUIT, SIG_IGN);
         waitpid(id, &status, 0);
+
+        // Restore original terminal attributes in parent
+        if (tcsetattr(STDIN_FILENO, TCSANOW, &original_termios) == -1) {
+            perror("tcsetattr failed");
+        }
+
         restore_sigint();  // Restore SIGINT handler in parent
+
         if (WIFEXITED(status))
             shell_ctx->exit_status = WEXITSTATUS(status);
-       	else if (WIFSIGNALED(status))
-		{
-			shell_ctx->exit_status = 128 + WTERMSIG(status);
-			if (WTERMSIG(status) == SIGINT)
-				write (1,"Quit\n",5);
+        else if (WIFSIGNALED(status))
+        {
+            shell_ctx->exit_status = 128 + WTERMSIG(status);
+            if (WTERMSIG(status) == SIGINT)
+                write(1, "\n", 1);  // Typically just newline for SIGINT
             else if (WTERMSIG(status) == SIGQUIT)
-			    write (1,"Quit\n",5);
-		}
+                write(1, "Quit\n", 5);
+        }
         else
             shell_ctx->exit_status = 1;
     }
     else
     {
         perror("fork failed");
+        // Restore terminal attributes if fork fails
+        if (tcsetattr(STDIN_FILENO, TCSANOW, &original_termios) == -1) {
+            perror("tcsetattr failed");
+        }
         restore_sigint();
     }
 }
@@ -333,8 +360,8 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
                 // if (WTERMSIG(wstatus) == SIGINT)
 				//     write (1,"Quit\n",5);
                 // else 
-        //         if (WTERMSIG(wstatus) == SIGQUIT)
-				    // write (1,"Quit\n",5);
+                // if (WTERMSIG(wstatus) == SIGQUIT)
+				//     write (1,"Quit\n",5);
             }
             else
                 shell_ctx->exit_status = 1;
