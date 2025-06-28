@@ -8,7 +8,4 @@ minishell$ $rtdf ls
 minishell: 1/mnt/homes/maskour/.brew/bin/: execution failedminishell$ 
 ------------------------------------------
 ------------------------------------------
-minishell$ echo qwerty > l
-qwerty
-minishell$
 ------------------------------------------
