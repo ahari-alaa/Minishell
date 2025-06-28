@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:22 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/20 22:02:06 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/28 21:13:09 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
     int i = 1;
     int n_nb = 0;
     t_cmd *current_cmd = *cmd;
-    
+    int j;
     if (nb_args(current_cmd->cmd) > 1)
     {
         while (current_cmd->cmd[i] && check_new_line(current_cmd->cmd[i]))
@@ -50,7 +50,16 @@ void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
         }
         while (current_cmd->cmd[i])
         {
-            printf("%s",current_cmd->cmd[i]);
+            if (current_cmd->cmd[i][0] == '$' && current_cmd->cmd[i][1] != '\0')
+            {j = 1;
+            while (current_cmd->cmd[i][j])
+            {
+                printf("%c",current_cmd->cmd[i][j]);
+                j++;
+            }
+            }
+            else 
+                printf("%s",current_cmd->cmd[i]);
             if(current_cmd->cmd[i+1])
                 printf(" ");
             i++;

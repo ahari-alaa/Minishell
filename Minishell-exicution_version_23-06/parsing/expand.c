@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/25 13:58:56 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/27 17:09:17 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,64 +118,137 @@ static char *handle_env_var(char *cmd, int pos, char **env)
     return (new_cmd);
 }
 
-static char *handle_double_dollar(char *cmd, int pos)
+static char *replace_double_dollar(char *cmd)
 {
-    char *replacement;
-    char *new_cmd;
-
-	replacement = ft_strdup("$");
-    if (!replacement)
-        return (NULL);
-    new_cmd = build_new_command(cmd, pos, replacement, 2);
-    free(replacement);
-    return (new_cmd);
+    int     len = ft_strlen(cmd);
+    char    *new_cmd = malloc(len + 1);
+    int     i = 0;
+    int     j = 0;
+    if (!new_cmd)
+        return NULL;
+    while (cmd[i]) {
+        if (cmd[i] == '$' && cmd[i + 1] == '$')
+        {
+            new_cmd[j++] = '\x01';
+            i += 2;
+        }
+        else
+            new_cmd[j++] = cmd[i++];
+    }
+    new_cmd[j] = '\0';
+    return new_cmd;
 }
 
-char *found_env(char *cmd, char **env, t_shell *shell_ctx)
+static void	update_quote_state(char c, int *in_quotes, char *quote_char)
 {
-    int pos = 0;
-    char *new_cmd;
-    
-    if (!cmd)
-        return NULL;
+	if (c == '\'' || c == '"')
+	{
+		if (!*in_quotes)
+		{
+			*in_quotes = 1;
+			*quote_char = c;
+		}
+		else if (c == *quote_char)
+		{
+			*in_quotes = 0;
+			*quote_char = 0;
+		}
+	}
+}
 
-    while (cmd[pos])
-    {
-        if (cmd[pos] == '$' && (pos == 0 || cmd[pos - 1] != '\\'))
-        {
-            if (cmd[pos + 1] == '$')
-            {
-                new_cmd = handle_double_dollar(cmd, pos);
-                if (new_cmd)
-                {
-                    free(cmd);
-                    return found_env(new_cmd, env, shell_ctx);
-                }
-            }
-            else if (cmd[pos + 1] == '?' || cmd[pos + 1] == '0' || ft_isdigit(cmd[pos + 1]))
-            {
-                new_cmd = handle_special_var(cmd, pos, shell_ctx);
-                if (new_cmd)
-                {
-                    free(cmd);
-                    return found_env(new_cmd, env, shell_ctx);
-                }
-            }
-            else if (is_char(cmd[pos + 1]))
-            {
-                new_cmd = handle_env_var(cmd, pos, env);
-                if (new_cmd)
-                {
-                    free(cmd);
-                    return found_env(new_cmd, env, shell_ctx);
-                }
-            }
-        }
-        pos++;
-    }
-    char *result = ft_strdup(cmd);
-    free(cmd); 
-    return result;
+static int	should_expand_var(char *cmd, int pos, int in_quotes, char quote_char)
+{
+	if (cmd[pos] != '$')
+		return (0);
+	if (pos > 0 && cmd[pos - 1] == '\\')
+		return (0);
+	if (in_quotes && quote_char == '\'')
+		return (0);
+	return (1);
+}
+
+static char	*process_special_variable(char *cmd, int pos, t_shell *shell_ctx)
+{
+	char	*new_cmd;
+
+	if (cmd[pos + 1] == '?' || cmd[pos + 1] == '0' || ft_isdigit(cmd[pos + 1]))
+	{
+		new_cmd = handle_special_var(cmd, pos, shell_ctx);
+		if (new_cmd)
+			return (found_env(new_cmd, NULL, shell_ctx));
+	}
+	return (NULL);
+}
+
+static char	*process_env_variable(char *cmd, int pos, char **env, t_shell *shell_ctx)
+{
+	char	*new_cmd;
+
+	if (cmd[pos + 1] && is_char(cmd[pos + 1]))
+	{
+		new_cmd = handle_env_var(cmd, pos, env);
+		if (new_cmd)
+			return (found_env(new_cmd, env, shell_ctx));
+	}
+	return (NULL);
+}
+
+static char	*restore_dollar_signs(char *cmd)
+{
+	int		i;
+	char	*result;
+
+	i = 0;
+	while (cmd[i])
+	{
+		if (cmd[i] == '\x01')
+			cmd[i] = '$';
+		i++;
+	}
+	result = ft_strdup(cmd);
+	return (result);
+}
+
+static char	*process_variables(char *cmd, char **env, t_shell *shell_ctx)
+{
+	int		pos;
+	int		in_quotes;
+	char	quote_char;
+	char	*result;
+
+	pos = 0;
+	in_quotes = 0;
+	quote_char = 0;
+	while (cmd[pos])
+	{
+		update_quote_state(cmd[pos], &in_quotes, &quote_char);
+		if (cmd[pos] == '\'' || cmd[pos] == '"')
+		{
+			pos++;
+			continue ;
+		}
+		if (should_expand_var(cmd, pos, in_quotes, quote_char))
+		{
+			result = process_special_variable(cmd, pos, shell_ctx);
+			if (result)
+				return (result);
+			result = process_env_variable(cmd, pos, env, shell_ctx);
+			if (result)
+				return (result);
+		}
+		pos++;
+	}
+	return (restore_dollar_signs(cmd));
+}
+
+char	*found_env(char *cmd, char **env, t_shell *shell_ctx)
+{
+	char	*preprocessed;
+
+	if (!cmd)
+		return (NULL);
+	preprocessed = replace_double_dollar(cmd);
+	return (process_variables(preprocessed, env, shell_ctx));
 }
 
 

@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/27 12:06:13 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/28 17:47:00 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,14 @@ typedef enum e_token_type
 	TOKEN_REDIRECT_OUT, // >
 	TOKEN_APPEND,       // >>
 	TOKEN_HEREDOC,      // <<
-	TOKEN_NULL,        // for empty or errors
+	TOKEN_NULL,       // for empty or errors
+	TOKEN_SEMICOLON,
 } t_token_type;
 
+typedef struct s_shell
+{
+    int exit_status;
+} t_shell;
 
 typedef struct s_token
 {
@@ -77,12 +82,6 @@ typedef struct s_env
 	struct s_env *next; /* data */
 }t_env;
 
-typedef struct s_shell
-{
-    int exit_status;
-} t_shell;
-
-
 
 /*---------------function for free--------------------*/
 void			free_tokens(t_token *tokens, char *input);
@@ -92,8 +91,20 @@ void			free_cmd_array(char **cmd);
 void			free_files(t_file *files, int file_count);
 void			free_cmd_list(t_cmd *cmd_list);
 void			print_error(t_token *head, char *val, t_shell *shell_ctx);
+void			free_array(char **array);
+
 /*-----------------Tokenizer --------------------------*/
 t_token			*string_tokens(char *str, t_shell *shell_ctx);
+t_token			*find_previous_token(t_token *head, t_token *target);
+
+
+/*-----------------parsing --------------------------*/
+// int				is_export_assignment(t_token *head, t_token *current);
+char			**split_with_quotes(char *str);
+// int				process_token(t_token *current, t_token **head, t_shell *shell_ctx, char **env_table);
+// int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx);
+// int handle_token_splitting(t_token *current, t_token **head, char **split);
+
 
 /*-----------------for print--------------------------*/
 void			print_tokens(t_token *head);
@@ -108,11 +119,9 @@ t_cmd			*parse_commands(t_token *tokens, t_shell *shell_ctx);
 int				ft_isredirect(t_token_type type);
 int				count_args(t_token *token);
 t_token			*check_quoted(char *str, t_shell *shell_ctx, char **env_table);
-t_cmd			*expand_cmd_list(t_cmd *cmd_head, t_shell *shell_ctx, char **env);
 char			**convert(t_env *env_list);
 
 /*------------ tools for parsing ----------------*/
-char			*check_export_syntax(char *str);
 int				is_quote(char c);
 int				ft_isspace(char c);
 int				is_operator(const char s);
@@ -131,6 +140,10 @@ char			*ft_itoa(int n);
 // char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
 char			*found_env(char *cmd, char **env, t_shell *shell_ctx);
+// int				is_single_quoted(char *original_val, char *substring);
+// int				is_quoted(char *original_val, char *substring);
+// char			*join_export_tokens(char **split);
+
 
 /*--------------this function for tockens------------*/
 void			add_token(t_token **head, t_token *new);
@@ -139,7 +152,6 @@ t_token			*new_token(char *val, t_token_type type);
 
 //for testing
 char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx);
-
 
 
 
