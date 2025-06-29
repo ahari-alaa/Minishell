@@ -41,28 +41,11 @@ static t_token	*get_cmd_token(t_token *head, t_token *current)
 	return (cmd_token);
 }
 
-static int	is_after_pipe_or_semicolon(t_token *head, t_token *current)
-{
-	t_token	*temp = head;
-
-	while (temp && temp != current)
-	{
-		if (temp->type == TOKEN_PIPE || temp->type == TOKEN_SEMICOLON)
-		{
-			if (temp->next)
-				temp = temp->next;
-			break;
-		}
-		temp = temp->next;
-	}
-	return (1);
-}
 
 int	is_export_assignment(t_token *head, t_token *current)
 {
 	t_token	*cmd_token;
 
-	is_after_pipe_or_semicolon(head, current);
 	cmd_token = get_cmd_token(head, current);
 	if (cmd_token && ft_strcmp(cmd_token->value, "export") == 0)
 	{

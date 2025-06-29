@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 16:30:57 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/29 23:06:44 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,12 @@ char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx)
                 free_array(strings);
                 return (NULL);
             }
+            if (quote == '"')
+            {
+                char *quoted_tmp = ft_strjoin("\1", tmp);
+                free(tmp);
+                tmp = quoted_tmp;
+            }
             if (*tmp)
                 strings[count++] = tmp;
             else
@@ -146,6 +152,8 @@ int is_single_quoted(char *original_val, char *substring)
 
  int is_quoted(char *original_val, char *substring)
 {
+    if (substring && substring[0] == '\1')
+        return 1;
     char *pos = ft_strstr(original_val, substring);
     int i = 0;
     char current_quote = 0;
@@ -265,6 +273,7 @@ int handle_token_splitting(t_token *current, t_token **head, char **split)
 
     while (split[j])
     {
+        printf("split[%d]: %s\n", j, split[j]);
         t_token *new_tokens = new_token(ft_strdup(split[j]), TOKEN_WORD);
         if (!new_tokens)
         {

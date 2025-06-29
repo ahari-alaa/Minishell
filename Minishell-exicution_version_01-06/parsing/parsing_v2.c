@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 16:45:37 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/29 23:12:29 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,22 @@ int	process_token_loop(t_token *cur, t_token **head,
 	{
 		if (!is_single_quoted(cur->value, p.new_val[i]))
 		{
+			 if (p.new_val[i][0] == '\1')
+            {
+                char *unmarked = ft_strdup(p.new_val[i] + 1);
+                if (!unmarked)
+                    return 0;
+                char *expanded = found_env(unmarked, p.env, ctx);
+                free(unmarked);
+                if (!expanded)
+                    return 0;
+                free(p.new_val[i]);
+                p.new_val[i] = expanded;
+                if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
+                    return 0;
+                i++;
+                continue;
+            }
 			if (!process_env_expansion(p.new_val, i, p.env, ctx))
 				return (free_tokens(*head, NULL), free_array(p.new_val),
 					free(p.val_cmd), 0);

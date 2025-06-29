@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 18:01:41 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/29 22:23:27 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ static char *handle_env_var(char *cmd, int pos, char **env)
         free(env_value);
     }
     else
-        new_cmd = build_new_command(cmd, pos, "$empty", var_len + 1);///alaa + $USER 
+        new_cmd = build_new_command(cmd, pos, "\2", var_len + 1);///alaa + $USER 
     
     return (new_cmd);
 }
@@ -139,30 +139,11 @@ static char *replace_double_dollar(char *cmd)
     return new_cmd;
 }
 
-static void	update_quote_state(char c, int *in_quotes, char *quote_char)
-{
-	if (c == '\'' || c == '"')
-	{
-		if (!*in_quotes)
-		{
-			*in_quotes = 1;
-			*quote_char = c;
-		}
-		else if (c == *quote_char)
-		{
-			*in_quotes = 0;
-			*quote_char = 0;
-		}
-	}
-}
-
-static int	should_expand_var(char *cmd, int pos, int in_quotes, char quote_char)
+static int	should_expand_var(char *cmd, int pos)
 {
 	if (cmd[pos] != '$')
 		return (0);
 	if (pos > 0 && cmd[pos - 1] == '\\')
-		return (0);
-	if (in_quotes && quote_char == '\'')
 		return (0);
 	return (1);
 }
@@ -224,24 +205,14 @@ static char	*restore_dollar_signs(char *cmd)
 static char	*process_variables(char *cmd, char **env, t_shell *shell_ctx)
 {
 	int		pos;
-	int		in_quotes;
-	char	quote_char;
 	char	*result;
 
 	pos = 0;
-	in_quotes = 0;
-	quote_char = 0;
 	while (cmd[pos])
 	{
-		update_quote_state(cmd[pos], &in_quotes, &quote_char);
-		if (cmd[pos] == '\'' || cmd[pos] == '"')
+		if (should_expand_var(cmd, pos))
 		{
-			pos++;
-			continue ;
-		}
-		if (should_expand_var(cmd, pos, in_quotes, quote_char))
-		{
-			result = process_special_variable(cmd, pos, shell_ctx);\
+			result = process_special_variable(cmd, pos, shell_ctx);
 			if (result)
 				return (result);
 			result = process_env_variable(cmd, pos, env, shell_ctx);
@@ -255,11 +226,22 @@ static char	*process_variables(char *cmd, char **env, t_shell *shell_ctx)
 
 char *found_env(char *cmd, char **env, t_shell *shell_ctx)
 {
-    char *preprocessed;
+    char *preprocessed = NULL;
     char *result;
 
     if (!cmd)
         return NULL;
+    
+    // Handle quoted variables first
+    if (cmd[0] == '\1')
+    {
+        char *expanded = process_variables(cmd + 1, env, shell_ctx);
+        if (!expanded)
+            return NULL;
+        // Return the expanded value without re-adding the quote marker
+        return expanded;
+    }
+    
     preprocessed = replace_double_dollar(cmd);
     if (!preprocessed)
         return NULL;

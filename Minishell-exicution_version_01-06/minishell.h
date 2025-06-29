@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/27 22:49:03 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/29 21:48:51 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ typedef struct s_token
 {
 	char            *value;         // the actual string (e.g. "ls", ">", "file.txt")
 	t_token_type    type;           // type of token
-	char            quote_type;  // '\"', '\'', or 0 (no quotes)
+	int				was_quoted;  // '\"', '\'', or 0 (no quotes)
 	struct s_token  *next;          // pointer to next token
 }   t_token;
 
