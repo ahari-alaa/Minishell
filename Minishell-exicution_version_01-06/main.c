@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/27 20:28:20 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/29 16:36:18 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,6 @@
 
 #include "minishell.h"
 
-// static void remove_env_key(t_env **env, const char *key) {
-//     t_env *current = *env, *prev = NULL;
-//     int key_len = strlen(key);
-
-//     while (current) {
-//         if (!strncmp(current->data_env, key, key_len) &&
-//             (current->data_env[key_len] == '=' || current->data_env[key_len] == '\0')) 
-//         {
-//             if (prev)
-//                 prev->next = current->next;
-//             else
-//                 *env = current->next;
-
-//             free(current->data_env);
-//             free(current);
-//             return;
-//         }
-//         prev = current;
-//         current = current->next;
-//     }
-// }
 void free_char_array(char **array)
 {
     int i;
@@ -59,7 +38,7 @@ int main(int ac,char **av,char **env)
     (void)av;
     char        *input;
     t_token     *tokens;
-     t_cmd       *commands;
+    t_cmd       *commands;
     t_env *env_list;
     env_list = file_inv(env);
     signal(SIGINT, handler_sig); 
@@ -68,10 +47,9 @@ int main(int ac,char **av,char **env)
     shell_ctx = malloc (sizeof(t_shell));
     if(!shell_ctx)
         exit(1);
-    shell_ctx->exit_status = 0; 
+    shell_ctx->exit_status = 0;
     while (1)
     {
-        //atexit(ff);
         input = readline("minishell$ ");
         if (!input)
         {            
@@ -81,19 +59,16 @@ int main(int ac,char **av,char **env)
         if (input[0])
             add_history(input);
         char **env_table = convert(env_list);
-        // tokens = string_tokens(input, shell_ctx);
-       // input = export_parsing(input);
         tokens = check_quoted(input, shell_ctx, env_table);
-        //print_tokens(tokens);
-        //print_tokens(tokens);
+        print_tokens(tokens);
         if (!tokens)
         {
             free (input);
             free_char_array(env_table);
             continue ;
         }
-        commands = parse_commands(tokens , shell_ctx);
-        //print_command_with_files(commands);
+       commands = parse_commands(tokens , shell_ctx);
+       print_command_with_files(commands);
         if (!commands)
         {
             free_tokens(tokens, input);
@@ -105,7 +80,6 @@ int main(int ac,char **av,char **env)
             free_cmd_list(commands);
         free_tokens(tokens, input);
     }
-    // remove_env_key(&env_list, "OLDPWD");
     free_env_list(env_list);
     free(shell_ctx);
     return (0);

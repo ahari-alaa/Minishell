@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/27 21:19:57 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/27 22:49:03 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,13 @@ typedef struct s_env
 	char *data_env;//this the path like use/bin....
 	struct s_env *next; /* data */
 }t_env;
+typedef struct s_process
+{
+	char	**new_val;
+	char	*val_cmd;
+	char	**env;
+	int		is_export;
+}	t_process;
 
 
 /*---------------function for free--------------------*/
@@ -99,8 +106,9 @@ t_token			*find_previous_token(t_token *head, t_token *target);
 
 
 /*-----------------parsing --------------------------*/
-// int				is_export_assignment(t_token *head, t_token *current);
+int				is_export_assignment(t_token *head, t_token *current);
 char			**split_with_quotes(char *str);
+int	process_token(t_token *current, t_token **head, t_shell *shell_ctx, char **env_table);
 // int				process_token(t_token *current, t_token **head, t_shell *shell_ctx, char **env_table);
 // int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx);
 // int handle_token_splitting(t_token *current, t_token **head, char **split);
@@ -140,9 +148,12 @@ char			*ft_itoa(int n);
 // char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
 char			*found_env(char *cmd, char **env, t_shell *shell_ctx);
-// int				is_single_quoted(char *original_val, char *substring);
-// int				is_quoted(char *original_val, char *substring);
-// char			*join_export_tokens(char **split);
+//********
+int				is_single_quoted(char *original_val, char *substring);
+int				is_quoted(char *original_val, char *substring);
+char			*join_export_tokens(char **split);
+int handle_token_splitting(t_token *current, t_token **head, char **split);
+int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx);
 
 
 /*--------------this function for tockens------------*/

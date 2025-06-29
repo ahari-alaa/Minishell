@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/27 17:09:17 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/29 16:46:41 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ static char *handle_env_var(char *cmd, int pos, char **env)
         free(env_value);
     }
     else
-        new_cmd = build_new_command(cmd, pos, "", var_len + 1);
+        new_cmd = build_new_command(cmd, pos, "", var_len + 1);///alaa + $USER 
     
     return (new_cmd);
 }
@@ -167,31 +167,43 @@ static int	should_expand_var(char *cmd, int pos, int in_quotes, char quote_char)
 	return (1);
 }
 
-static char	*process_special_variable(char *cmd, int pos, t_shell *shell_ctx)
+static char *process_special_variable(char *cmd, int pos, t_shell *shell_ctx)
 {
-	char	*new_cmd;
+    char *new_cmd;
+    char *expanded;
 
-	if (cmd[pos + 1] == '?' || cmd[pos + 1] == '0' || ft_isdigit(cmd[pos + 1]))
-	{
-		new_cmd = handle_special_var(cmd, pos, shell_ctx);
-		if (new_cmd)
-			return (found_env(new_cmd, NULL, shell_ctx));
-	}
-	return (NULL);
+    if (cmd[pos + 1] == '?' || cmd[pos + 1] == '0' || ft_isdigit(cmd[pos + 1]))
+    {
+        new_cmd = handle_special_var(cmd, pos, shell_ctx);
+        if (new_cmd)
+        {
+            expanded = found_env(new_cmd, NULL, shell_ctx);
+            free(new_cmd); // 🔥 fix leak
+            return expanded;
+        }
+    }
+    return NULL;
 }
 
-static char	*process_env_variable(char *cmd, int pos, char **env, t_shell *shell_ctx)
-{
-	char	*new_cmd;
 
-	if (cmd[pos + 1] && is_char(cmd[pos + 1]))
-	{
-		new_cmd = handle_env_var(cmd, pos, env);
-		if (new_cmd)
-			return (found_env(new_cmd, env, shell_ctx));
-	}
-	return (NULL);
+static char *process_env_variable(char *cmd, int pos, char **env, t_shell *shell_ctx)
+{
+    char *new_cmd;
+    char *expanded;
+
+    if (cmd[pos + 1] && is_char(cmd[pos + 1]))
+    {
+        new_cmd = handle_env_var(cmd, pos, env);
+        if (new_cmd)
+        {
+            expanded = found_env(new_cmd, env, shell_ctx);
+            free(new_cmd); // 🔥 fix leak
+            return expanded;
+        }
+    }
+    return NULL;
 }
+
 
 static char	*restore_dollar_signs(char *cmd)
 {
@@ -229,26 +241,35 @@ static char	*process_variables(char *cmd, char **env, t_shell *shell_ctx)
 		}
 		if (should_expand_var(cmd, pos, in_quotes, quote_char))
 		{
-			result = process_special_variable(cmd, pos, shell_ctx);
+			result = process_special_variable(cmd, pos, shell_ctx);\
+            if (!result)
+                return (NULL);
 			if (result)
 				return (result);
 			result = process_env_variable(cmd, pos, env, shell_ctx);
 			if (result)
 				return (result);
+            if (!result)
+                return (NULL);
 		}
 		pos++;
 	}
 	return (restore_dollar_signs(cmd));
 }
 
-char	*found_env(char *cmd, char **env, t_shell *shell_ctx)
+char *found_env(char *cmd, char **env, t_shell *shell_ctx)
 {
-	char	*preprocessed;
+    char *preprocessed;
+    char *result;
 
-	if (!cmd)
-		return (NULL);
-	preprocessed = replace_double_dollar(cmd);
-	return (process_variables(preprocessed, env, shell_ctx));
+    if (!cmd)
+        return NULL;
+    preprocessed = replace_double_dollar(cmd);
+    if (!preprocessed)
+        return NULL;
+    result = process_variables(preprocessed, env, shell_ctx);
+    free(preprocessed);
+    return result;
 }
 
 

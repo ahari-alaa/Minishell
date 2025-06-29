@@ -1,112 +1,75 @@
-// /* ************************************************************************** */
-// /*                                                                            */
-// /*                                                        :::      ::::::::   */
-// /*   split_with_quotes.c                               :+:      :+:    :+:   */
-// /*                                                    +:+ +:+         +:+     */
-// /*   By: username <username@student.42.fr>          +#+  +:+       +#+        */
-// /*                                                +#+#+#+#+#+   +#+           */
-// /*   Created: 2024/01/01 00:00:00 by username          #+#    #+#             */
-// /*   Updated: 2024/01/01 00:00:00 by username         ###   ########.fr       */
-// /*                                                                            */
-// /* ************************************************************************** */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   split_with_quotes.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: username <username@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/01 00:00:00 by username          #+#    #+#             */
+/*   Updated: 2024/01/01 00:00:00 by username         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// #include "../minishell.h"
+#include "../minishell.h"
 
-// static void	advance_through_word(char *str, int *i, int *in_quotes,
-// 		char *quote_char)
-// {
-// 	while (str[*i])
-// 	{
-// 		if (str[*i] == '\'' || str[*i] == '"')
-// 		{
-// 			if (!*in_quotes)
-// 			{
-// 				*in_quotes = 1;
-// 				*quote_char = str[*i];
-// 			}
-// 			else if (str[*i] == *quote_char)
-// 			{
-// 				*in_quotes = 0;
-// 				*quote_char = 0;
-// 			}
-// 			(*i)++;
-// 		}
-// 		else if (!*in_quotes && ft_isspace(str[*i]))
-// 			break ;
-// 		else
-// 			(*i)++;
-// 	}
-// }
+static int	has_quotes(char *str)
+{
+	int	i = 0;
 
-// static int	count_words_with_quotes(char *str)
-// {
-// 	int		i;
-// 	int		count;
-// 	int		in_quotes;
-// 	char	quote_char;
+	while (str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+			return (1);
+		i++;
+	}
+	return (0);
+}
 
-// 	i = 0;
-// 	count = 0;
-// 	in_quotes = 0;
-// 	quote_char = 0;
-// 	while (str[i])
-// 	{
-// 		while (ft_isspace(str[i]))
-// 			i++;
-// 		if (!str[i])
-// 			break ;
-// 		count++;
-// 		advance_through_word(str, &i, &in_quotes, &quote_char);
-// 	}
-// 	return (count);
-// }
+static t_token	*get_cmd_token(t_token *head, t_token *current)
+{
+	t_token	*temp = head;
+	t_token	*cmd_token = NULL;
 
-// static int	extract_words(char *str, char **result)
-// {
-// 	int		i;
-// 	int		start;
-// 	int		count;
-// 	int		in_quotes;
-// 	char	quote_char;
+	while (temp && temp != current)
+	{
+		if (temp->type == TOKEN_PIPE || temp->type == TOKEN_SEMICOLON)
+			cmd_token = NULL;
+		else if (temp->type == TOKEN_WORD && !cmd_token)
+			cmd_token = temp;
+		temp = temp->next;
+	}
+	return (cmd_token);
+}
 
-// 	i = 0;
-// 	count = 0;
-// 	in_quotes = 0;
-// 	quote_char = 0;
-// 	while (str[i])
-// 	{
-// 		while (ft_isspace(str[i]))
-// 			i++;
-// 		if (!str[i])
-// 			break ;
-// 		start = i;
-// 		advance_through_word(str, &i, &in_quotes, &quote_char);
-// 		result[count] = ft_strndup(str + start, i - start);
-// 		if (!result[count])
-// 			return (0);
-// 		count++;
-// 	}
-// 	return (1);
-// }
+static int	is_after_pipe_or_semicolon(t_token *head, t_token *current)
+{
+	t_token	*temp = head;
 
-// char	**split_with_quotes(char *str)
-// {
-// 	char	**result;
-// 	int		word_count;
+	while (temp && temp != current)
+	{
+		if (temp->type == TOKEN_PIPE || temp->type == TOKEN_SEMICOLON)
+		{
+			if (temp->next)
+				temp = temp->next;
+			break;
+		}
+		temp = temp->next;
+	}
+	return (1);
+}
 
-// 	if (!str || !*str)
-// 		return (NULL);
-// 	word_count = count_words_with_quotes(str);
-// 	if (word_count == 0)
-// 		return (NULL);
-// 	result = malloc(sizeof(char *) * (word_count + 1));
-// 	if (!result)
-// 		return (NULL);
-// 	if (!extract_words(str, result))
-// 	{
-// 		free_array(result);
-// 		return (NULL);
-// 	}
-// 	result[word_count] = NULL;
-// 	return (result);
-// }
+int	is_export_assignment(t_token *head, t_token *current)
+{
+	t_token	*cmd_token;
+
+	is_after_pipe_or_semicolon(head, current);
+	cmd_token = get_cmd_token(head, current);
+	if (cmd_token && ft_strcmp(cmd_token->value, "export") == 0)
+	{
+		if (has_quotes(current->value))
+			return (2);
+		if (ft_strchr(current->value, '='))
+			return (1);
+	}
+	return (0);
+}
