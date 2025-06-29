@@ -113,7 +113,7 @@ static void handle_cmd_errors(char *cmd_path)
 	}
 }
 
-static void cmd_process(t_cmd *cmd, char **env,  t_env *env_list, t_shell *shell_ctx)
+static void cmd_process(t_cmd *cmd, char **env)
 {
     char *cmd_path;
     if (!cmd || !cmd->cmd) 
@@ -159,7 +159,7 @@ static void cmd_process(t_cmd *cmd, char **env,  t_env *env_list, t_shell *shell
     exit(0); // Should never reach here
 }
 
-static void execute_single_command(t_cmd **cmd, char **envp, t_env *env_list, t_shell *shell_ctx)
+static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 {
     pid_t id;
     int status;
@@ -184,7 +184,7 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_env *env_list, t_
         // Modify child_termios settings if needed (e.g., disable echo, etc.)
         // tcsetattr(STDIN_FILENO, TCSANOW, &child_termios);
         
-        cmd_process(*cmd, envp, env_list, shell_ctx);
+        cmd_process(*cmd, envp);
         shell_ctx->exit_status = 0;
         
         // Child exits - no need to restore original attributes as they're per-process
@@ -435,7 +435,7 @@ int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
             free_env(env);
             return (0);
         }
-        execute_single_command(cmd, env, *env_list,shell_ctx);
+        execute_single_command(cmd, env,shell_ctx);
     }
     else
     {// Convert linked list to array
