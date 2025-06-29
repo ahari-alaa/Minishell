@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 16:46:41 by ahari            ###   ########.fr       */
+/*   Updated: 2025/06/29 17:36:17 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,7 @@ static char *handle_env_var(char *cmd, int pos, char **env)
         free(env_value);
     }
     else
-        new_cmd = build_new_command(cmd, pos, "", var_len + 1);///alaa + $USER 
-    
+        new_cmd = NULL;///alaa + $USER 
     return (new_cmd);
 }
 
@@ -194,12 +193,11 @@ static char *process_env_variable(char *cmd, int pos, char **env, t_shell *shell
     if (cmd[pos + 1] && is_char(cmd[pos + 1]))
     {
         new_cmd = handle_env_var(cmd, pos, env);
-        if (new_cmd)
-        {
-            expanded = found_env(new_cmd, env, shell_ctx);
-            free(new_cmd); // 🔥 fix leak
-            return expanded;
-        }
+        if (!new_cmd)
+            return NULL;
+        expanded = found_env(new_cmd, env, shell_ctx);
+        free(new_cmd);
+        return expanded;
     }
     return NULL;
 }
@@ -242,15 +240,13 @@ static char	*process_variables(char *cmd, char **env, t_shell *shell_ctx)
 		if (should_expand_var(cmd, pos, in_quotes, quote_char))
 		{
 			result = process_special_variable(cmd, pos, shell_ctx);\
-            if (!result)
-                return (NULL);
 			if (result)
 				return (result);
 			result = process_env_variable(cmd, pos, env, shell_ctx);
+            if (result == NULL && cmd[pos + 1] && is_char(cmd[pos + 1]))
+                return NULL;
 			if (result)
 				return (result);
-            if (!result)
-                return (NULL);
 		}
 		pos++;
 	}
