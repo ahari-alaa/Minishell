@@ -27,6 +27,8 @@ int	is_builtin(char *command)
 
 t_env	*execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell, int i)
 {
+	int stdin_copy = dup(STDIN_FILENO);
+    	int stdout_copy = dup(STDOUT_FILENO);
 	if (redirections(*cmd) != 0)
         {
         	dup2(stdin_copy, STDIN_FILENO);
