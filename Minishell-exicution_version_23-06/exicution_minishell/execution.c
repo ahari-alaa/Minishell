@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/28 21:35:50 by maskour          ###   ########.fr       */
+/*   Updated: 2025/06/29 16:29:07 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,12 +129,7 @@ static void cmd_process(t_cmd *cmd, char **env)
         handle_cmd_errors(NULL);
         exit(1); // Exit with error
     }
-        if (is_builtin(cmd->cmd[0]))
-        {
-            env_list = execut_bultin(&cmd->cmd[0], env_list, shell_ctx, 0);
-            free_env(env);
-        exit(shell_ctx->exit_status); // Don't forget to exit!
-    }
+
     cmd_path = find_path(cmd->cmd[0], env);
     // printf("%s\n",cmd_path);
     if (!cmd_path)
