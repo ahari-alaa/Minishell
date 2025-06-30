@@ -40,33 +40,27 @@ void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
     int i = 1;
     int n_nb = 0;
     t_cmd *current_cmd = *cmd;
-    int j;
+
     if (nb_args(current_cmd->cmd) > 1)
     {
+        // Handle -n options
         while (current_cmd->cmd[i] && check_new_line(current_cmd->cmd[i]))
         {
             n_nb = 1;
             i++;
         }
+        // Print arguments
         while (current_cmd->cmd[i])
         {
-            if (current_cmd->cmd[i][0] == '$' && current_cmd->cmd[i][1] != '\0')
-            {j = 1;
-            while (current_cmd->cmd[i][j])
-            {
-                printf("%c",current_cmd->cmd[i][j]);
-                j++;
-            }
-            }
-            else 
-                printf("%s",current_cmd->cmd[i]);
-            if(current_cmd->cmd[i+1])
-                printf(" ");
+            write(STDOUT_FILENO, current_cmd->cmd[i], strlen(current_cmd->cmd[i]));
+            if (current_cmd->cmd[i + 1])
+                write(STDOUT_FILENO, " ", 1);
             i++;
         }
-        
     }
+
     if (n_nb == 0)
-        printf("\n");
+        write(STDOUT_FILENO, "\n", 1);
+
     shell_ctx->exit_status = 0;
 }
