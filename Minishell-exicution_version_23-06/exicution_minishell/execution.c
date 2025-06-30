@@ -134,6 +134,13 @@ static void cmd_process(t_cmd *cmd, char **env)
     // printf("%s\n",cmd_path);
     if (!cmd_path)
     {
+       if (access(cmd->cmd[0], F_OK) == 0)
+        {
+            ft_putstr_fd_up("minishell: ", 2);
+            ft_putstr_fd_up(cmd->cmd[0], 2);
+            ft_putstr_fd_up(": Permission denied\n", 2);
+            exit(126); // Permission denied exit code
+        }
         ft_putstr_fd_up("minishell:", 2);
         ft_putstr_fd_up(cmd->cmd[0], 2);
         ft_putstr_fd_up(": command not found\n", 2);
@@ -328,6 +335,13 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
             char *path = find_path(cmds[i]->cmd[0], env);
             if (!path)
             {
+		        if (access(cmd->cmd[0], F_OK) == 0)
+        {
+            ft_putstr_fd_up("minishell: ", 2);
+            ft_putstr_fd_up(cmd->cmd[0], 2);
+            ft_putstr_fd_up(": Permission denied\n", 2);
+            exit(126); // Permission denied exit code
+        }
                 ft_putstr_fd_up("minishell: ", 2);
                 ft_putstr_fd_up(cmds[i]->cmd[0], 2);
                 ft_putstr_fd_up(": command not found\n", 2);
