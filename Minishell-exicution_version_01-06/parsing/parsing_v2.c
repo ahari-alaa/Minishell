@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 23:12:29 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/01 20:47:01 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 #include "../minishell.h"
 
 
-static void	process_export_assignment_split(char **new_val, int i, int is_export_var)
+static void	process_export_assignment_split(char **new_val, int i, int is_export_var, t_token **head)
 {
 	char	**split;
 	char	*joined;
     char    *tmp;
-
+	(void)head;
 	split = split_with_quotes(new_val[i]);
 	if (!split || !split[0] || !split[1])
 	{
@@ -41,9 +41,16 @@ static void	process_export_assignment_split(char **new_val, int i, int is_export
 	{
 		tmp = split[0];
 		split[0] = NULL;
-		free_array(split);
+		// free_array(split);
 		free(new_val[i]);
 		new_val[i] = tmp;
+		int i = 1;
+		while (split[i])
+		{
+			add_token(head, new_token(ft_strdup(split[i]), TOKEN_WORD));
+			i++;
+		}
+		free_array(split);
 	}
 }
 
@@ -90,7 +97,7 @@ int	handle_split(t_token *cur, t_token **head,
 {
 	char	**split;
 
-	split = split_with_quotes(new_val[i]);
+	split = ft_split_up(new_val[i], ' ');
 	if (split && split[0] && split[1])
 	{
 		if (!handle_token_splitting(cur, head, split))
@@ -113,7 +120,7 @@ int	process_token_loop(t_token *cur, t_token **head,
 	{
 		if (!is_single_quoted(cur->value, p.new_val[i]))
 		{
-			 if (p.new_val[i][0] == '\1')
+			if (p.new_val[i][0] == '\1')
             {
                 char *unmarked = ft_strdup(p.new_val[i] + 1);
                 if (!unmarked)
@@ -139,7 +146,7 @@ int	process_token_loop(t_token *cur, t_token **head,
 					return (free(p.val_cmd), ret);
 			}
 			else if (p.is_export && !is_quoted(cur->value, p.new_val[i]))
-				process_export_assignment_split(p.new_val, i, p.is_export);
+				process_export_assignment_split(p.new_val, i, p.is_export, head);
 		}
 		if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
 			return (0);
@@ -148,20 +155,20 @@ int	process_token_loop(t_token *cur, t_token **head,
 	return (finalize_token_value(cur, head, p.val_cmd, p.new_val));
 }
 
-int	process_token(t_token *current, t_token **head,
-		t_shell *shell_ctx, char **env_table)
+int process_token(t_token *current, t_token **head,
+        t_shell *shell_ctx, char **env_table)
 {
-	char	**new_val;
-	char	*val_cmd;
-	int		is_export_var;
+    char    **new_val;
+    char    *val_cmd;
+    int     is_export_var;
 
-	if (current->type != TOKEN_WORD)
-		return (1);
-	is_export_var = is_export_assignment(*head, current);
-	new_val = process_quoted_value(current->value, *head, shell_ctx);
-	if (!new_val)
-		return (0);
-	val_cmd = NULL;
-	return (process_token_loop(current, head, shell_ctx,
-			(t_process){new_val, val_cmd, env_table, is_export_var}));
+    if (current->type != TOKEN_WORD)
+        return (1);
+    is_export_var = is_export_assignment(*head, current);
+    new_val = process_quoted_value(current->value, *head, shell_ctx);
+    if (!new_val)
+        return (0);
+    val_cmd = NULL;
+    return (process_token_loop(current, head, shell_ctx,
+            (t_process){new_val, val_cmd, env_table, is_export_var}));
 }

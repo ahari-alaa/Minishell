@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 23:06:44 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/01 21:40:54 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,6 @@ t_token *find_previous_token(t_token *head, t_token *target)
         return  NULL;
 }
 
-
-// Special handling for export assignments - don't split after '='
 char *join_export_tokens(char **split)
 {
     char *result = NULL;
@@ -273,7 +271,6 @@ int handle_token_splitting(t_token *current, t_token **head, char **split)
 
     while (split[j])
     {
-        printf("split[%d]: %s\n", j, split[j]);
         t_token *new_tokens = new_token(ft_strdup(split[j]), TOKEN_WORD);
         if (!new_tokens)
         {
@@ -294,10 +291,7 @@ int handle_token_splitting(t_token *current, t_token **head, char **split)
     else
         *head = first_new;
     last_new->next = next_token;
-    free(current->value);
-    free(current);
-    
-    return (1);
+    return (free(current->value), free(current), 1);
 }
 
 int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx)
@@ -326,11 +320,9 @@ t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
         next = current->next;
         process_result = process_token(current, &head, shell_ctx, env_table);
         if (process_result == 0)
-            return NULL;
-        else if (process_result == 2)
         {
-            current = head;
-            continue;
+            free_tokens(head, str);
+            return (NULL);
         }
         current = next;
     }

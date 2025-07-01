@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 21:48:51 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/01 20:20:58 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 ///the headar of all file that we will use in this project 
 #include <signal.h>//this for the signals
 #include <limits.h>//this for the limits
-#include <sys/wait.h> // Required for waitpid()
 #include <fcntl.h> // Required for open() and flags
 #include <stdio.h>  // perror()
 #include <readline/readline.h>  // For rl_replace_line, rl_redisplay, etc.
@@ -25,14 +24,13 @@
 #include <sys/stat.h> // stat() & lstat() & fstat()
 #include <sys/types.h> // opendir() closedir()
 #include <dirent.h> // opendir() ,readdir() ,closedir()
-#include <string.h> // strerror() && 
 #include <sys/ioctl.h> // For ioctl()
 #include <stdlib.h> //
 #include <termios.h> //
 #include <curses.h> //
 #include <term.h> //
 #include <string.h>
-#include <termios.h>
+
 
 // #define PATH_MAX 4096
 
@@ -69,7 +67,7 @@ typedef struct s_file
 
 typedef struct s_cmd
 {
-	char		**cmd; // command name
+	char		**cmd; // command namel
 	t_file		*files; // files associated with the command
 	int			file_count; // number of files
 	struct s_cmd	*next; // pointer to next command
@@ -81,6 +79,7 @@ typedef struct s_env
 	char *data_env;//this the path like use/bin....
 	struct s_env *next; /* data */
 }t_env;
+//export
 typedef struct s_process
 {
 	char	**new_val;
@@ -145,6 +144,7 @@ char			*ft_strncpy(char *dest, const char *src, size_t n);
 char			*ft_strcat(char *dest, const char *src);
 char			*ft_substr(const char *s, unsigned int start, size_t len);
 char			*ft_itoa(int n);
+int ft_strspace(char *str);
 // char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
 char			*found_env(char *cmd, char **env, t_shell *shell_ctx);

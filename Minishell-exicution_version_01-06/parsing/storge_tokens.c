@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 22:46:47 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/01 21:44:11 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,23 @@ static int parse_arguments(t_cmd *cmd, t_token **tokens)
     int arg_i = 0;
     t_token *current = *tokens;
 
+    // First pass: count valid arguments
+    int valid_args = 0;
+    t_token *count_ptr = current;
+    while (count_ptr && count_ptr->type != TOKEN_PIPE)
+    {
+        if (count_ptr->type == TOKEN_WORD && ft_strcmp(count_ptr->value, "\2") != 0)
+            valid_args++;
+        count_ptr = count_ptr->next;
+    }
+    cmd->cmd = malloc(sizeof(char *) * (valid_args + 1));
+    if (!cmd->cmd)
+        return 0;
     while (current && current->type != TOKEN_PIPE)
     {
-        if (current->type == TOKEN_WORD)
+        if (current->type == TOKEN_WORD && ft_strcmp(current->value, "\2") != 0)
         {
-            if (ft_strcmp(current->value, "\2") != 0)
-                cmd->cmd[arg_i++] = ft_strdup(current->value);
-            else
-                printf("empty string\n");
+            cmd->cmd[arg_i++] = ft_strdup(current->value);
             if (!cmd->cmd[arg_i - 1])
                 return 0;
         }

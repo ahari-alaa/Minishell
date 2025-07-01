@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 22:23:27 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/01 21:46:54 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,34 @@ static char *handle_special_var(char *cmd, int pos, t_shell *exited)
     free(replacement);
     return new_cmd;
 }
+int ft_strspace(char *str)
+{
+    int i = 0;
+    if (!str)
+        return 0;
+    while (str[i])
+    {
+        if (!ft_isspace(str[i]))
+            return 0;
+        i++;
+    }
+    return 1;
+}
 
+char *ft_delete_spaces(char *str)
+{
+    if (!str)
+        return NULL;
+    int i= 0;
+    while (str[i] && ft_isspace(str[i]))
+    {
+        i++;
+    }
+    if (str[i] == '\0')
+        return NULL;
+    return (ft_strdup(str + i));
+    
+}
 static char *handle_env_var(char *cmd, int pos, char **env)
 {
     int		var_start;
@@ -106,15 +133,18 @@ static char *handle_env_var(char *cmd, int pos, char **env)
     if (!env_name)
         return (NULL);
     env_value = get_env(env, env_name);
+    if (ft_strspace(env_value) == 1)
+        env_value = ft_strdup(" ");
+    else
+        env_value = ft_delete_spaces(env_value);
     free(env_name);
-    if (env_value != NULL)
+    if (env_value != NULL && ft_strspace(env_value) != 1)
     {
         new_cmd = build_new_command(cmd, pos, env_value, var_len + 1);
         free(env_value);
     }
     else
-        new_cmd = build_new_command(cmd, pos, "\2", var_len + 1);///alaa + $USER 
-    
+        new_cmd = build_new_command(cmd, pos, "\2", var_len + 1);
     return (new_cmd);
 }
 
@@ -159,7 +189,7 @@ static char *process_special_variable(char *cmd, int pos, t_shell *shell_ctx)
         if (new_cmd)
         {
             expanded = found_env(new_cmd, NULL, shell_ctx);
-            free(new_cmd); // 🔥 fix leak
+            free(new_cmd);
             return expanded;
         }
     }
@@ -178,7 +208,7 @@ static char *process_env_variable(char *cmd, int pos, char **env, t_shell *shell
         if (new_cmd)
         {
             expanded = found_env(new_cmd, env, shell_ctx);
-            free(new_cmd); // 🔥 fix leak
+            free(new_cmd);
             return expanded;
         }
     }
@@ -226,27 +256,24 @@ static char	*process_variables(char *cmd, char **env, t_shell *shell_ctx)
 
 char *found_env(char *cmd, char **env, t_shell *shell_ctx)
 {
-    char *preprocessed = NULL;
-    char *result;
+    char    *preprocessed;
+    char    *result;
+    char    *expanded;
 
     if (!cmd)
-        return NULL;
-    
-    // Handle quoted variables first
+        return (NULL);
     if (cmd[0] == '\1')
     {
-        char *expanded = process_variables(cmd + 1, env, shell_ctx);
+        expanded = process_variables(cmd + 1, env, shell_ctx);
         if (!expanded)
-            return NULL;
-        // Return the expanded value without re-adding the quote marker
+            return (NULL);
         return expanded;
     }
-    
     preprocessed = replace_double_dollar(cmd);
     if (!preprocessed)
-        return NULL;
+        return (NULL);
     result = process_variables(preprocessed, env, shell_ctx);
     free(preprocessed);
-    return result;
+    return (result);
 }
 

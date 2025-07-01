@@ -20,6 +20,10 @@ static int	has_quotes(char *str)
 	{
 		if (str[i] == '\'' || str[i] == '"')
 			return (1);
+		if (str[i] == '$')
+			return (3);
+		if (str[i] == '=')
+			break ;
 		i++;
 	}
 	return (0);
@@ -41,15 +45,60 @@ static t_token	*get_cmd_token(t_token *head, t_token *current)
 	return (cmd_token);
 }
 
+int ft_parsexport(char *str)
+{
+	int qouted;
+	int i;
+	if (!str || !*str)
+		return (0);
+	i = 0;
+	qouted = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'' || str[i] == '\"')
+			qouted = 1;
+		i++;
+	}
+	return (qouted);
+}
+char *ft_strremovechar(const char *str)
+{
+    int i = 0, j = 0;
+    char *new_str;
+
+    if (!str)
+        return NULL;
+
+    new_str = malloc(ft_strlen(str) + 1);
+    if (!new_str)
+        return NULL;
+
+    while (str[i])
+    {
+        if (str[i] != '\'' || str[i] != '\"')
+        {
+            new_str[j] = str[i];
+            j++;
+        }
+        i++;
+    }
+    new_str[j] = '\0';
+    return new_str;
+}
+
 
 int	is_export_assignment(t_token *head, t_token *current)
 {
 	t_token	*cmd_token;
+	int		qouted;
+	char	*str;
 
+	qouted = ft_parsexport(current->value);
+	str = ft_strremovechar(current->value); 
 	cmd_token = get_cmd_token(head, current);
-	if (cmd_token && ft_strcmp(cmd_token->value, "export") == 0)
+	if (cmd_token && (ft_strcmp(str, "export") == 0 ))
 	{
-		if (has_quotes(current->value))
+		if (has_quotes(current->value) || qouted != 0)
 			return (2);
 		if (ft_strchr(current->value, '='))
 			return (1);
