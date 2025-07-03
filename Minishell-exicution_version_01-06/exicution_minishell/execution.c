@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/22 20:47:08 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 18:07:19 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ static void handle_cmd_errors(char *cmd_path)
 	}
 }
 
-static void cmd_process(t_cmd *cmd, char **env)
+static void cmd_process(t_cmd *cmd, char **env, t_shell *shell_ctx)
 {
     char *cmd_path;
     if (!cmd)
@@ -104,7 +104,7 @@ static void cmd_process(t_cmd *cmd, char **env)
         handle_cmd_errors(NULL);
         exit(1); // Exit with error
     }
-    if (redirections(cmd))
+    if (redirections(cmd,env, shell_ctx))
         exit(1); // Error in redirection
 
     if (!cmd->cmd || !cmd->cmd[0])
@@ -141,7 +141,7 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
         // Child process - restore default SIGINT handler
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
-        cmd_process(*cmd, envp);
+        cmd_process(*cmd, envp, shell_ctx); // Execute the command
         shell_ctx->exit_status = 0;
     }
     else if (id > 0)
@@ -212,7 +212,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_shell *s
                 exit(127);
             }
             // Handle redirections
-            if (redirections(cmds[i]))
+            if (redirections(cmds[i],env, shell_ctx)) 
             {
                 exit(1);  // Redirection failed
             }

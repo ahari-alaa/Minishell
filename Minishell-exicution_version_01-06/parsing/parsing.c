@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/03 17:31:57 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 18:40:59 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -312,6 +312,7 @@ t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
     int process_result;
 
     head = string_tokens(str, shell_ctx);
+   // print_tokens(head);
     if (!head)
         return (NULL);
     current = head;

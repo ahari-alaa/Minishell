@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/03 17:25:05 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 18:40:31 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,10 @@ static void *get_rundem_name(char *file_name)
     }
     return (NULL);
 }
-
-static int function_herdoc(t_file *file)
+//char			*found_env(char *cmd, char **env, t_shell *shell_ctx);
+static int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
 {
+
     char *filename = get_rundem_name(file->name);
     if (!filename)
     {
@@ -105,13 +106,34 @@ static int function_herdoc(t_file *file)
         line = readline("> ");
         if (!line)
             break;
-        if (!ft_strcmp(line, file->name)) {
+        if (!ft_strcmp(line, file->name))
+        {
             free(line);
             break ;
         }
-        write(fd, line, ft_strlen(line));
-        write(fd, "\n", 1);
+        char *tmp = ft_strjoin("$",file->name);
+        if (file->check_expand == 0 && ft_strcmp(line, tmp) != 0)
+        {
+            printf("dkhal hna\n");
+            char *expanded_line = found_env(line, env, shell_ctx);
+            if (!expanded_line)
+            {
+                free(line);
+                close(fd);
+                unlink(filename);
+                return (1);
+            }
+            write(fd, expanded_line, ft_strlen(expanded_line));
+            write(fd, "\n", 1);
+            free(expanded_line);
+        } else
+        {
+            write(fd, line, ft_strlen(line));
+            write(fd, "\n", 1);
+        }
+        // write(fd, line, ft_strlen(line));
         free(line);
+        free(tmp);
     }
     close(fd);
 
@@ -121,7 +143,7 @@ static int function_herdoc(t_file *file)
     return (0);
 }
 
-int redirections(t_cmd *cmd)
+int redirections(t_cmd *cmd, char **env, t_shell *shell_ctx)
 {
     if (!cmd || cmd->file_count <= 0)
         return 0;
@@ -140,7 +162,7 @@ int redirections(t_cmd *cmd)
             last_heredoc_idx = i;
     }
     if (last_heredoc_idx != -1) {
-        if (function_herdoc(&cmd->files[last_heredoc_idx])) {
+        if (function_herdoc(&cmd->files[last_heredoc_idx], env , shell_ctx)) {
             goto cleanup;
         }
     }

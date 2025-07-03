@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/03 17:14:40 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 18:05:37 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,7 @@ char	*ft_strtrim(char const *s1, char const *set);
 /*---------------exicution_util-----------------------*/
 int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx);
 // int execute_single_command(t_cmd **cmd, char **envp);
-int redirections(t_cmd *cmd);
+int redirections(t_cmd *cmd, char **env, t_shell *shell_ctx);
 char	*find_path(char *cmd, char **env);
 
 /*---------------------builtins-----------------------*/

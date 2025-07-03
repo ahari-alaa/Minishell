@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/03 17:32:17 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 18:14:06 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int main(int ac,char **av,char **env)
             continue ;
         }
        commands = parse_commands(tokens , shell_ctx);
-       print_command_with_files (commands);
+    //    print_command_with_files (commands);
         if (!commands)
         {
             free_tokens(tokens, input);

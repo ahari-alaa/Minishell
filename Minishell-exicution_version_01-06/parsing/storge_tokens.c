@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/03 17:45:55 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 18:15:08 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,7 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
             if(!file->name)
                 return (free(file), 0);
             file->type = current->type;
-            printf("was quoted :%d\n",  current->next->was_quoted);
-            file->check_expand =  current->next->was_quoted;
+            file->check_expand = current->next->was_quoted;
             // if (!file->name)
             //     return (free(file), 0);
             cmd->files[cmd->file_count++] = *file;

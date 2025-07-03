@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/03 18:00:10 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 18:02:45 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,14 +74,14 @@ static void handle_cmd_errors(char *cmd_path)
     exit(1);
 }
 
-static void cmd_process(t_cmd *cmd, char **env)
+static void cmd_process(t_cmd *cmd, char **env, t_shell *shell_ctx)
 {
     char *cmd_path;
     // char **cmd_arg;
     // char **cmd_arg;
     if (!cmd || !cmd->cmd || !cmd->cmd[0])
         handle_cmd_errors(NULL);
-    redirections(cmd); // that's to handel the rederections
+    redirections(cmd, env, shell_ctx); // that's to handel the rederections
     // cmd_arg = split_cmd(cmd);
     cmd_path = find_path(cmd->cmd[0], env);
     if (!cmd_path)
@@ -94,14 +94,14 @@ static void cmd_process(t_cmd *cmd, char **env)
         handle_cmd_errors(cmd_path);
 }
 
-static void execute_single_command(t_cmd **cmd, char **envp)
+static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 {
     pid_t id;
     int status;
     id = fork();
     // printf("single_command\n");
     if (id == 0)
-        cmd_process(*cmd,envp);
+        cmd_process(*cmd,envp, shell_ctx); // that's to execute the command
     else if (id > 0)
         waitpid(id, &status, 0);
     else
@@ -172,7 +172,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env)
     while (wait(NULL) > 0);
 }
 
-int exicut(t_cmd **cmd, t_env *env_list)
+int exicut(t_cmd **cmd, t_env *env_list ,t_shell *shell_ctx)
 {
     int cmd_count = 0;
     if (!cmd || !*cmd)
@@ -191,7 +191,7 @@ int exicut(t_cmd **cmd, t_env *env_list)
             env_list = execut_bultin(cmd, env_list);
             return (0);
         }
-        execute_single_command(cmd, env);
+        execute_single_command(cmd, env, env_list->shell_ctx);
     }
     else
         execute_pipeline(cmd, cmd_count,env);
