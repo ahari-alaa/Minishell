@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/14 22:10:43 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/03 17:52:17 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ static void function_herdoc(t_file *file)
 	dup2(fd,0);
 	close(fd);
 }
+//char			*found_env(char *cmd, char **env, t_shell *shell_ctx);
 void redirections(t_cmd *cmd)
 {
 	int i = 0;

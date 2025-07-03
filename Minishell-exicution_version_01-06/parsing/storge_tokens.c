@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/01 21:44:11 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 17:45:55 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ static int parse_arguments(t_cmd *cmd, t_token **tokens)
     int arg_i = 0;
     t_token *current = *tokens;
 
-    // First pass: count valid arguments
     int valid_args = 0;
     t_token *count_ptr = current;
     while (count_ptr && count_ptr->type != TOKEN_PIPE)
@@ -97,8 +96,10 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
             if(!file->name)
                 return (free(file), 0);
             file->type = current->type;
-            if (!file->name)
-                return (free(file), 0);
+            printf("was quoted :%d\n",  current->next->was_quoted);
+            file->check_expand =  current->next->was_quoted;
+            // if (!file->name)
+            //     return (free(file), 0);
             cmd->files[cmd->file_count++] = *file;
             free(file);
             current = current->next;

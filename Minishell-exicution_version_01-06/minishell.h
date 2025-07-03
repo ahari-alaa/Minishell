@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/01 20:20:58 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 17:14:40 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ typedef struct s_file
 {
 	char			*name; // name of the file
 	t_token_type	type;// file type
+	int				check_expand; 
 }	t_file;
 
 typedef struct s_cmd
@@ -127,6 +128,7 @@ int				ft_isredirect(t_token_type type);
 int				count_args(t_token *token);
 t_token			*check_quoted(char *str, t_shell *shell_ctx, char **env_table);
 char			**convert(t_env *env_list);
+int count_herdoc(t_cmd *cmd);
 
 /*------------ tools for parsing ----------------*/
 int				is_quote(char c);
@@ -144,16 +146,17 @@ char			*ft_strncpy(char *dest, const char *src, size_t n);
 char			*ft_strcat(char *dest, const char *src);
 char			*ft_substr(const char *s, unsigned int start, size_t len);
 char			*ft_itoa(int n);
-int ft_strspace(char *str);
+int				ft_strspace(char *str);
 // char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
 char			*found_env(char *cmd, char **env, t_shell *shell_ctx);
+int				has_quotes(char *str);
 //********
 int				is_single_quoted(char *original_val, char *substring);
 int				is_quoted(char *original_val, char *substring);
 char			*join_export_tokens(char **split);
-int handle_token_splitting(t_token *current, t_token **head, char **split);
-int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx);
+int				handle_token_splitting(t_token *current, t_token **head, char **split);
+int				process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx);
 
 
 /*--------------this function for tockens------------*/

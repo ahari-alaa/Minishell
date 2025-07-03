@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/26 22:30:06 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/03 17:25:05 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,8 @@ static void *get_rundem_name(char *file_name)
 static int function_herdoc(t_file *file)
 {
     char *filename = get_rundem_name(file->name);
-    if (!filename) {
+    if (!filename)
+    {
         perror("minishell: cannot create temporary file");
         return (1);
     }

@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/01 20:56:16 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 17:32:17 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void free_char_array(char **array)
     }
     free(array);
 }
+
 void ff()
 {
     system("leaks minishell");
@@ -67,10 +68,20 @@ int main(int ac,char **av,char **env)
             continue ;
         }
        commands = parse_commands(tokens , shell_ctx);
+       print_command_with_files (commands);
         if (!commands)
         {
             free_tokens(tokens, input);
             continue ;
+        }
+        if (count_herdoc(commands) > 16)
+        {
+                write(2, "minishell: too many here-documents\n", 36);
+                shell_ctx->exit_status = 2;
+                free_tokens(tokens, input);
+                free_cmd_list(commands);
+                free_char_array(env_table);
+                break;
         }
         free_char_array(env_table);
         exicut(&commands, &env_list, shell_ctx);

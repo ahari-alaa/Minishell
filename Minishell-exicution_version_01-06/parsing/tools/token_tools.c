@@ -10,7 +10,7 @@
 // /*                                                                            */
 // /* ************************************************************************** */
 
-// #include "../../minishell.h"
+#include "../../minishell.h"
 
 // int is_single_quoted(char *original_val, char *substring)
 // {
@@ -52,3 +52,15 @@
 //     }
 //     return (current_quote != 0);
 // }
+int count_herdoc(t_cmd *cmd)
+{
+    int count = 0;
+    int i= 0;
+    while (i < cmd->file_count) 
+    {
+        if (cmd->files->type == TOKEN_HEREDOC)
+                count++;
+        i++;
+    }
+    return count;
+}

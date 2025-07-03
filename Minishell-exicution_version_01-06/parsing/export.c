@@ -12,10 +12,9 @@
 
 #include "../minishell.h"
 
-static int	has_quotes(char *str)
+int	has_quotes(char *str)
 {
 	int	i = 0;
-
 	while (str[i])
 	{
 		if (str[i] == '\'' || str[i] == '"')

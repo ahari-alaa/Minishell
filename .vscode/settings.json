@@ -61,7 +61,8 @@
     "algorithm": "c",
     "bitset": "c",
     "chrono": "c",
-    "unordered_map": "c"
+    "unordered_map": "c",
+    "typeinfo": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

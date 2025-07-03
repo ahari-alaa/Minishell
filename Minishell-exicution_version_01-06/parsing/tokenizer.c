@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 16:04:38 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/29 23:06:12 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/03 17:40:58 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,12 @@ t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *she
     if (!val)
         return (NULL);    
     t_token *new = new_token(val, TOKEN_WORD);
+    printf("val: %s\n", val);
+    printf("type: %d\n", new->type);
+    if (has_quotes(new->value) == 1)
+        new->was_quoted = 1;
+    else
+        new->was_quoted = 0;
     if (!new)
         return (free(val), NULL);
     add_token(head, new);
@@ -144,7 +150,6 @@ t_token	*string_tokens(char *str, t_shell *shell_ctx)
 	i = 0;
 	if (!validate_syntax(str, shell_ctx))
 		return (NULL);
-
 	while (str[i])
 	{
 		while (ft_isspace(str[i]))
