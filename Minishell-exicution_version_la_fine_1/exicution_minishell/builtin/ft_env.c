@@ -6,11 +6,12 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:17 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/26 00:20:58 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/04 20:07:51 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+
 void ft_env(t_env *env_list, t_shell *shell_ctx)
 {
     t_env *env = env_list;

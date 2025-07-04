@@ -6,22 +6,13 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/03 22:34:46 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/04 19:20:08 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../minishell.h"
-// static void handl_quitsig(int signal)
-// {
-//     if (signal == SIGINT)
-// 	{
-//     	 write(1,"\n",1);
-//   		rl_on_new_line();
-//   		rl_replace_line("", 0);
-//   		rl_redisplay();
-// 	}
-// }
+
 static void ignore_sigint(void)
 {
     signal(SIGINT, SIG_IGN);
@@ -32,11 +23,6 @@ static void restore_sigint(void)
     // write(1,"\n",1);
     signal(SIGINT, handler_sig);
 }
-// static void restore_sigint_1(void)
-// {
-//     signal(SIGINT, SIG_IGN);
-//     write(1,"Quit\n",5);
-// }
 
 static void free_env(char **env)
 {
@@ -326,9 +312,9 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
                     return; // Other heredoc failure
                 }
             }
+            signal(SIGINT, SIG_IGN);
         }
     }
-    restore_sigint();
     int pipes[2];
     pid_t pid;
     int prev_pipe = -1;

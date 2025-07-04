@@ -6,13 +6,41 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/03 17:27:08 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/04 20:40:53 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+static void	add_oldpwd (t_env *data_env)
+{
+	t_env	*curreent;
+	t_env	*last;
+	char	*new_path;
 
+	curreent = data_env;
+	last = NULL;
+	while (curreent)
+	{
+		if (ft_strstr(curreent->data_env, "OLDPWD="))
+				return ;
+			last = curreent;
+			curreent = curreent->next;
+	}
+	new_path = ft_strjoin("OLDPWD", "=");
+	if (!new_path)
+		return ;
+	t_env *new_node = malloc(sizeof(t_env));
+	if (!new_node)
+	{
+		free(new_path);
+		return ;
+	}
+	new_node->data_env = new_path;
+	new_node->next = NULL;
+	if (last)
+		last->next = new_node;
+}
 static void update_env_var(t_env *data_env, char *key, char *dest)
 {
     t_env *current = data_env;
@@ -40,6 +68,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
     char oldpwd_update[PATH_MAX];
     char *path = NULL;
     t_cmd *cmd_path = *cmd;
+
     if (ft_strcmp(cmd_path->cmd[0], "cd") != 0)
         return data_env;
     if (access(".", F_OK | X_OK) != 0)
@@ -48,14 +77,11 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
         shell_ctx->exit_status = 1;
         return data_env;
     }
-
     if (!cmd_path->cmd[1])
     {
         shell_ctx->exit_status = 0;
         return data_env;
     }
-
-
     if (!getcwd(oldpwd_update, PATH_MAX))
     {
         if (ft_strncmp(cmd_path->cmd[1],".",2) == 0)
@@ -118,23 +144,19 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
         shell_ctx->exit_status = 1;
         return data_env;
     }
-
     if (!getcwd(pwd_update, PATH_MAX))
     {
-        // perror("minishell: cd: getcwd error");
         shell_ctx->exit_status = 1;
         return data_env;
     }
-
+    add_oldpwd(data_env);
     update_env_var(data_env, "OLDPWD=", oldpwd_update);
     update_env_var(data_env, "PWD=", pwd_update);
-
     if (!ft_strcmp(cmd_path->cmd[1], "-"))
     {
         ft_putstr_fd_up(pwd_update, 1);
         ft_putstr_fd_up("\n", 1);
     }
-
     shell_ctx->exit_status = 0;
     return data_env;
 }

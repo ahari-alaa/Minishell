@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/03 22:15:06 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/04 19:21:25 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
         perror("minishell: fork (heredoc)");
         return 1;
     }
-    
+    signal(SIGINT, SIG_IGN);
     if (pid == 0)
     {
         // Child process: set default signal handling
