@@ -36,8 +36,9 @@ static t_env *sort_env(t_env *env) {
     int swapped;
     t_env *ptr1;
     t_env *lptr = NULL;
-
-    do {
+    swapped = 1;
+    while (swapped) 
+    {
         swapped = 0;
         ptr1 = env;
 
@@ -52,7 +53,7 @@ static t_env *sort_env(t_env *env) {
             ptr1 = ptr1->next;
         }
         lptr = ptr1;
-    } while (swapped);
+    }
 
     return env;
 }
@@ -146,9 +147,20 @@ static void add_env_export(t_env **env, char *key, char *value) {
         char *tmp = ft_strjoin(key, "=");
         if (!tmp) { free(new_node); return; }
         new_node->data_env = ft_strjoin(tmp, value);
+        if (!new_node)
+        {
+            free(tmp);
+            free(new_node);
+            return ;
+        }
         free(tmp);
     } else {
         new_node->data_env = strdup(key); // export-only
+        if (!new_node->data_env){
+            free(tmp);
+            free(new_node);
+            return ;
+        }
     }
     new_node->next = NULL;
     if (!*env) {
