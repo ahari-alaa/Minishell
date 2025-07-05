@@ -6,56 +6,42 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/01 20:47:01 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/05 16:51:07 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../minishell.h"
 
-
-static void	process_export_assignment_split(char **new_val, int i, int is_export_var, t_token **head)
+//
+static void process_export_assignment_split(char **new_val, int i, int is_export_var)
 {
-	char	**split;
-	char	*joined;
-    char    *tmp;
-	(void)head;
-	split = split_with_quotes(new_val[i]);
-	if (!split || !split[0] || !split[1])
-	{
-		if (split)
-			free_array(split);
-		return ;
-	}
-	if (is_export_var == 1)
-	{
-		joined = join_export_tokens(split);
-		if (joined)
-		{
-			free(new_val[i]);
-			new_val[i] = joined;
-		}
-		free_array(split);
-	}
-	else if (is_export_var == 2)
-	{
-		tmp = split[0];
-		split[0] = NULL;
-		// free_array(split);
-		free(new_val[i]);
-		new_val[i] = tmp;
-		int i = 1;
-		while (split[i])
-		{
-			add_token(head, new_token(ft_strdup(split[i]), TOKEN_WORD));
-			i++;
-		}
-		free_array(split);
-	}
+    char	**split;
+    char    *joined;
+
+    if (is_export_var == 2)
+    	return ;
+    split = split_with_quotes(new_val[i]);
+    if (!split || !split[0])
+    {
+        if (split)
+            free_array(split);
+        return ;
+    }
+    if (is_export_var == 1)
+    {
+        joined = join_export_tokens(split);
+        if (joined)
+        {
+            free(new_val[i]);
+            new_val[i] = joined;
+        }
+        free_array(split);
+    }
 }
 
 
-static int	finalize_token_value(t_token *current, t_token **head, char *val_cmd, char **new_val)
+int	finalize_token_value(t_token *current, t_token **head, char *val_cmd, char **new_val)
 {
 	free_array(new_val);
 	free(current->value);
@@ -97,7 +83,7 @@ int	handle_split(t_token *cur, t_token **head,
 {
 	char	**split;
 
-	split = ft_split_up(new_val[i], ' ');
+	split = ft_split(new_val[i]);
 	if (split && split[0] && split[1])
 	{
 		if (!handle_token_splitting(cur, head, split))
@@ -139,14 +125,14 @@ int	process_token_loop(t_token *cur, t_token **head,
 			if (!process_env_expansion(p.new_val, i, p.env, ctx))
 				return (free_tokens(*head, NULL), free_array(p.new_val),
 					free(p.val_cmd), 0);
-			if (!is_quoted(cur->value, p.new_val[i]) && !p.is_export)
+			if (!is_quoted(cur->value, p.new_val[i]) && p.is_export == 0)
 			{
 				ret = handle_split(cur, head, p.new_val, i);
 				if (ret != 1)
 					return (free(p.val_cmd), ret);
 			}
 			else if (p.is_export && !is_quoted(cur->value, p.new_val[i]))
-				process_export_assignment_split(p.new_val, i, p.is_export, head);
+				process_export_assignment_split(p.new_val, i, p.is_export);
 		}
 		if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
 			return (0);

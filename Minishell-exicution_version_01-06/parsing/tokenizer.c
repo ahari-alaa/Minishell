@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 16:04:38 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/03 18:15:28 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/05 16:36:36 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *she
     t_token *new = new_token(val, TOKEN_WORD);
     if (has_quotes(new->value) == 1)
         new->was_quoted = 1;
+    else if (has_quotes(new->value) == 3)
+        new->was_quoted = 3;
     else
         new->was_quoted = 0;
     if (!new)

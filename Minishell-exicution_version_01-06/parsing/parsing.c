@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/03 18:40:59 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/05 16:45:17 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,7 +296,9 @@ int handle_token_splitting(t_token *current, t_token **head, char **split)
 
 int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx)
 {
-    char *expanded = found_env(new_val[i], env_table, shell_ctx);
+    char    *expanded;
+
+    expanded = found_env(new_val[i], env_table, shell_ctx);
     if (!expanded)
         return (0);
     free(new_val[i]);
@@ -309,10 +311,9 @@ t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
     t_token *head;
     t_token *current;
     t_token *next;
-    int process_result;
+    int     process_result;
 
     head = string_tokens(str, shell_ctx);
-   // print_tokens(head);
     if (!head)
         return (NULL);
     current = head;

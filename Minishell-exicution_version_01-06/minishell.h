@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/03 18:05:37 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/05 16:50:12 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,10 +108,8 @@ t_token			*find_previous_token(t_token *head, t_token *target);
 /*-----------------parsing --------------------------*/
 int				is_export_assignment(t_token *head, t_token *current);
 char			**split_with_quotes(char *str);
-int	process_token(t_token *current, t_token **head, t_shell *shell_ctx, char **env_table);
-// int				process_token(t_token *current, t_token **head, t_shell *shell_ctx, char **env_table);
-// int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx);
-// int handle_token_splitting(t_token *current, t_token **head, char **split);
+int				process_token(t_token *current, t_token **head, t_shell *shell_ctx, char **env_table);
+int	finalize_token_value(t_token *current, t_token **head, char *val_cmd, char **new_val);
 
 
 /*-----------------for print--------------------------*/
@@ -128,7 +126,7 @@ int				ft_isredirect(t_token_type type);
 int				count_args(t_token *token);
 t_token			*check_quoted(char *str, t_shell *shell_ctx, char **env_table);
 char			**convert(t_env *env_list);
-int count_herdoc(t_cmd *cmd);
+int				count_herdoc(t_cmd *cmd);
 
 /*------------ tools for parsing ----------------*/
 int				is_quote(char c);

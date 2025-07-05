@@ -14,12 +14,12 @@
 
 int	has_quotes(char *str)
 {
-	int	i = 0;
+	int				i = 0;
 	while (str[i])
 	{
 		if (str[i] == '\'' || str[i] == '"')
 			return (1);
-		if (str[i] == '$')
+		if (str[i] == '$' || ft_isdigit(str[i]))
 			return (3);
 		if (str[i] == '=')
 			break ;
@@ -95,12 +95,12 @@ int	is_export_assignment(t_token *head, t_token *current)
 	qouted = ft_parsexport(current->value);
 	str = ft_strremovechar(current->value); 
 	cmd_token = get_cmd_token(head, current);
-	if (cmd_token && (ft_strcmp(str, "export") == 0 ))
-	{
-		if (has_quotes(current->value) || qouted != 0)
-			return (2);
-		if (ft_strchr(current->value, '='))
-			return (1);
-	}
+	if (cmd_token && (ft_strcmp(str, "export") == 0))
+    {
+        if (current->was_quoted == 1 || current->was_quoted == 3)
+            return (2);
+        if (ft_strchr(current->value, '='))
+            return (1);
+    }
 	return (0);
 }
