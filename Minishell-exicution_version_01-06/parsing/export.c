@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+ #include "../minishell.h"
 
 int	has_quotes(char *str)
 {
@@ -28,7 +28,7 @@ int	has_quotes(char *str)
 	return (0);
 }
 
-static t_token	*get_cmd_token(t_token *head, t_token *current)
+ t_token	*get_cmd_token(t_token *head, t_token *current)
 {
 	t_token	*temp = head;
 	t_token	*cmd_token = NULL;
@@ -74,7 +74,7 @@ char *ft_strremovechar(const char *str)
 
     while (str[i])
     {
-        if (str[i] != '\'' || str[i] != '\"')
+        if (str[i] != '\'' && str[i] != '\"')
         {
             new_str[j] = str[i];
             j++;
@@ -85,22 +85,40 @@ char *ft_strremovechar(const char *str)
     return new_str;
 }
 
+static int is_valid_export_token(t_token *cmd_token)
+{
+    // Reject if there are quotes in the export command token
+    if (!cmd_token)
+        return (0);
+    return (ft_strcmp(ft_strremovechar(cmd_token->value), "export") == 0 && 
+			cmd_token->was_quoted == 0);
+}
+
+static int	is_var_exp_assignment(const char *str)
+{
+	const char	*eq;
+	
+	eq = ft_strchr(str, '=');
+	if (!eq || eq == str)
+		return (0);
+	for (const char *p = str; *p; ++p)
+		if (*p == '\'' || *p == '"')
+			return (0);
+	if (*(eq + 1) == '$' && *(eq + 2))
+		return (1);
+	return (0);
+}
 
 int	is_export_assignment(t_token *head, t_token *current)
 {
 	t_token	*cmd_token;
-	int		qouted;
-	char	*str;
 
-	qouted = ft_parsexport(current->value);
-	str = ft_strremovechar(current->value); 
+	if (!head || !current)
+		return (0);
 	cmd_token = get_cmd_token(head, current);
-	if (cmd_token && (ft_strcmp(str, "export") == 0))
-    {
-        if (current->was_quoted == 1 || current->was_quoted == 3)
-            return (2);
-        if (ft_strchr(current->value, '='))
-            return (1);
-    }
-	return (0);
+	if (!is_valid_export_token(cmd_token))
+		return (0);
+	if (!is_var_exp_assignment(current->value))
+		return (0);
+	return (1);
 }

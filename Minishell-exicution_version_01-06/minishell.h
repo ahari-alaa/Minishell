@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/05 16:50:12 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/06 00:20:55 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,10 +86,10 @@ typedef struct s_process
 	char	**new_val;
 	char	*val_cmd;
 	char	**env;
-	int		is_export;
+	int		is_export; // 1 if export, 0 otherwise
 }	t_process;
 
-
+void export_one_case(char *value, t_token *head);
 /*---------------function for free--------------------*/
 void			free_tokens(t_token *tokens, char *input);
 void			free_char_array(char **array);

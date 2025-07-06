@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/05 16:45:17 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/06 00:18:31 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,7 +323,7 @@ t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
         process_result = process_token(current, &head, shell_ctx, env_table);
         if (process_result == 0)
         {
-            free_tokens(head, str);
+             free_tokens(head, str);
             return (NULL);
         }
         current = next;

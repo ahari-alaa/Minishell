@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/05 16:51:07 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/06 00:28:21 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,13 +125,13 @@ int	process_token_loop(t_token *cur, t_token **head,
 			if (!process_env_expansion(p.new_val, i, p.env, ctx))
 				return (free_tokens(*head, NULL), free_array(p.new_val),
 					free(p.val_cmd), 0);
-			if (!is_quoted(cur->value, p.new_val[i]) && p.is_export == 0)
+			if (!is_quoted(cur->value, p.new_val[i]))
 			{
 				ret = handle_split(cur, head, p.new_val, i);
 				if (ret != 1)
 					return (free(p.val_cmd), ret);
 			}
-			else if (p.is_export && !is_quoted(cur->value, p.new_val[i]))
+			else if (!is_quoted(cur->value, p.new_val[i]))
 				process_export_assignment_split(p.new_val, i, p.is_export);
 		}
 		if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
@@ -139,6 +139,79 @@ int	process_token_loop(t_token *cur, t_token **head,
 		i++;
 	}
 	return (finalize_token_value(cur, head, p.val_cmd, p.new_val));
+}
+char *ft_strjoin3(char const *s1, char const *s2, char const *s3)
+{
+    char    *result;
+    size_t  len1;
+    size_t  len2;
+    size_t  len3;
+    size_t  total_len;
+
+    if (!s1 || !s2 || !s3)
+        return (NULL);
+    len1 = ft_strlen(s1);
+    len2 = ft_strlen(s2);
+    len3 = ft_strlen(s3);
+    total_len = len1 + len2 + len3 + 1;
+    result = (char *)malloc(total_len * sizeof(char));
+    if (!result)
+        return (NULL);
+    ft_strlcpy(result, s1, len1 + 1);
+    ft_strlcpy(result + len1, s2, len2 + 1);
+    ft_strlcpy(result + len1 + len2, s3, len3 + 1);
+    return (result);
+}
+void export_one_case(char *value, t_token *head)
+{
+    char *equal_sign;
+    char *var_part;
+    char *val_part;
+    char *new_value;
+    int needs_quotes = 0;
+
+    if (!value || !head)
+        return;
+    equal_sign = ft_strchr(value, '=');
+    if (!equal_sign)
+        return; 
+    var_part = ft_strndup(value, equal_sign - value);
+    val_part = ft_strdup(equal_sign + 1);
+    if (!var_part || !val_part)
+    {
+        free(var_part);
+        free(val_part);
+        return;
+	}
+    int has_empty_quotes = (var_part[0] == '\'' && var_part[1] == '\'');
+    if (ft_strchr(val_part, '$') && 
+        !is_quoted(val_part, val_part) && 
+        !has_empty_quotes)
+    {
+        needs_quotes = 1;
+    }
+    if (needs_quotes)
+    {
+        new_value = ft_strjoin3(var_part, "=\"", val_part);
+        if (new_value)
+        {
+            new_value = ft_strjoin(new_value, "\"");
+            free(value);
+            head->value = new_value;
+            head->was_quoted = 1;
+        }
+    }
+    else
+    {
+        new_value = ft_strjoin3(var_part, "=", val_part);
+        if (new_value)
+        {
+            free(value);
+            head->value = new_value;
+        }
+    }
+    free(var_part);
+    free(val_part);
 }
 
 int process_token(t_token *current, t_token **head,
@@ -150,7 +223,13 @@ int process_token(t_token *current, t_token **head,
 
     if (current->type != TOKEN_WORD)
         return (1);
+    
     is_export_var = is_export_assignment(*head, current);
+    if (is_export_assignment(*head, current))
+    {
+        export_one_case(current->value, current);
+		printf("exported: %s\n", current->value);
+    }
     new_val = process_quoted_value(current->value, *head, shell_ctx);
     if (!new_val)
         return (0);
