@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 17:55:46 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 22:31:49 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ char			*ft_substr(const char *s, unsigned int start, size_t len);
 char			*ft_itoa(int n);
 int				ft_strspace(char *str);
 void			remove_quotes_before_equal(t_token *token);
+char			*ft_delete_spaces(char *str);
 // char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
 char			*found_env(char *cmd, char **env, t_shell *shell_ctx);

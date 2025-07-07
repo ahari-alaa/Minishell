@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 18:19:58 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 22:37:53 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ static void process_export_assignment_split(char **new_val, int i, int is_export
 
     if (is_export_var == 2)
     	return ;
+	printf("split  here\n");
     split = split_with_quotes(new_val[i]);
     if (!split || !split[0])
     {
@@ -108,7 +109,8 @@ int	handle_special_expansion(t_process *p, t_token **head, t_shell *ctx, int *i)
 	if (!expanded)
 		return (0);
 	free(p->new_val[*i]);
-	p->new_val[*i] = expanded;
+	p->new_val[*i] = ft_delete_spaces(expanded);
+	free(expanded);
 	if (!join_new_value(&p->val_cmd, p->new_val[*i], head, p->new_val))
 		return (0);
 	(*i)++;

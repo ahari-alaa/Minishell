@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 14:43:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 21:51:25 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 22:27:55 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,6 @@ static char *handle_env_var(char *cmd, int pos, char **env)
     free(env_name);
     if (env_value != NULL && ft_strspace(env_value) != 1)
     {
-        printf("hna leaks 3\n");
         new_cmd = build_new_command(cmd, pos, env_value, var_len + 1);
         // system("leaks minishell");
         free(env_value);

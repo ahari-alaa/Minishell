@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 20:50:27 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 21:59:10 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ char **split_with_quotes(char *str)
     while (str[i])
     {
         while (ft_isspace(str[i]))
-            i++;   
+            i++;
         if (!str[i])
             break;
         count++;

@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/07 21:38:24 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 21:58:18 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,17 +62,13 @@ int main(int ac,char **av,char **env)
             add_history(input);
         char **env_table = convert(env_list);
         tokens = check_quoted(input, shell_ctx, env_table);
-        print_tokens(tokens);
         if (!tokens)
         {
             free (input);
             free_char_array(env_table);
             continue ;
         }
-         printf("%p\n", tokens);
         commands = parse_commands(tokens , shell_ctx);
-         printf("%p\n", tokens);
-        print_command_with_files (commands);
         if (!commands)
         {
             free_tokens(tokens, input);
