@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 22:37:53 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 23:52:28 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	join_new_value(char **val_cmd, char *str, t_token **head, char **new_val)
 	{
 		*val_cmd = ft_strdup(str);
 		if (!*val_cmd)
-			return (free_array(new_val), free_tokens(*head, NULL), 0);
+			return (free_array(new_val),0);
 	}
 	else
 	{
@@ -131,7 +131,7 @@ int	process_token_loop(t_token *cur, t_token **head,
 			if (p.new_val[i][0] == '\1')
             {
                 if (!handle_special_expansion(&p, head, ctx, &i))
-                    return (0);
+                    return (1);
                 continue;
             }
 			if (!process_env_expansion(p.new_val, i, p.env, ctx))
