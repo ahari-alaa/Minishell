@@ -214,6 +214,37 @@ void export_one_case(char *value, t_token *head)
     free(val_part);
 }
 
+void remove_quotes_before_equal(t_token *token)
+{
+    if (!token || !token->value)
+        return;
+    char *equal_sign = ft_strchr(token->value, '=');
+    if (!equal_sign)
+        return;
+    int prefix_len = equal_sign - token->value;
+    char *src = token->value;
+    char *clean = malloc(ft_strlen(token->value) + 1);
+    if (!clean)
+        return;
+    int i = 0, j = 0;
+    char quote = 0;
+    while (i < prefix_len)
+    {
+        if ((src[i] == '\'' || src[i] == '\"') && quote == 0)
+            quote = src[i];
+        else if (src[i] == quote)
+            quote = 0;
+        else
+            clean[j++] = src[i];
+        i++;
+    }
+    while (src[i])
+        clean[j++] = src[i++];
+    clean[j] = '\0';
+    free(token->value);
+    token->value = clean;
+}
+
 int process_token(t_token *current, t_token **head,
         t_shell *shell_ctx, char **env_table)
 {
@@ -230,6 +261,7 @@ int process_token(t_token *current, t_token **head,
         export_one_case(current->value, current);
 		printf("exported: %s\n", current->value);
     }
+    remove_quotes_before_equal(current);
     new_val = process_quoted_value(current->value, *head, shell_ctx);
     if (!new_val)
         return (0);

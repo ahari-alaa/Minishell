@@ -30,7 +30,7 @@
 #include <curses.h> //
 #include <term.h> //
 #include <string.h>
-
+#include <sys/wait.h>
 
 // #define PATH_MAX 4096
 
