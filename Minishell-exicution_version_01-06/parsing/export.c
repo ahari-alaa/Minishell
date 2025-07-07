@@ -58,10 +58,16 @@ char	*ft_strremovechar(const char *str)
 
 static int	is_valid_export_token(t_token *cmd_token)
 {
+	char	*temp;
+	int		valid;
+
 	if (!cmd_token)
 		return (0);
-	return (ft_strcmp(ft_strremovechar(cmd_token->value), "export") == 0 \
+	temp = ft_strremovechar(cmd_token->value);
+	valid = (temp && ft_strcmp(temp, "export") == 0 \
 		&& cmd_token->was_quoted == 0);
+	free(temp);
+	return (valid);
 }
 
 static int	is_var_exp_assignment(const char *str)

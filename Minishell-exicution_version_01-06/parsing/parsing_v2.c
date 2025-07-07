@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 18:07:06 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 18:19:58 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,27 @@ int	handle_split(t_token *cur, t_token **head,
 		free_array(split);
 	return (1);
 }
+
+int	handle_special_expansion(t_process *p, t_token **head, t_shell *ctx, int *i)
+{
+	char	*unmarked;
+	char	*expanded;
+
+	unmarked = ft_strdup(p->new_val[*i] + 1);
+	if (!unmarked)
+		return (0);
+	expanded = found_env(unmarked, p->env, ctx);
+	free(unmarked);
+	if (!expanded)
+		return (0);
+	free(p->new_val[*i]);
+	p->new_val[*i] = expanded;
+	if (!join_new_value(&p->val_cmd, p->new_val[*i], head, p->new_val))
+		return (0);
+	(*i)++;
+	return (1);
+}
+
 int	process_token_loop(t_token *cur, t_token **head,
 		t_shell *ctx, t_process p)
 {
@@ -107,18 +128,8 @@ int	process_token_loop(t_token *cur, t_token **head,
 		{
 			if (p.new_val[i][0] == '\1')
             {
-                char *unmarked = ft_strdup(p.new_val[i] + 1);
-                if (!unmarked)
-                    return 0;
-                char *expanded = found_env(unmarked, p.env, ctx);
-                free(unmarked);
-                if (!expanded)
-                    return 0;
-                free(p.new_val[i]);
-                p.new_val[i] = expanded;
-                if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
-                    return 0;
-                i++;
+                if (!handle_special_expansion(&p, head, ctx, &i))
+                    return (0);
                 continue;
             }
 			if (!process_env_expansion(p.new_val, i, p.env, ctx))
