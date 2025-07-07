@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/06 00:20:55 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/07 17:55:46 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ void			free_array(char **array);
 /*-----------------Tokenizer --------------------------*/
 t_token			*string_tokens(char *str, t_shell *shell_ctx);
 t_token			*find_previous_token(t_token *head, t_token *target);
+t_token			*get_cmd_token(t_token *head, t_token *current);
 
 
 /*-----------------parsing --------------------------*/
@@ -145,6 +146,7 @@ char			*ft_strcat(char *dest, const char *src);
 char			*ft_substr(const char *s, unsigned int start, size_t len);
 char			*ft_itoa(int n);
 int				ft_strspace(char *str);
+void			remove_quotes_before_equal(t_token *token);
 // char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
 char			*found_env(char *cmd, char **env, t_shell *shell_ctx);

@@ -12,46 +12,42 @@
 
 #include "../../minishell.h"
 
-// int is_single_quoted(char *original_val, char *substring)
-// {
-//     char *pos = ft_strstr(original_val, substring);
-//     int quote_count = 0;
-//     int i = 0;
-    
-//     if (!pos)
-//         return 0;
-    
-//     while (&original_val[i] < pos)
-//     {
-//         if (original_val[i] == '\'' && (i == 0 || original_val[i - 1] != '\\'))
-//             quote_count++;
-//         i++;
-//     }
-//     return (quote_count % 2 == 1);
-// }
+int has_quotes(char *str)
+{
+	int i;
 
-// int is_quoted(char *original_val, char *substring)
-// {
-//     char *pos = ft_strstr(original_val, substring);
-//     int i = 0;
-//     char current_quote = 0;
-    
-//     if (!pos)
-//         return 0;
-//     while (&original_val[i] < pos)
-//     {
-//         if ((original_val[i] == '\'' || original_val[i] == '"') && 
-//             (i == 0 || original_val[i - 1] != '\\'))
-//         {
-//             if (!current_quote)
-//                 current_quote = original_val[i];
-//             else if (original_val[i] == current_quote)
-//                 current_quote = 0;
-//         }
-//         i++;
-//     }
-//     return (current_quote != 0);
-// }
+    i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+			return (1);
+		if (str[i] == '$' || ft_isdigit(str[i]))
+			return (3);
+		if (str[i] == '=')
+			break ;
+		i++;
+	}
+	return (0);
+}
+
+t_token	*get_cmd_token(t_token *head, t_token *current)
+{
+	t_token *temp;
+	t_token *cmd_token;
+
+    temp = head;
+    cmd_token = NULL;
+	while (temp && temp != current)
+	{
+		if (temp->type == TOKEN_PIPE || temp->type == TOKEN_SEMICOLON)
+			cmd_token = NULL;
+		else if (temp->type == TOKEN_WORD && !cmd_token)
+			cmd_token = temp;
+		temp = temp->next;
+	}
+	return (cmd_token);
+}
+
 int count_herdoc(t_cmd *cmd)
 {
     int count = 0;
