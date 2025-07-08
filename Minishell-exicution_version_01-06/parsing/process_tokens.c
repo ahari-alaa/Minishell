@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 17:17:31 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 20:26:57 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/08 18:19:32 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,13 @@ char *ft_strjoin3(char const *s1, char const *s2, char const *s3)
     ft_strlcpy(result + len1 + len2, s3, len3 + 1);
     return (result);
 }
-
 void export_one_case(char *value, t_token *head)
 {
     char *equal_sign;
     char *var_part;
     char *val_part;
     char *new_value;
+    char *temp;
     int needs_quotes = 0;
     int has_empty_quotes;
 
@@ -48,15 +48,15 @@ void export_one_case(char *value, t_token *head)
         return;
     equal_sign = ft_strchr(value, '=');
     if (!equal_sign)
-        return; 
+        return;
     var_part = ft_strndup(value, equal_sign - value);
     val_part = ft_strdup(equal_sign + 1);
     if (!var_part || !val_part)
     {
         free(var_part);
         free(val_part);
-        return;
-	}
+        return ;
+    }
     has_empty_quotes = (var_part[0] == '\'' && var_part[1] == '\'');
     if (ft_strchr(val_part, '$') && 
         !is_quoted(val_part, val_part) &&
@@ -67,23 +67,21 @@ void export_one_case(char *value, t_token *head)
         new_value = ft_strjoin3(var_part, "=\"", val_part);
         if (new_value)
         {
-            new_value = ft_strjoin(new_value, "\"");
-            free(value);
-            head->value = new_value;
-            head->was_quoted = 1;
+            temp = ft_strjoin(new_value, "\"");
+            free(new_value);
+            new_value = temp;
         }
     }
     else
-    {
         new_value = ft_strjoin3(var_part, "=", val_part);
-        if (new_value)
-        {
-            free(value);
-            head->value = new_value;
-        }
-    }
     free(var_part);
     free(val_part);
+    if (new_value)
+    {
+        free(head->value);
+        head->value = new_value;
+        head->was_quoted = needs_quotes ? 1 : 0;
+    }
 }
 
 void remove_quotes_before_equal(t_token *token)

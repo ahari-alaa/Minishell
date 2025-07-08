@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 23:52:28 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/08 18:20:49 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	join_new_value(char **val_cmd, char *str, t_token **head, char **new_val)
 	{
 		*val_cmd = ft_strdup(str);
 		if (!*val_cmd)
-			return (free_array(new_val),0);
+			return (free_array(new_val), 0);
 	}
 	else
 	{
@@ -100,7 +100,8 @@ int	handle_special_expansion(t_process *p, t_token **head, t_shell *ctx, int *i)
 {
 	char	*unmarked;
 	char	*expanded;
-
+	char	*tmp;
+	
 	unmarked = ft_strdup(p->new_val[*i] + 1);
 	if (!unmarked)
 		return (0);
@@ -109,7 +110,11 @@ int	handle_special_expansion(t_process *p, t_token **head, t_shell *ctx, int *i)
 	if (!expanded)
 		return (0);
 	free(p->new_val[*i]);
-	p->new_val[*i] = ft_delete_spaces(expanded);
+	tmp = ft_delete_spaces(expanded);
+	if (!tmp)
+		p->new_val[*i] = ft_strdup("");
+	else
+		p->new_val[*i] = tmp;
 	free(expanded);
 	if (!join_new_value(&p->val_cmd, p->new_val[*i], head, p->new_val))
 		return (0);
@@ -162,7 +167,6 @@ int process_token(t_token *current, t_token **head,
 
     if (current->type != TOKEN_WORD)
         return (1);
-    
     is_export_var = is_export_assignment(*head, current);
     if (is_export_assignment(*head, current))
     {
