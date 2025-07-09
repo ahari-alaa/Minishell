@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   environment_variables.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:11:14 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/14 18:52:52 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/09 16:44:07 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char *expand_env_var(t_token *args)
         expand_exit_stat();
     else if(ft_strcmp(args, "0") == 0)
         expand_0();
-    else if(ft_stcmp(args, "?") == 0) //stile this i don´tknow how to complet it 
+    else if(ft_stcmp(args, "?") == 0)
         expand_pip();
 
     char *val;
@@ -53,7 +53,8 @@ char *expand_env_var(t_token *args)
 void expand_tokens(t_token *tokens)
 {
     t_token *current;
-    char *expanded;
+    char    *expanded;
+
     current = tokens;
     while (current != NULL)
     {

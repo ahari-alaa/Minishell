@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/08 18:16:00 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/09 17:02:15 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,66 +69,71 @@ char *join_export_tokens(char **split)
     return result;
 }
 
-char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx)
+char	**process_quoted_value(char *val, t_token *head, t_shell *shell_ctx)
 {
-    char    **strings = NULL;
-    int     i = 0, start, count = 0;
-    char    quote;
-    char    *tmp;
-    
-    if (!val)
-        return (print_error(head, NULL, shell_ctx), NULL);
-    strings = malloc(sizeof(char *) * (ft_strlen(val) + 1));
-    if (!strings)
-        return (print_error(head, NULL, shell_ctx), NULL);
-    while (val[i])
-    {
-        if (val[i] == '\'' || val[i] == '\"')
-        {
-            quote = val[i];
-            i++;
-            start = i;
-            while (val[i] && val[i] != quote)
-                i++;
-            tmp = ft_substr(val, start, i - start);
-            if (!tmp)
-            {
-                free_array(strings);
-                return (NULL);
-            }
-            if (quote == '"')
-            {
-                char *quoted_tmp = ft_strjoin("\1", tmp);
-                free(tmp);
-                tmp = quoted_tmp;
-            }
-            if (*tmp)
-                strings[count++] = tmp;
-            else
-                free(tmp);
-            if (val[i] == quote)
-                i++;
-        }
-        else
-        {
-            start = i;
-            while (val[i] && val[i] != '\'' && val[i] != '\"')
-                i++;
-            tmp = ft_substr(val, start, i - start);
-            if (!tmp)
-            {
-                free_array(strings);
-                return (NULL);
-            }
-            if (*tmp)
-                strings[count++] = tmp;
-            else
-                free(tmp);
-        }
-    }
-    strings[count] = NULL;
-    return strings;
+	char	**strings;
+	int		i;
+	int		start;
+	int		count;
+	char	quote;
+	char	*tmp;
+
+	i = 0;
+	count = 0;
+	if (!val)
+		return (print_error(head, NULL, shell_ctx), NULL);
+	strings = malloc(sizeof(char *) * (ft_strlen(val) + 1));
+	if (!strings)
+		return (print_error(head, NULL, shell_ctx), NULL);
+	while (val[i])
+	{
+		if (val[i] == '\'' || val[i] == '\"')
+		{
+			quote = val[i++];
+			start = i;
+			while (val[i] && val[i] != quote)
+				i++;
+			tmp = ft_substr(val, start, i - start);
+			if (!tmp)
+				return (free_array(strings), NULL);
+			if (quote == '\"')
+			{
+				char *quoted_tmp = ft_strjoin("\1", tmp);
+				free(tmp);
+				tmp = quoted_tmp;
+			}
+			if (*tmp)
+				strings[count++] = tmp;
+			else
+				free(tmp);
+			if (val[i] == quote)
+				i++;
+		}
+		else
+		{
+			start = i;
+			while (val[i] && val[i] != '\'' && val[i] != '\"')
+				i++;
+			tmp = ft_substr(val, start, i - start);
+			if (!tmp)
+				return (free_array(strings), NULL);
+			if (ft_strcmp(tmp, "$") == 0)
+			{
+				free(tmp);
+				tmp = ft_strdup("$\5");//delete this 
+				if (!tmp)
+					return (free_array(strings), NULL);
+			}
+			if (*tmp)
+				strings[count++] = tmp;
+			else
+				free(tmp);
+		}
+	}
+	strings[count] = NULL;
+	return (strings);
 }
+
 
 int is_single_quoted(char *original_val, char *substring)
 {
@@ -305,6 +310,63 @@ int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shel
     new_val[i] = expanded;
     return (1);
 }
+char	*remove_dollar_before_quote(const char *str)
+{
+	char	*result;
+	int		i;
+	int		j;
+
+	if (!str)
+		return (NULL);
+	result = malloc(ft_strlen(str) + 1);
+	if (!result)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (str[i])
+	{
+		if (str[i] == '$' && (str[i + 1] == '"' || str[i + 1] == '\''))
+			i++;
+		result[j++] = str[i++];
+	}
+	result[j] = '\0';
+	return (result);
+}
+
+void	fix_export_dollar_before_quote(t_token *head)
+{
+	t_token	*cur;
+	char	*eq_pos;
+	char	*new_val;
+	char	*before_eq;
+	char	*fixed_after;
+
+	cur = head;
+	while (cur)
+	{
+		if (cur->type == TOKEN_WORD && cur->value)
+		{
+			eq_pos = ft_strchr(cur->value, '=');
+			if (eq_pos && eq_pos[1] == '$' && eq_pos[2] == '"')
+			{
+				before_eq = ft_substr(cur->value, 0, eq_pos - cur->value + 1);
+				if (!before_eq)
+					return ;
+				fixed_after = remove_dollar_before_quote(eq_pos + 1);
+				if (!fixed_after)
+					return (free(before_eq));
+				new_val = ft_strjoin(before_eq, fixed_after);
+				free(before_eq);
+				free(fixed_after);
+				if (!new_val)
+					return ;
+				free(cur->value);
+				cur->value = new_val;
+			}
+		}
+		cur = cur->next;
+	}
+}
 
 t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
 {
@@ -316,6 +378,7 @@ t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
     head = string_tokens(str, shell_ctx);
     if (!head)
         return (NULL);
+    fix_export_dollar_before_quote(head);
     current = head;
     while (current)
     {

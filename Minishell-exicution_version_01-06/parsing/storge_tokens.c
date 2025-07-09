@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/07 21:44:17 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/09 18:01:57 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,29 +28,24 @@ static int parse_arguments(t_cmd *cmd, t_token *tokens)
 {
     int arg_i = 0;
     t_token *current = tokens;
-
-    int valid_args = 0;
-    t_token *count_ptr = current;
-    while (count_ptr && count_ptr->type != TOKEN_PIPE)
-    {
-        if (count_ptr->type == TOKEN_WORD && ft_strcmp(count_ptr->value, "\2") != 0)
-            valid_args++;
-        count_ptr = count_ptr->next;
-    }
     if (!cmd->cmd)
         return 0;
     while (current && current->type != TOKEN_PIPE)
     {
-        if (current->type == TOKEN_WORD && ft_strcmp(current->value, "\2") != 0)
+        if (current->type == TOKEN_WORD && 
+            ft_strcmp(current->value, "\2") != 0 &&
+            !(ft_strspaces(current->value) && current->was_quoted != 1))
         {
-            cmd->cmd[arg_i++] = ft_strdup(current->value);
-            if (!cmd->cmd[arg_i - 1])
+            cmd->cmd[arg_i] = ft_strdup(current->value);
+            if (!cmd->cmd[arg_i])
             {
                 while (--arg_i >= 0)
                     free(cmd->cmd[arg_i]);
+                free(cmd->cmd);
+                cmd->cmd = NULL;
                 return 0;
             }
-
+            arg_i++;
         }
         else if (ft_isredirect(current->type))
         {

@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/08 18:20:49 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/09 18:07:47 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static void process_export_assignment_split(char **new_val, int i, int is_export
 
     if (is_export_var == 2)
     	return ;
-	printf("split  here\n");
     split = split_with_quotes(new_val[i]);
     if (!split || !split[0])
     {
@@ -69,6 +68,11 @@ int	join_new_value(char **val_cmd, char *str, t_token **head, char **new_val)
 	}
 	else
 	{
+		if(ft_strcmp(*val_cmd, "$\5") == 0)
+		{
+			free(*val_cmd);
+			*val_cmd = ft_strdup("");
+		}
 		tmp = ft_strjoin(*val_cmd, str);
 		free(*val_cmd);
 		*val_cmd = tmp;
@@ -95,50 +99,88 @@ int	handle_split(t_token *cur, t_token **head,
 		free_array(split);
 	return (1);
 }
+int	ft_strspaces(char *str)
+{
+	int	i;
 
-int	handle_special_expansion(t_process *p, t_token **head, t_shell *ctx, int *i)
+	if (!str)
+		return (1);
+	i = 0;
+	while (str[i])
+	{
+		if (!ft_isspace(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int	handle_special_expansion(t_process *p, t_token **head,
+			t_shell *ctx, int *i)
 {
 	char	*unmarked;
 	char	*expanded;
 	char	*tmp;
-	
+
 	unmarked = ft_strdup(p->new_val[*i] + 1);
 	if (!unmarked)
 		return (0);
 	expanded = found_env(unmarked, p->env, ctx);
 	free(unmarked);
 	if (!expanded)
-		return (0);
+		return (free(p->new_val[*i]), 0);
+	if (ft_strspaces(expanded) == 1)
+		tmp = ft_strdup(expanded);
+	else
+		tmp = ft_delete_spaces(expanded);
 	free(p->new_val[*i]);
-	tmp = ft_delete_spaces(expanded);
 	if (!tmp)
+	{
+		if (tmp)
+			free(tmp);
 		p->new_val[*i] = ft_strdup("");
+	}
 	else
 		p->new_val[*i] = tmp;
 	free(expanded);
+	if (!p->new_val[*i])
+		return (0);
 	if (!join_new_value(&p->val_cmd, p->new_val[*i], head, p->new_val))
 		return (0);
 	(*i)++;
 	return (1);
 }
 
-int	process_token_loop(t_token *cur, t_token **head,
+
+int	process_token_loop(t_token *cur, t_token **head, 
 		t_shell *ctx, t_process p)
 {
 	int	i;
 	int	ret;
+	t_token *prev;
 
 	i = 0;
+	prev = find_previous_token(*head, cur);
+	if (prev && prev->type == TOKEN_HEREDOC)
+	{
+		while (p.new_val[i])
+		{
+			if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
+				return (0);
+			i++;
+		}
+		return (finalize_token_value(cur, head, p.val_cmd, p.new_val));
+	}
 	while (p.new_val[i])
 	{
 		if (!is_single_quoted(cur->value, p.new_val[i]))
 		{
 			if (p.new_val[i][0] == '\1')
-            {
-                if (!handle_special_expansion(&p, head, ctx, &i))
-                    return (1);
-                continue;
-            }
+			{
+				if (!handle_special_expansion(&p, head, ctx, &i))
+					return (1);
+				continue;
+			}
 			if (!process_env_expansion(p.new_val, i, p.env, ctx))
 				return (free_tokens(*head, NULL), free_array(p.new_val),
 					free(p.val_cmd), 0);
@@ -171,7 +213,7 @@ int process_token(t_token *current, t_token **head,
     if (is_export_assignment(*head, current))
     {
         export_one_case(current->value, current);
-		printf("exported: %s\n", current->value);
+		// printf("exported: %s\n", current->value);
     }
     remove_quotes_before_equal(current);
     new_val = process_quoted_value(current->value, *head, shell_ctx);
