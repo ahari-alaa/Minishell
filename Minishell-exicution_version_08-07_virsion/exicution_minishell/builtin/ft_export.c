@@ -145,53 +145,67 @@ static void append_env_node(t_env **env, t_env *new_node)
 		last = last->next;
 	last->next = new_node;
 }
-static void add_env_export(t_env **env, char *key, char *value)
+
+static int update_exist_env(t_env *env, char *key, char *value)
 {
-	t_env *current = *env;
-	int key_len = strlen(key);
+	t_env *current = env;
 
 	while (current)
 	{
-		if (!strncmp(current->data_env, key, key_len) &&
-			(current->data_env[key_len] == '=' || current->data_env[key_len] == '\0')) 
+		if (!strncmp(current->data_env, key, strlen(key)) &&
+			(current->data_env[strlen(key)] == '=' || current->data_env[strlen(key)] == '\0')) 
 		{
 			free(current->data_env);
 			if (value)
 			{
 				char *tmp = ft_strjoin(key, "=");
-				if (!tmp) return;
+				if (!tmp) 
+					return 1;
 				current->data_env = ft_strjoin(tmp, value);
 				free(tmp);
 			}
 			else 
 				current->data_env = strdup(key);
-			return ; 
+			return 1; 
 		}
 		current = current->next;
 	}
-	t_env *new_node = malloc(sizeof(t_env));
-	if (!new_node) return;
+	return 0;
+}
+
+static char	*merge_key_value(char *key, char *value)
+{
+	char *tmp;
+	char *result;
+
 	if (value)
 	{
-		char *tmp = ft_strjoin(key, "=");
-		if (!tmp) { free(new_node); return; }
-		new_node->data_env = ft_strjoin(tmp, value);
-		if (!new_node)
-		{
-			free(tmp);
-			free(new_node);
-			return ;
-		}
+		tmp = ft_strjoin(key, "=");
+		if (!tmp)
+			return NULL;
+		result = ft_strjoin(tmp, value);
 		free(tmp);
-	} 
-	else
+		if (!result)
+			return NULL;
+		return result;
+	}
+	return ft_strdup(key);
+}
+
+static void	add_env_export(t_env **env, char *key, char *value)
+{
+	t_env *new_node;
+
+	if (update_exist_env(*env, key, value))
+		return;
+	new_node = malloc(sizeof(t_env));
+	if (!new_node)
+		return;
+	new_node->data_env = merge_key_value(key, value);
+	if (!new_node->data_env)
 	{
-		new_node->data_env = strdup(key); 
-		if (!new_node->data_env)
-		{
-			free(new_node);
-			return ;
-		}
+		free(new_node);
+		return;
 	}
 	new_node->next = NULL;
 	append_env_node(env, new_node);
@@ -254,7 +268,7 @@ static int update_env_value(t_env *current, char *key, char *value)
 	if (!old_val)
 		return (0);
 	old_val++;
-	char *new_data = build_appended_env_value(key, old_val, value);
+	new_data = build_appended_env_value(key, old_val, value);
 	if (!new_data)
 		return (0);
 	free(current->data_env);
