@@ -12,105 +12,127 @@
 
 #include "../minishell.h"
 
-char *ft_strjoin3(char const *s1, char const *s2, char const *s3)
+static char *realloc_result(char *result, size_t *capacity, size_t new_len)
 {
-    char    *result;
-    size_t  len1;
-    size_t  len2;
-    size_t  len3;
-    size_t  total_len;
+    char *new_result;
+    size_t old_capacity;
+    if (new_len <= *capacity)
+        return (result);
+    old_capacity = *capacity;
+    *capacity = new_len * 2;
+    new_result = ft_realloc(result, old_capacity, *capacity);
+    return (new_result);
+}
 
-    if (!s1 || !s2 || !s3)
+// Helper function to append string to result with reallocation
+static char *append_to_result(char *result, char *tmp, size_t *capacity)
+{
+    size_t result_len;
+    char *new_result;
+    
+    if (!tmp)
+        return (result);
+    result_len = ft_strlen(result) + ft_strlen(tmp) + 1;
+    new_result = realloc_result(result, capacity, result_len);
+    if (!new_result)
+        return (free(tmp), free(result), NULL);
+    ft_strcat(new_result, tmp);
+    free(tmp);
+    return (new_result);
+}
+
+// Process quoted section (single or double quotes)
+static char *process_quoted_section(char *val, int *i, t_env_list *env)
+{
+    char quote;
+    int start;
+    char *tmp;
+    char *expanded;
+    
+    quote = val[(*i)++];
+    start = *i;
+    while (val[*i] && val[*i] != quote)
+        (*i)++;
+    tmp = ft_substr(val, start, *i - start);
+    if (!tmp)
         return (NULL);
-    len1 = ft_strlen(s1);
-    len2 = ft_strlen(s2);
-    len3 = ft_strlen(s3);
-    total_len = len1 + len2 + len3 + 1;
-    result = (char *)malloc(total_len * sizeof(char));
+    if (quote == '\"')
+    {
+        expanded = found_env(tmp, env->env_table, env->exit_status);
+        free(tmp);
+        tmp = expanded;
+    }
+    if (val[*i] == quote)
+        (*i)++;
+    return (tmp);
+}
+
+// Process unquoted section with environment variable expansion
+static char *process_unquoted_section(char *val, int *i, t_env_list *env)
+{
+    int start;
+    char *tmp;
+    char *expanded;
+    
+    start = *i;
+    while (val[*i] && val[*i] != '\'' && val[*i] != '\"')
+        (*i)++;
+    tmp = ft_substr(val, start, *i - start);
+    if (!tmp)
+        return (NULL);
+    expanded = found_env(tmp, env->env_table, env->exit_status);
+    free(tmp);
+    tmp = expanded;
+    if (ft_strcmp(tmp, "$") == 0)
+    {
+        free(tmp);
+        tmp = ft_strdup("\1");
+    }
+    return (tmp);
+}
+
+// Initialize result buffer
+static char *init_result_buffer(char *val, t_token *head, size_t *capacity)
+{
+    char *result;
+    
+    if (!val)
+        return (print_error(head, NULL, NULL), NULL);
+    *capacity = ft_strlen(val) + 1;
+    result = malloc(*capacity);
     if (!result)
-        return (NULL);
-    ft_strlcpy(result, s1, len1 + 1);
-    ft_strlcpy(result + len1, s2, len2 + 1);
-    ft_strlcpy(result + len1 + len2, s3, len3 + 1);
+        return (print_error(head, NULL, NULL), NULL);
+    result[0] = '\0';
     return (result);
 }
-void export_one_case(char *value, t_token *head)
-{
-    char *equal_sign;
-    char *var_part;
-    char *val_part;
-    char *new_value;
-    char *temp;
-    int needs_quotes = 0;
-    int has_empty_quotes;
 
-    if (!value || !head)
-        return;
-    equal_sign = ft_strchr(value, '=');
-    if (!equal_sign)
-        return;
-    var_part = ft_strndup(value, equal_sign - value);
-    val_part = ft_strdup(equal_sign + 1);
-    if (!var_part || !val_part)
-    {
-        free(var_part);
-        free(val_part);
-        return ;
-    }
-    has_empty_quotes = (var_part[0] == '\'' && var_part[1] == '\'');
-    if (ft_strchr(val_part, '$') && 
-        !is_quoted(val_part, val_part) &&
-        !has_empty_quotes)
-        needs_quotes = 1;
-    if (needs_quotes)
-    {
-        new_value = ft_strjoin3(var_part, "=\"", val_part);
-        if (new_value)
-        {
-            temp = ft_strjoin(new_value, "\"");
-            free(new_value);
-            new_value = temp;
-        }
-    }
-    else
-        new_value = ft_strjoin3(var_part, "=", val_part);
-    free(var_part);
-    free(val_part);
-    if (new_value)
-    {
-        free(head->value);
-        head->value = new_value;
-        head->was_quoted = needs_quotes ? 1 : 0;
-    }
-}
-
-void remove_quotes_before_equal(t_token *token)
+// Main function - now less than 25 lines
+char *process_quoted_value(char *val, t_token *head, t_env_list *env)
 {
-    if (!token || !token->value)
-        return;
-    char *equal_sign = ft_strchr(token->value, '=');
-    if (!equal_sign)
-        return;
-    int prefix_len = equal_sign - token->value;
-    char *src = token->value;
-    char *clean = malloc(ft_strlen(token->value) + 1);
-    if (!clean)
-        return;
-    int i = 0, j = 0;
-    char quote = 0;
-    while (i < prefix_len)
+    char *result;
+    char *tmp;
+    int i;
+    size_t result_capacity;
+    
+    i = 0;
+    if (ft_strchr(val, '=') != NULL)
+        val = remove_dollar_before_quotes(val);
+    if(!val)
+        return NULL;
+    result = init_result_buffer(val, head, &result_capacity);
+    if (!result)
+        return (NULL);
+    while (val[i])
     {
-        if ((src[i] == '\'' || src[i] == '\"') && quote == 0)
-            quote = src[i];
-        else if (src[i] == quote)
-            quote = 0;
+        if (val[i] == '\'' || val[i] == '\"')
+            tmp = process_quoted_section(val, &i, env);
         else
-            clean[j++] = src[i];
-        i++;
+            tmp = process_unquoted_section(val, &i, env);
+        if (!tmp)
+            return (free(result), NULL);   
+        result = append_to_result(result, tmp, &result_capacity);
+        if (!result)
+            return (NULL);
     }
-    while (src[i])
-        clean[j++] = src[i++];
-    clean[j] = '\0';
-    free(token->value);
-    token->value = clean;
+    return (result);
 }

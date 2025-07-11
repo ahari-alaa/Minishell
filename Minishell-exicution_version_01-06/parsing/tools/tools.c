@@ -113,3 +113,32 @@ char	*ft_strcpy(char *dest, const char *src)
 	dest[i] = '\0';
 	return (dest);
 }
+
+char	*remove_dollar_before_quotes(char *str)
+{
+	char	*result;
+	int		i;
+	int		j;
+	int		len;
+
+	if (!str)
+		return (NULL);
+	len = ft_strlen(str);
+	result = malloc(sizeof(char) * (len + 1));
+	if (!result)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (str[i])
+	{
+		if (str[i] == '$' && str[i + 1] && 
+			(str[i + 1] == '"' || str[i + 1] == '\''))
+		{
+			i++;
+			continue ;
+		}
+		result[j++] = str[i++];
+	}
+	result[j] = '\0';
+	return (result);
+}

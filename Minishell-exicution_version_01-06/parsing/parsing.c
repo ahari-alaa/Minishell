@@ -14,382 +14,225 @@
 
 void free_array(char **array)
 {
-    int i;
+	int i;
 
-    if (!array)
-        return;
-    i = 0;
-    while (array[i])
-    {
-        free(array[i]);
-        i++;
-    }
-    free(array);
+	if (!array)
+		return;
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
 }
 
 t_token *find_previous_token(t_token *head, t_token *target)
 {
-    if (!head || head == target)
-        return NULL;
-    t_token *current = head;
-    while (current->next && current->next != target)
-        current = current->next;
-    if (current->next == target)
-        return current;
-    else
-        return  NULL;
+	if (!head || head == target)
+		return NULL;
+	t_token *current = head;
+	while (current->next && current->next != target)
+		current = current->next;
+	if (current->next == target)
+		return current;
+	else
+		return  NULL;
 }
 
-char *join_export_tokens(char **split)
-{
-    char *result = NULL;
-    char *temp = NULL;
-    int i = 0;
-    char *equals_pos = ft_strchr(split[0], '=');
-    if (!equals_pos)
-        return NULL;
-    result = ft_strdup(split[0]);
-    if (!result)
-        return NULL;
-    i = 1;
-    while (split[i])
-    {
-        temp = ft_strjoin(result, " ");
-        free(result);
-        if (!temp)
-            return NULL;
-        result = temp;
-        temp = ft_strjoin(result, split[i]);
-        free(result);
-        if (!temp)
-            return NULL;
-        result = temp;
-        i++;
-    }
-    return result;
-}
 
-char	**process_quoted_value(char *val, t_token *head, t_shell *shell_ctx)
-{
-	char	**strings;
-	int		i;
-	int		start;
-	int		count;
-	char	quote;
-	char	*tmp;
+// char *process_quoted_value(char *val, t_token *head, t_env_list *env)
+// {
+//     char    *result;
+//     char    *tmp = NULL;
+//     int     i;
+//     int     start;
+//     char    quote;
+//     char    *expanded;
+//     size_t  result_capacity;
+//     size_t  result_len;
 
-	i = 0;
-	count = 0;
-	if (!val)
-		return (print_error(head, NULL, shell_ctx), NULL);
-	strings = malloc(sizeof(char *) * (ft_strlen(val) + 1));
-	if (!strings)
-		return (print_error(head, NULL, shell_ctx), NULL);
-	while (val[i])
+//     i = 0;
+//     if (!val)
+//         return (print_error(head, NULL, NULL), NULL);
+
+//     // Start with initial allocation
+//     result_capacity = ft_strlen(val) + 1;
+//     result = malloc(result_capacity);
+//     if (!result)
+//         return (print_error(head, NULL, NULL), NULL);
+//     result[0] = '\0';
+
+//     while (val[i])
+//     {
+//         if (val[i] == '\'' || val[i] == '\"')
+//         {
+//             quote = val[i++];
+//             start = i;
+//             while (val[i] && val[i] != quote)
+//                 i++;
+//             tmp = ft_substr(val, start, i - start);
+//             if (!tmp)
+//             {
+//                 free(result);
+//                 return (NULL);
+//             }
+//             if (quote == '\"')
+//             {
+//                 expanded = found_env(tmp, env->env_table, env->exit_status);
+//                 free(tmp);
+//                 tmp = expanded;
+//             }
+
+//             // Ensure enough capacity before strcat
+//             result_len = ft_strlen(result) + ft_strlen(tmp) + 1;
+//             if (result_len > result_capacity)
+// 			{
+//                 result_capacity = result_len * 2;
+//                 char *new_result = realloc(result, result_capacity);
+//                 if (!new_result)
+//                     return (free(tmp), free(result), NULL);
+//                 result = new_result;
+//             }
+//             ft_strcat(result, tmp);
+//             free(tmp);
+//             if (val[i] == quote)
+//                 i++;
+//         }
+//         else
+//         {
+//             start = i;
+//             while (val[i] && val[i] != '\'' && val[i] != '\"')
+//                 i++;
+//             tmp = ft_substr(val, start, i - start);
+//             if (!tmp)
+//                 return (free(result), NULL);
+//             expanded = found_env(tmp, env->env_table, env->exit_status);
+//             free(tmp);
+//             tmp = expanded;
+//             if (ft_strcmp(tmp, "$") == 0)
+//             {
+//                 free(tmp);
+//                 tmp = ft_strdup("\1");
+//             }
+//             result_len = ft_strlen(result) + ft_strlen(tmp) + 1;
+//             if (result_len > result_capacity)
+// 			{
+//                 result_capacity = result_len * 2;
+//                 char *new_result = realloc(result, result_capacity);
+//                 if (!new_result)
+//                     return (free(tmp), free(result), NULL);
+//                 result = new_result;
+//             }
+//             ft_strcat(result, tmp);
+//             free(tmp);
+//         }
+//     }
+//     if (ft_strcmp(result, "\1") == 0)
+//     {
+//         free(result);
+//         result = ft_strdup("$");
+//     }
+//     return (result);
+// }
+
+// Function to parse heredoc values by removing quotes and keeping dollar signs intact
+// char *herdoc_parsing(char *val)
+// {
+// 	char	*result;
+// 	char	*tmp;
+// 	int		i;
+// 	int		start;
+// 	char	quote;
+
+// 	i = 0;
+// 	if (!val)
+// 		return (NULL);
+
+// 	result = malloc(sizeof(char) * (ft_strlen(val) + 1));
+// 	if (!result)
+// 		return (NULL);
+
+// 	result[0] = '\0';
+
+// 	while (val[i])
+// 	{
+// 		if (val[i] == '\'' || val[i] == '\"')
+// 		{
+// 			quote = val[i++];
+// 			start = i;
+// 			while (val[i] && val[i] != quote)
+// 				i++;
+// 			tmp = ft_strndup(val + start, i - start);
+// 			if (!tmp)
+// 			{
+// 				free(result);
+// 				return (NULL);
+// 			}
+// 			// Append the content inside quotes to result
+// 			if (ft_strcmp(result, "$") == 0)
+// 				result = ft_strdup("");
+// 			ft_strcat(result, tmp);
+// 			free(tmp);
+// 			if (val[i] == quote)
+// 				i++;
+// 		}
+// 		else
+// 		{
+// 			start = i;
+// 			while (val[i] && val[i] != '\'' && val[i] != '\"')
+// 				i++;
+// 			tmp = ft_strndup(val + start, i - start);
+// 			if (!tmp)
+// 			{
+// 				free(result);
+// 				return (NULL);
+// 			}
+// 			// Append the content outside quotes to result
+// 			ft_strcat(result, tmp);
+// 			if(ft_strcmp(tmp, "$") == 0)
+// 				tmp = ft_strdup("\1");
+// 			free(tmp);
+// 		}
+// 	}
+//     if(ft_strcmp(result, "\1") == 0)
+// 		result = ft_strdup("$");
+// 	return (result);
+// }
+
+t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_tab)
+{
+	t_token *head;
+	t_token *current;
+	t_token *prev;
+	int     process_result;
+	t_env_list	*env_list;
+
+	env_list = malloc(sizeof(t_env_list));
+	if (!env_list)
+		{return NULL;}
+	env_list->env_table = env_tab;
+	env_list->exit_status = shell_ctx;
+	head = string_tokens(str, shell_ctx);
+	if (!head)
+		return (NULL);
+	current = head;
+	while (current)
 	{
-		if (val[i] == '\'' || val[i] == '\"')
+		prev = find_previous_token(head, current);
+		if (prev && prev->type == TOKEN_HEREDOC)
 		{
-			quote = val[i++];
-			start = i;
-			while (val[i] && val[i] != quote)
-				i++;
-			tmp = ft_substr(val, start, i - start);
-			if (!tmp)
-				return (free_array(strings), NULL);
-			if (quote == '\"')
-			{
-				char *quoted_tmp = ft_strjoin("\1", tmp);
-				free(tmp);
-				tmp = quoted_tmp;
-			}
-			if (*tmp)
-				strings[count++] = tmp;
-			else
-				free(tmp);
-			if (val[i] == quote)
-				i++;
+			current->value = herdoc_parsing(current->value);
+			if (!current->value)
+			      return (free_tokens(head, str), NULL);
 		}
 		else
 		{
-			start = i;
-			while (val[i] && val[i] != '\'' && val[i] != '\"')
-				i++;
-			tmp = ft_substr(val, start, i - start);
-			if (!tmp)
-				return (free_array(strings), NULL);
-			if (ft_strcmp(tmp, "$") == 0)
-			{
-				free(tmp);
-				tmp = ft_strdup("$\5");//delete this 
-				if (!tmp)
-					return (free_array(strings), NULL);
-			}
-			if (*tmp)
-				strings[count++] = tmp;
-			else
-				free(tmp);
+			process_result = process_token(current, &head, env_list);
+			if (process_result == 0)
+               return (free_tokens(head, str), NULL);
 		}
+		current = current->next;
 	}
-	strings[count] = NULL;
-	return (strings);
-}
-
-
-int is_single_quoted(char *original_val, char *substring)
-{
-    char *pos = ft_strstr(original_val, substring);
-    int quote_count = 0;
-    int i = 0;
-    
-    if (!pos)
-        return 0;
-    
-    while (&original_val[i] < pos)
-    {
-        if (original_val[i] == '\'' && (i == 0 || original_val[i - 1] != '\\'))
-            quote_count++;
-        i++;
-    }
-    return (quote_count % 2 == 1);
-}
-
- int is_quoted(char *original_val, char *substring)
-{
-    if (substring && substring[0] == '\1')
-        return 1;
-    char *pos = ft_strstr(original_val, substring);
-    int i = 0;
-    char current_quote = 0;
-    
-    if (!pos)
-        return 0;
-    while (&original_val[i] < pos)
-    {
-        if ((original_val[i] == '\'' || original_val[i] == '"') && 
-            (i == 0 || original_val[i - 1] != '\\'))
-        {
-            if (!current_quote)
-                current_quote = original_val[i];
-            else if (original_val[i] == current_quote)
-                current_quote = 0;
-        }
-        i++;
-    }
-    return (current_quote != 0);
-}
-
-char **split_with_quotes(char *str)
-{
-    int i = 0, start = 0, count = 0;
-    char **result = NULL;
-    int in_quotes = 0;
-    char quote_char = 0;
-    
-    if (!str || !*str)
-        return NULL;
-    while (str[i])
-    {
-        while (ft_isspace(str[i]))
-            i++;
-        if (!str[i])
-            break;
-        count++;
-        start = i;
-        while (str[i])
-        {
-            if (str[i] == '\'' || str[i] == '"')
-            {
-                if (!in_quotes)
-                {
-                    in_quotes = 1;
-                    quote_char = str[i];
-                }
-                else if (str[i] == quote_char)
-                {
-                    in_quotes = 0;
-                    quote_char = 0;
-                }
-                i++;
-            }
-            else if (!in_quotes && ft_isspace(str[i]))
-                break;
-            else
-                i++;
-        }
-    }
-    if (count == 0)
-        return NULL;
-    result = malloc(sizeof(char *) * (count + 1));
-    if (!result)
-        return NULL;
-    i = 0;
-    count = 0;
-    in_quotes = 0;
-    quote_char = 0;
-    while (str[i])
-    {
-        while (ft_isspace(str[i]))
-            i++;       
-        if (!str[i])
-            break;
-        start = i;
-        while (str[i])
-        {
-            if (str[i] == '\'' || str[i] == '"')
-            {
-                if (!in_quotes)
-                {
-                    in_quotes = 1;
-                    quote_char = str[i];
-                }
-                else if (str[i] == quote_char)
-                {
-                    in_quotes = 0;
-                    quote_char = 0;
-                }
-                i++;
-            }
-            else if (!in_quotes && ft_isspace(str[i]))
-                break;
-            else
-                i++;
-        }
-        result[count] = ft_strndup(str + start, i - start);
-        if (!result[count])
-        {
-            free_array(result);
-            return NULL;
-        }
-        count++;
-    }
-    result[count] = NULL;
-    return result;
-}
-
-int handle_token_splitting(t_token *current, t_token **head, char **split)
-{
-    t_token *next_token = current->next;
-    t_token *prev_token = find_previous_token(*head, current);
-    t_token *first_new = NULL;
-    t_token *last_new = NULL;
-    int j = 0;
-
-    while (split[j])
-    {
-        t_token *new_tokens = new_token(ft_strdup(split[j]), TOKEN_WORD);
-        if (!new_tokens)
-        {
-            if (first_new)
-                free_tokens(first_new, NULL);
-            return (0);
-        }
-        if (!first_new)
-            first_new = new_tokens;
-        
-        if (last_new)
-            last_new->next = new_tokens;
-        last_new = new_tokens;
-        j++;
-    }
-    if (prev_token)
-        prev_token->next = first_new;
-    else
-        *head = first_new;
-    last_new->next = next_token;
-    return (free(current->value), free(current), 1);
-}
-
-int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx)
-{
-    char    *expanded;
-
-    expanded = found_env(new_val[i], env_table, shell_ctx);
-    if (!expanded)
-        return (0);
-    free(new_val[i]);
-    new_val[i] = expanded;
-    return (1);
-}
-char	*remove_dollar_before_quote(const char *str)
-{
-	char	*result;
-	int		i;
-	int		j;
-
-	if (!str)
-		return (NULL);
-	result = malloc(ft_strlen(str) + 1);
-	if (!result)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (str[i])
-	{
-		if (str[i] == '$' && (str[i + 1] == '"' || str[i + 1] == '\''))
-			i++;
-		result[j++] = str[i++];
-	}
-	result[j] = '\0';
-	return (result);
-}
-
-void	fix_export_dollar_before_quote(t_token *head)
-{
-	t_token	*cur;
-	char	*eq_pos;
-	char	*new_val;
-	char	*before_eq;
-	char	*fixed_after;
-
-	cur = head;
-	while (cur)
-	{
-		if (cur->type == TOKEN_WORD && cur->value)
-		{
-			eq_pos = ft_strchr(cur->value, '=');
-			if (eq_pos && eq_pos[1] == '$' && eq_pos[2] == '"')
-			{
-				before_eq = ft_substr(cur->value, 0, eq_pos - cur->value + 1);
-				if (!before_eq)
-					return ;
-				fixed_after = remove_dollar_before_quote(eq_pos + 1);
-				if (!fixed_after)
-					return (free(before_eq));
-				new_val = ft_strjoin(before_eq, fixed_after);
-				free(before_eq);
-				free(fixed_after);
-				if (!new_val)
-					return ;
-				free(cur->value);
-				cur->value = new_val;
-			}
-		}
-		cur = cur->next;
-	}
-}
-
-t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
-{
-    t_token *head;
-    t_token *current;
-    t_token *next;
-    int     process_result;
-
-    head = string_tokens(str, shell_ctx);
-    if (!head)
-        return (NULL);
-    fix_export_dollar_before_quote(head);
-    current = head;
-    while (current)
-    {
-        next = current->next;
-        process_result = process_token(current, &head, shell_ctx, env_table);
-        if (process_result == 0)
-        {
-            free_tokens(head, str);
-            return (NULL);
-        }
-        current = next;
-    }
-    return head;
+	return head;
 }

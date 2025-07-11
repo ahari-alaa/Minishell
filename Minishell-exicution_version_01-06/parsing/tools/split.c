@@ -78,12 +78,12 @@ char **ft_split(char *str)
 		return (NULL);
 	while (i < count_word(str))
 	{
-		while (str[j] && (str[j] == 32 || str[j] == '\t'))
+		while (str[j] && (ft_isspace(str[j])))
 			j++;
 		p[i] = malloc_str(str + j);
 		if (!p[i])
 			return (free_split(p), NULL);
-		while (str[j] && str[j] != 32 && str[j] != '\t')
+		while (str[j] && (!ft_isspace(str[j])))
 			j++;
 		i++;
 	}

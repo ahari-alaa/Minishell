@@ -79,15 +79,13 @@ typedef struct s_env
 {
 	char *data_env;//this the path like use/bin....
 	struct s_env *next; /* data */
-}t_env;
+} t_env;
 //export
-typedef struct s_process
+typedef struct s_env_list
 {
-	char	**new_val;
-	char	*val_cmd;
-	char	**env;
-	int		is_export; // 1 if export, 0 otherwise
-}	t_process;
+	char	**env_table;
+	t_shell		*exit_status;
+}	t_env_list;
 
 void export_one_case(char *value, t_token *head);
 /*---------------function for free--------------------*/
@@ -109,9 +107,9 @@ t_token			*get_cmd_token(t_token *head, t_token *current);
 /*-----------------parsing --------------------------*/
 int				is_export_assignment(t_token *head, t_token *current);
 char			**split_with_quotes(char *str);
-int				process_token(t_token *current, t_token **head, t_shell *shell_ctx, char **env_table);
-int	finalize_token_value(t_token *current, t_token **head, char *val_cmd, char **new_val);
-
+char *process_quoted_value(char *val, t_token *head, t_env_list *env);
+// int	finalize_token_value(t_token *current, t_token **head, char *val_cmd, char **new_val);
+// char	*remove_dollar_before_quote(const char *str);
 
 /*-----------------for print--------------------------*/
 void			print_tokens(t_token *head);
@@ -128,9 +126,13 @@ int				count_args(t_token *token);
 t_token			*check_quoted(char *str, t_shell *shell_ctx, char **env_table);
 char			**convert(t_env *env_list);
 int				count_herdoc(t_cmd *cmd);
-
+int				process_token(t_token *current, t_token **head, t_env_list *env_list);
+char	*herdoc_parsing(char *val);
+char *remove_char(const char *str, char to_remove);
+char	*remove_dollar_before_quotes(char *str);
 /*------------ tools for parsing ----------------*/
 int				is_quote(char c);
+void			*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 int				ft_isspace(char c);
 int				is_operator(const char s);
 int				ft_isalpha(char c);
@@ -167,7 +169,7 @@ t_token_type	get_token_type(const char *s);
 t_token			*new_token(char *val, t_token_type type);
 
 //for testing
-char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx);
+char	*process_quoted_value(char *val, t_token *head,t_env_list *env_list);
 
 
 

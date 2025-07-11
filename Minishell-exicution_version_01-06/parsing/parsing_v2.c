@@ -10,95 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../minishell.h"
 
-static void process_export_assignment_split(char **new_val, int i, int is_export_var)
-{
-    char	**split;
-    char    *joined;
-
-    if (is_export_var == 2)
-    	return ;
-    split = split_with_quotes(new_val[i]);
-    if (!split || !split[0])
-    {
-        if (split)
-            free_array(split);
-        return ;
-    }
-    if (is_export_var == 1)
-    {
-        joined = join_export_tokens(split);
-        if (joined)
-        {
-            free(new_val[i]);
-            new_val[i] = joined;
-        }
-        free_array(split);
-    }
-}
-
-
-int	finalize_token_value(t_token *current, t_token **head, char *val_cmd, char **new_val)
-{
-	free_array(new_val);
-	free(current->value);
-	if (val_cmd)
-		current->value = val_cmd;
-	else
-		current->value = ft_strdup("");
-	if (!current->value)
-	{
-		free_tokens(*head, NULL);
-		return (0);
-	}
-	return (1);
-}
-
-int	join_new_value(char **val_cmd, char *str, t_token **head, char **new_val)
-{
-	char	*tmp;
-
-	if (!*val_cmd)
-	{
-		*val_cmd = ft_strdup(str);
-		if (!*val_cmd)
-			return (free_array(new_val), 0);
-	}
-	else
-	{
-		if(ft_strcmp(*val_cmd, "$\5") == 0)
-		{
-			free(*val_cmd);
-			*val_cmd = ft_strdup("");
-		}
-		tmp = ft_strjoin(*val_cmd, str);
-		free(*val_cmd);
-		*val_cmd = tmp;
-		if (!*val_cmd)
-			return (free_array(new_val), free_tokens(*head, NULL), 0);
-	}
-	return (1);
-}
-
-int	handle_split(t_token *cur, t_token **head,
-		char **new_val, int i)
-{
-	char	**split;
-
-	split = ft_split(new_val[i]);
-	if (split && split[0] && split[1])
-	{
-		if (!handle_token_splitting(cur, head, split))
-			return (free_tokens(*head, NULL), free_array(new_val),
-				free_array(split), 0);
-		return (free_array(split), free_array(new_val), 2);
-	}
-	if (split)
-		free_array(split);
-	return (1);
-}
 int	ft_strspaces(char *str)
 {
 	int	i;
@@ -115,111 +28,75 @@ int	ft_strspaces(char *str)
 	return (1);
 }
 
-int	handle_special_expansion(t_process *p, t_token **head,
-			t_shell *ctx, int *i)
+void append_token(t_token **head, t_token *new_token)
 {
-	char	*unmarked;
-	char	*expanded;
-	char	*tmp;
+	t_token	*current;
 
-	unmarked = ft_strdup(p->new_val[*i] + 1);
-	if (!unmarked)
-		return (0);
-	expanded = found_env(unmarked, p->env, ctx);
-	free(unmarked);
-	if (!expanded)
-		return (free(p->new_val[*i]), 0);
-	if (ft_strspaces(expanded) == 1)
-		tmp = ft_strdup(expanded);
-	else
-		tmp = ft_delete_spaces(expanded);
-	free(p->new_val[*i]);
-	if (!tmp)
+	if (!head || !new_token)
+		return;
+	if (*head == NULL)
 	{
-		if (tmp)
-			free(tmp);
-		p->new_val[*i] = ft_strdup("");
+		*head = new_token;
+		return;
+	}
+	current = *head;
+	while (current->next)
+		current = current->next;
+	current->next = new_token;
+}
+
+int split_and_process_tokens(t_token *current, t_token **head, char *new_val)
+{
+    char	**split;
+	t_token	*new_tokens;
+	char	*tmp;
+	int		i;
+    
+	i = 1;
+	split = ft_split(new_val);
+	if (!split)
+        return (free(new_val), 0);
+    free(current->value);
+    current->value = ft_strdup(split[0]);
+    if (!current->value)
+        return (free_array(split), free(new_val), 0);
+    while (split[i])
+	{
+        tmp = ft_strdup(split[i]);
+        new_tokens = new_token(ft_strjoin("\2", tmp), TOKEN_WORD);
+        if (!new_tokens)
+            return (free_array(split),free(new_val), 0);
+        append_token(head, new_tokens);
+        i++;
+    }
+    return (free_array(split), free(new_val), 1);
+}
+
+int process_token(t_token *current, t_token **head, t_env_list *env_list)
+{
+	char	*new_val;
+	int		is_export_var;
+
+	is_export_var = is_export_assignment(*head, current);
+	if (current->type != TOKEN_WORD)
+		return (1);
+	new_val = process_quoted_value(current->value, *head, env_list);
+	if (!new_val)
+		return (0);
+	if (is_export_var == 1 || ft_strspaces(new_val))
+	{
+		free(current->value);
+		current->value = ft_strdup(new_val);
+		if(!current->value)
+			return (free(new_val),
+				print_error(*head, NULL, NULL), 0);
+		free(new_val);
 	}
 	else
-		p->new_val[*i] = tmp;
-	free(expanded);
-	if (!p->new_val[*i])
-		return (0);
-	if (!join_new_value(&p->val_cmd, p->new_val[*i], head, p->new_val))
-		return (0);
-	(*i)++;
+	{
+		if(split_and_process_tokens(current, head, new_val) == 0)
+			return (print_error(*head, NULL, NULL), 0);
+	}
 	return (1);
 }
 
-
-int	process_token_loop(t_token *cur, t_token **head, 
-		t_shell *ctx, t_process p)
-{
-	int	i;
-	int	ret;
-	t_token *prev;
-
-	i = 0;
-	prev = find_previous_token(*head, cur);
-	if (prev && prev->type == TOKEN_HEREDOC)
-	{
-		while (p.new_val[i])
-		{
-			if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
-				return (0);
-			i++;
-		}
-		return (finalize_token_value(cur, head, p.val_cmd, p.new_val));
-	}
-	while (p.new_val[i])
-	{
-		if (!is_single_quoted(cur->value, p.new_val[i]))
-		{
-			if (p.new_val[i][0] == '\1')
-			{
-				if (!handle_special_expansion(&p, head, ctx, &i))
-					return (1);
-				continue;
-			}
-			if (!process_env_expansion(p.new_val, i, p.env, ctx))
-				return (free_tokens(*head, NULL), free_array(p.new_val),
-					free(p.val_cmd), 0);
-			if (!is_quoted(cur->value, p.new_val[i]))
-			{
-				ret = handle_split(cur, head, p.new_val, i);
-				if (ret != 1)
-					return (free(p.val_cmd), ret);
-			}
-			else if (!is_quoted(cur->value, p.new_val[i]))
-				process_export_assignment_split(p.new_val, i, p.is_export);
-		}
-		if (!join_new_value(&p.val_cmd, p.new_val[i], head, p.new_val))
-			return (0);
-		i++;
-	}
-	return (finalize_token_value(cur, head, p.val_cmd, p.new_val));
-}
-
-int process_token(t_token *current, t_token **head,
-        t_shell *shell_ctx, char **env_table)
-{
-    char    **new_val;
-    char    *val_cmd;
-    int     is_export_var;
-
-    if (current->type != TOKEN_WORD)
-        return (1);
-    is_export_var = is_export_assignment(*head, current);
-    if (is_export_assignment(*head, current))
-    {
-        export_one_case(current->value, current);
-		// printf("exported: %s\n", current->value);
-    }
-    remove_quotes_before_equal(current);
-    new_val = process_quoted_value(current->value, *head, shell_ctx);
-    if (!new_val)
-        return (0);
-    val_cmd = NULL;
-    return (process_token_loop(current, head, shell_ctx,
-            (t_process){new_val, val_cmd, env_table, is_export_var}));
-}

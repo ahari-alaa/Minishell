@@ -60,3 +60,43 @@ int count_herdoc(t_cmd *cmd)
     }
     return count;
 }
+
+void	*ft_memcpy(void *dst, const void *src, size_t n)
+{
+	unsigned char		*d;
+	const unsigned char	*s;
+	size_t				i;
+
+	if (!dst && !src)
+		return (NULL);
+	d = (unsigned char *)dst;
+	s = (const unsigned char *)src;
+	i = 0;
+	while (i < n)
+	{
+		d[i] = s[i];
+		i++;
+	}
+	return (dst);
+}
+
+void *ft_realloc(void *ptr, size_t old_size, size_t new_size)
+{
+    void *new_ptr;
+    if (new_size == 0)
+    {
+        free(ptr);
+        return NULL;
+    }
+    if (!ptr)
+        return malloc(new_size);
+
+    new_ptr = malloc(new_size);
+    if (!new_ptr)
+        return NULL;
+    if (old_size > new_size)
+        old_size = new_size;
+    ft_memcpy(new_ptr, ptr, old_size);
+    free(ptr);
+    return new_ptr;
+}

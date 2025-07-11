@@ -23,7 +23,35 @@ static int count_commands(t_token *tokens)
     }
     return count;
 }
+char *remove_char(const char *str, char to_remove)
+{
+    int i = 0, j = 0;
+    char *result;
 
+    if (!str)
+        return NULL;
+
+    // Allocate memory for the resulting string (same size as the original string)
+    result = malloc(strlen(str) + 1);
+    if (!result)
+        return NULL;
+
+    // Iterate through the original string
+    while (str[i])
+    {
+        // Copy characters that are not the one to remove
+        if (str[i] != to_remove)
+        {
+            result[j++] = str[i];
+        }
+        i++;
+    }
+
+    // Null-terminate the resulting string
+    result[j] = '\0';
+
+    return result;
+}
 static int parse_arguments(t_cmd *cmd, t_token *tokens)
 {
     int arg_i = 0;
@@ -36,7 +64,8 @@ static int parse_arguments(t_cmd *cmd, t_token *tokens)
             ft_strcmp(current->value, "\2") != 0 &&
             !(ft_strspaces(current->value) && current->was_quoted != 1))
         {
-            cmd->cmd[arg_i] = ft_strdup(current->value);
+            char *tmp = ft_strdup(current->value);
+            cmd->cmd[arg_i] = remove_char(tmp, '\2');
             if (!cmd->cmd[arg_i])
             {
                 while (--arg_i >= 0)
