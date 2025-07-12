@@ -36,17 +36,16 @@ t_file	*init_mfile(void)
     return (file);
 }
 
-t_token	*new_token(char *val, t_token_type type)
+t_token *new_token(char *val, t_token_type type)
 {
-    t_token *token;
-
-    token = malloc(sizeof(t_token));
-    if (!token)
-        return NULL;
-    token->value = val;
-    token->type = type;
-    token->next = NULL;
-    return token;
+	t_token *token = malloc(sizeof(t_token));
+	if (!token)
+		return NULL;
+	token->value = val ? ft_strdup(val) : NULL;
+	token->type = type;
+	token->was_quoted = 0;
+	token->next = NULL;
+	return token;
 }
 
 int ft_isredirect(t_token_type type)

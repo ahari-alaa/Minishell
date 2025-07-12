@@ -120,14 +120,16 @@ static int parse_redirections(t_cmd *cmd, t_token **tokens)
             file = init_mfile();
             if (!file)
                 return 0;
-            file->name = ft_strdup(current->next->value);
+            char *tmp = ft_strdup(current->next->value);
+            if (!tmp)
+                 return (free(file), 0);
+            file->name = remove_char(tmp , '\2');
             if(!file->name)
                 return (free(file), 0);
             file->type = current->type;
             file->check_expand = current->next->was_quoted;
-            // if (!file->name)
-            //     return (free(file), 0);
             cmd->files[cmd->file_count++] = *file;
+            free(tmp);
             free(file);
             current = current->next;
         }
@@ -166,7 +168,6 @@ static t_cmd *parse_single_command(t_token **tokens)
     cmd->files = malloc(sizeof(t_file) * (redir_count + 1));
     if (!cmd->files)
         return (free(cmd->cmd), free(cmd), NULL);
-
     if (!parse_arguments(cmd, *tokens) || !parse_redirections(cmd, &start))
         return (free(cmd),NULL);
     while (*tokens && (*tokens)->type != TOKEN_PIPE)

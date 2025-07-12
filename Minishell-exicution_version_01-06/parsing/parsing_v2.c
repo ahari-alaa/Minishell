@@ -47,29 +47,32 @@ void append_token(t_token **head, t_token *new_token)
 
 int split_and_process_tokens(t_token *current, t_token **head, char *new_val)
 {
-    char	**split;
+	char	**split;
 	t_token	*new_tokens;
 	char	*tmp;
 	int		i;
-    
+
 	i = 1;
-	split = ft_split(new_val);
+	split = ft_split(new_val); // assume this NULL-terminates
 	if (!split)
-        return (free(new_val), 0);
-    free(current->value);
-    current->value = ft_strdup(split[0]);
-    if (!current->value)
-        return (free_array(split), free(new_val), 0);
-    while (split[i])
+		return (free(new_val), 0);
+	free(current->value);
+	current->value = ft_strdup(split[0]);
+	if (!current->value)
+		return (free_array(split), free(new_val), 0);
+	while (split[i])
 	{
-        tmp = ft_strdup(split[i]);
-        new_tokens = new_token(ft_strjoin("\2", tmp), TOKEN_WORD);
-        if (!new_tokens)
-            return (free_array(split),free(new_val), 0);
-        append_token(head, new_tokens);
-        i++;
-    }
-    return (free_array(split), free(new_val), 1);
+		tmp = ft_strdup(split[i]);
+		new_tokens = new_token(tmp, TOKEN_WORD);
+		free(tmp);
+		if (!new_tokens)
+			return (free_array(split), free(new_val), 0);
+		append_token(head, new_tokens);
+		i++;
+	}
+	free_array(split);
+	free(new_val);
+	return 1;
 }
 
 int process_token(t_token *current, t_token **head, t_env_list *env_list)
@@ -83,7 +86,8 @@ int process_token(t_token *current, t_token **head, t_env_list *env_list)
 	new_val = process_quoted_value(current->value, *head, env_list);
 	if (!new_val)
 		return (0);
-	if (is_export_var == 1 || ft_strspaces(new_val))
+	if (is_export_var == 1 || ft_strspaces(new_val) || \
+		current->was_quoted != 0)
 	{
 		free(current->value);
 		current->value = ft_strdup(new_val);

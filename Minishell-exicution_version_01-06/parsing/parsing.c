@@ -40,6 +40,54 @@ t_token *find_previous_token(t_token *head, t_token *target)
 		return  NULL;
 }
 
+t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_tab)
+{
+	t_token *head;
+	t_token *current;
+	t_token *prev;
+	int     process_result;
+	t_env_list	*env_list;
+
+	env_list = malloc(sizeof(t_env_list));
+	if (!env_list)
+		return NULL;
+	env_list->env_table = env_tab;
+	env_list->exit_status = shell_ctx;
+	head = string_tokens(str, shell_ctx);
+	if (!head)
+	{
+		free(env_list);
+		return NULL;
+	}
+	current = head;
+	while (current)
+	{
+		prev = find_previous_token(head, current);
+		if (prev && prev->type == TOKEN_HEREDOC)
+		{
+			char *new_val = herdoc_parsing(current->value);
+			if (!new_val)
+			{
+				free(env_list);
+				return (free_tokens(head, str), NULL);
+			}
+			free(current->value);
+			current->value = new_val;
+		}
+		else
+		{
+			process_result = process_token(current, &head, env_list);
+			if (process_result == 0)
+			{
+				free(env_list);
+				return (free_tokens(head, str), NULL);
+			}
+		}
+		current = current->next;
+	}
+	free(env_list);
+	return head;
+}
 
 // char *process_quoted_value(char *val, t_token *head, t_env_list *env)
 // {
@@ -200,39 +248,39 @@ t_token *find_previous_token(t_token *head, t_token *target)
 // 	return (result);
 // }
 
-t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_tab)
-{
-	t_token *head;
-	t_token *current;
-	t_token *prev;
-	int     process_result;
-	t_env_list	*env_list;
+// t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_tab)
+// {
+// 	t_token *head;
+// 	t_token *current;
+// 	t_token *prev;
+// 	int     process_result;
+// 	t_env_list	*env_list;
 
-	env_list = malloc(sizeof(t_env_list));
-	if (!env_list)
-		{return NULL;}
-	env_list->env_table = env_tab;
-	env_list->exit_status = shell_ctx;
-	head = string_tokens(str, shell_ctx);
-	if (!head)
-		return (NULL);
-	current = head;
-	while (current)
-	{
-		prev = find_previous_token(head, current);
-		if (prev && prev->type == TOKEN_HEREDOC)
-		{
-			current->value = herdoc_parsing(current->value);
-			if (!current->value)
-			      return (free_tokens(head, str), NULL);
-		}
-		else
-		{
-			process_result = process_token(current, &head, env_list);
-			if (process_result == 0)
-               return (free_tokens(head, str), NULL);
-		}
-		current = current->next;
-	}
-	return head;
-}
+// 	env_list = malloc(sizeof(t_env_list));
+// 	if (!env_list)
+// 		{return NULL;}
+// 	env_list->env_table = env_tab;
+// 	env_list->exit_status = shell_ctx;
+// 	head = string_tokens(str, shell_ctx);
+// 	if (!head)
+// 		return (NULL);
+// 	current = head;
+// 	while (current)
+// 	{
+// 		prev = find_previous_token(head, current);
+// 		if (prev && prev->type == TOKEN_HEREDOC)
+// 		{
+// 			current->value = herdoc_parsing(current->value);
+// 			if (!current->value)
+// 			      return (free_tokens(head, str), NULL);
+// 		}
+// 		else
+// 		{
+// 			process_result = process_token(current, &head, env_list);
+// 			if (process_result == 0)
+//                return (free_tokens(head, str), NULL);
+// 		}
+// 		current = current->next;
+// 	}
+// 	return head;
+// }
