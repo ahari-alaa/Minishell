@@ -187,14 +187,12 @@ int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
                 break;
             }
 
-            char *tmp = ft_strjoin("$", file->name);
-            if (file->check_expand == 0 && ft_strcmp(line, tmp) != 0)
+            if (file->check_expand == 0 && ft_strcmp(line, file->name) != 0)
             {
                 char *expanded_line = found_env(line, env, shell_ctx);
                 if (!expanded_line)
                 {
                     free(line);
-                    free(tmp);
                     close(fd);
                     unlink(filename);
                     free(filename);
@@ -209,7 +207,6 @@ int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
                 write(fd, line, strlen(line));
                 write(fd, "\n", 1);
             }
-            free(tmp);
             free(line);
         }
         close(fd);
