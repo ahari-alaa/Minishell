@@ -33,13 +33,13 @@ static int	is_var_exp_assignment(const char *str)
 		}
 		p++;
 	}
+	if (*(eq + 1) == '$' && check != -1)
+		return (1);
 	if (str[0] == '\'' || str[0] == '"')
 		return (0);
 	if (*(eq + 1) == '\"' || *(eq + 1) == '\'')
 		return (1);
 	if (*(eq + 1) == '\"' && *(eq + 2) == '$')
-		return (1);
-	if (*(eq + 1) == '$' && check != -1)
 		return (1);
 	return (0);
 }
@@ -48,13 +48,23 @@ int	is_export_assignment(t_token *head, t_token *current)
 {
 	t_token	*prev;
 
-	prev = find_previous_token(head, current);
 	if (!head || !current)
 		return (0);
+	prev = find_previous_token(head, current);
+	if (!prev)
+	{
+		if (current->was_quoted != 0)
+			return (1);
+		else
+			return (0);
+	}
+	if (ft_strcmp(prev->value, "export") == 0 && current->was_quoted != 0 \
+		&& is_var_exp_assignment(current->value) == 1)
+		return (printf("alaa1\n"),1, free(prev->value));
 	if (prev && prev->was_quoted == 0)
 	{
 		if(is_var_exp_assignment(current->value) == 1)
-			return (1);
+			return (printf("alaa2\n"),1);
 	}
 	return (0);
 }

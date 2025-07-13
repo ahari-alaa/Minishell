@@ -50,7 +50,7 @@ t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *she
     if (!val)
         return (NULL);    
     t_token *new = new_token(val, TOKEN_WORD);
-    if (has_quotes(new->value) != 0)
+    if (has_quotes(new->value) == 1 || has_quotes(new->value) == 2)
         new->was_quoted = 1;
     else
         new->was_quoted = 0;

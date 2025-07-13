@@ -29,9 +29,11 @@ void free_array(char **array)
 
 t_token *find_previous_token(t_token *head, t_token *target)
 {
+	t_token *current;
+
 	if (!head || head == target)
 		return NULL;
-	t_token *current = head;
+	current = head;
 	while (current->next && current->next != target)
 		current = current->next;
 	if (current->next == target)

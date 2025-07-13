@@ -86,8 +86,7 @@ int process_token(t_token *current, t_token **head, t_env_list *env_list)
 	new_val = process_quoted_value(current->value, *head, env_list);
 	if (!new_val)
 		return (0);
-	if (is_export_var == 1 || ft_strspaces(new_val) || \
-		current->was_quoted != 0)
+	if (is_export_var == 1 || ft_strspaces(new_val))
 	{
 		free(current->value);
 		current->value = ft_strdup(new_val);

@@ -19,8 +19,10 @@ int has_quotes(char *str)
     i = 0;
 	while (str[i])
 	{
-		if (str[i] == '\'' || str[i] == '"')
+		if (str[i] == '\'')
 			return (1);
+		if (str[i] == '\"')
+			return (2);
 		if (str[i] == '$' || ft_isdigit(str[i]))
 			return (3);
 		if (str[i] == '=')

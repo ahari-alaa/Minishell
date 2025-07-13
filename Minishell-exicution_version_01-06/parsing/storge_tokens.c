@@ -65,6 +65,8 @@ static int parse_arguments(t_cmd *cmd, t_token *tokens)
             !(ft_strspaces(current->value) && current->was_quoted != 1))
         {
             char *tmp = ft_strdup(current->value);
+            if (!tmp)
+                return (0);
             cmd->cmd[arg_i] = remove_char(tmp, '\2');
             if (!cmd->cmd[arg_i])
             {
