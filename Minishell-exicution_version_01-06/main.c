@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/13 17:15:07 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 20:53:24 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,11 @@ int main(int ac, char **av, char **env)
 
         env_table = convert(env_list);
         tokens = check_quoted(input, shell_ctx, env_table);
-        print_tokens(tokens);
+        // print_tokens(tokens);
+        free(input);
         if (!tokens)
         {
-            free(input);
+            free(NULL);
             free_array(env_table);
             continue;
         }
@@ -63,7 +64,7 @@ int main(int ac, char **av, char **env)
 
         if (!commands)
         {
-            free_tokens(tokens, input);
+            free_tokens(tokens, NULL);
             free_array(env_table); // 🧼 FIXED: memory leak
             continue;
         }
@@ -72,7 +73,7 @@ int main(int ac, char **av, char **env)
         {
             write(2, "minishell: too many here-documents\n", 36);
             shell_ctx->exit_status = 2;
-            free_tokens(tokens, input);
+            free_tokens(tokens, NULL);
             free_cmd_list(commands);
             free_array(env_table);
             break;
@@ -81,7 +82,7 @@ int main(int ac, char **av, char **env)
         exicut(&commands, &env_list, shell_ctx);
         if (commands)
             free_cmd_list(commands);
-        free_tokens(tokens, input);
+        free_tokens(tokens, NULL);
     }
     free_env_list(env_list);
     free(shell_ctx);

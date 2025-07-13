@@ -96,31 +96,39 @@ static char	*handle_unquoted_heredoc(char *result, char *val, int *i)
 }
 
 // Main heredoc parsing function
-char	*herdoc_parsing(char *val)
+char    *herdoc_parsing(char *val)
 {
-	char	*result;
-	int		i;
+    char    *result;
+    char    *tmp;
+    int        i;
 
-	i = 0; 
-	result = ft_strdup("");
-	if (!result || !val)
-		return (NULL);
-	while (val[i])
-	{
-		if (val[i] == '\'' || val[i] == '\"')
-			result = handle_quoted_heredoc(result, val, &i);
-		else
-			result = handle_unquoted_heredoc(result, val, &i);
-		if (!result)
-			return (NULL);
-	}
-	if (ft_strcmp(result, "\1") == 0)
-	{
-		free(result);
-		result = ft_strdup("$");
+    i = 0;
+    if (!val)
+        return (NULL);
+    result = ft_strdup("");
+    if (!result)
+        return (NULL);
+    while (val[i])
+    {
+        if (val[i] == '\'' || val[i] == '\"')
+            tmp = handle_quoted_heredoc(result, val, &i);
+        else
+            tmp = handle_unquoted_heredoc(result, val, &i);
+        if (!tmp)
+        {
+            free(result);
+            return (NULL);
+        }
+        result = tmp;
+    }
+    if (ft_strcmp(result, "\1") == 0)
+    {
+        free(result);
+        result = ft_strdup("$");
         if (!result)
-             return (NULL);
-	}
-    result = remove_char(result, '\1');
-	return (result);
+            return (NULL);
+    }
+    tmp = remove_char(result, '\1');
+    free(result);
+    return tmp;
 }

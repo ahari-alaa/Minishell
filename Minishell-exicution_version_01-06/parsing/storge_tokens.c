@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:49:49 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/09 18:01:57 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 19:17:43 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ t_cmd *parse_commands(t_token *tokens, t_shell *shell_ctx)
     while (i < cmd_count)
     {
         new_cmd = parse_single_command(&tokens);
-        printf("token %p\n", tokens);
+        // printf("token %p\n", tokens);
         if (!new_cmd)
             return (free_cmd_list(cmd_head), shell_ctx->exit_status = 258, NULL);
         if (!cmd_head)

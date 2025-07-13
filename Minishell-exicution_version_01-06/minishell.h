@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/08 21:20:47 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 19:15:11 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ int				count_herdoc(t_cmd *cmd);
 int				process_token(t_token *current, t_token **head, t_env_list *env_list);
 char	*herdoc_parsing(char *val);
 char *remove_char(const char *str, char to_remove);
-char	*remove_dollar_before_quotes(char *str);
+char	*remove_dollar_before_quotes(char *str, char **temp);
 /*------------ tools for parsing ----------------*/
 int				is_quote(char c);
 void			*ft_realloc(void *ptr, size_t old_size, size_t new_size);

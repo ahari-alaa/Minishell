@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 16:04:38 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 17:04:38 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 19:17:31 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ t_token *handle_operator(char *str, int *i, t_token **head)
     if (!new)
         return (free(val), NULL);
     add_token(head, new);
-    return (*head);
+    return (free(val), *head);
 }
 void ft_putstr(char *s)
 {
@@ -166,7 +166,7 @@ t_token *string_tokens(char *str, t_shell *shell_ctx)
 		else
 		{
 
-            printf("qlqq\n");
+            // printf("qlqq\n");
 			// If handle_word_with_quotes fails, free all allocated tokens
 			if (!handle_word_with_quotes(str, &i, &head, shell_ctx))
 				return (free_tokens(head, NULL), NULL);
