@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 22:10:09 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 22:34:26 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_tab)
 	if (!head)
 	{
 		free(env_list);
-		free_tokens(head, str);
+		if (head)
+			free_tokens(head, str);
 		return NULL;
 	}
 	current = head;
