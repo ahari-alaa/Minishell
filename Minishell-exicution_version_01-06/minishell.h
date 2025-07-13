@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 21:21:50 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 21:37:38 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,6 +219,7 @@ void free_env_list(t_env *env_list);
 void handler_sig(int signal);
 
 int function_herdoc(t_file *file, char ** env, t_shell *shell_ctx);
+
 
 
 #endif

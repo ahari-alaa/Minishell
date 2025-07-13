@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-static int is_var_exp_assignment(const char *str)
+static int is_exp_var(const char *str)
 {
     const char *eq;
     const char *p;
@@ -65,12 +65,14 @@ static int is_exp(const char *str)
 
 static char *ft_strremovechar(const char *str)
 {
-    int i = 0, j = 0;
+    int i;
+    int j;
     char *new_str;
 
+    i = 0;
+    j = 0;
     if (!str)
-        return NULL;
-
+        return (NULL);
     new_str = malloc(ft_strlen(str) + 1);
     if (!new_str)
         return NULL;
@@ -85,13 +87,14 @@ static char *ft_strremovechar(const char *str)
         i++;
     }
     new_str[j] = '\0';
-    return new_str;
+    return (new_str);
 }
 
 
 int	is_export_assignment(t_token *head, t_token *current)
 {
 	t_token	*prev;
+    char *tmp;
 
 	if (!head || !current)
 		return (0);
@@ -103,18 +106,17 @@ int	is_export_assignment(t_token *head, t_token *current)
 		else
 			return (0);
 	}
-    char *tmp = ft_strremovechar(prev->value);
+    tmp = ft_strremovechar(prev->value);
     if (!tmp)
         return (0);
-    if (ft_strcmp(tmp, "export") == 0 && current->was_quoted == 0)
-            return (free(tmp), 1);    
+    if (ft_strcmp(tmp, "export") == 0 && current->was_quoted == 0 \
+        && is_exp(current->value) != 1)
+            return (free(tmp), 1);
 	if (ft_strcmp(tmp, "export") == 0 && current->was_quoted != 0 \
 		&& is_exp(current->value) != 1)
 		return (free(tmp),1);
-	if (prev && prev->was_quoted == 0)
-	{
-		if(is_var_exp_assignment(current->value) == 1)
+	if (prev && prev->was_quoted == 0 && is_exp_var(current->value) == 1)
 			return (free(tmp), 1);
-	}
 	return (free(tmp), 0);
 }
+

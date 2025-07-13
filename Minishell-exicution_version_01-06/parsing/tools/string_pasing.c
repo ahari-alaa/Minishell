@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:16:06 by ahari             #+#    #+#             */
-/*   Updated: 2025/06/22 20:43:41 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 22:16:29 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ size_t	ft_strlen(const char *s)
 
 int ft_strcmp(const char *s1, const char *s2)
 {
+    if (!s1 || !s2)
+        return (0);
     while (*s1 && (*s1 == *s2))
     {
         s1++;

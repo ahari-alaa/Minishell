@@ -1,27 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcmp.c                                        :+:      :+:    :+:   */
+/*   error_file.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/30 15:54:14 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/09 13:57:28 by maskour          ###   ########.fr       */
+/*   Created: 2025/06/24 14:23:28 by maskour           #+#    #+#             */
+/*   Updated: 2025/06/24 15:50:27 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "../minishell.h"
 
-int	ft_strcmp(const char *s1, const char *s2)
+void handle_cmd_errors(char *cmd_path, char *message)
 {
-	if (!s1 || !s2)
-		return (0);
-	while (*s1 != '\0' || *s2 != '\0')
+	if(cmd_path)
 	{
-		if (*s1 != *s2)
-			return ((unsigned char)*s1 - (unsigned char)*s2);
-		s1++;
-		s2++;
+		ft_putstr_fd_up("minishell:", 2);
+		ft_putstr_fd_up(cmd_path, 2);
+		ft_putstr_fd_up(message, 2);
 	}
-	return (0);
 }

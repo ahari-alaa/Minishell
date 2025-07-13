@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/13 21:15:52 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 21:48:57 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int main(int ac, char **av, char **env)
         if (input[0])
             add_history(input);
 
+        
         env_table = convert(env_list);
         tokens = check_quoted(input, shell_ctx, env_table);
         // print_tokens(tokens);
