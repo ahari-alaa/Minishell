@@ -72,7 +72,7 @@ static char	*handle_quoted_heredoc(char *result, char *val, int *i)
 {
 	char	*tmp;
 	char	*new_result;
-
+	printf("whdjh\n");
 	tmp = process_quoted_heredoc(val, i);
 	if (!tmp)
 		return (free(result), NULL);

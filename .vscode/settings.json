@@ -62,7 +62,20 @@
     "bitset": "c",
     "chrono": "c",
     "unordered_map": "c",
-    "typeinfo": "c"
+    "typeinfo": "c",
+    "__functional_base": "c",
+    "__node_handle": "c",
+    "__memory": "c",
+    "functional": "c",
+    "iterator": "c",
+    "limits": "c",
+    "memory": "c",
+    "optional": "c",
+    "ratio": "c",
+    "system_error": "c",
+    "tuple": "c",
+    "type_traits": "c",
+    "vector": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

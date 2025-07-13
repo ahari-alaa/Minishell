@@ -12,36 +12,55 @@
 
 #include "../minishell.h"
 
-static int	is_var_exp_assignment(const char *str)
+static int is_var_exp_assignment(const char *str)
 {
-	const char	*eq;
-	const char	*p;
-	int			check;
+    const char *eq;
+    const char *p;
 
-	p = str;
-	eq = ft_strchr(str, '=');
-	if (!eq || eq == str)
-		return (0);
-	if (ft_isdigit(*p))
-		check = -1;
-	while (*p && p < eq)
+    p = str;
+    eq = ft_strchr(str, '=');
+    if (!eq || eq == str)
+        return (0);
+    if (ft_isdigit(*p) || *p == '\'' || *p == '"')
+        return (0);
+    while (*p && p < eq)
+    {
+        if (*p == '\'' || *p == '"' || *p == '$')
+            return (0);
+        p++;
+    }
+    if (*(eq + 1) == '$')
+        return (1);
+    if (*(eq + 1) == '\'' || *(eq + 1) == '"')
+    {
+        if (*(eq + 2) == '$')
+            return (1);
+        return (1);
+    }
+    return (0);
+}
+
+static int is_exp(const char *str)
+{
+    int i = 0;
+    int eq_pos = -1;
+
+    if (!str || !*str)
+        return (0);
+    while (str[i])
 	{
-		if (*p == '\'' || *p == '"' || *p == '$')
+        if (str[i] == '=')
 		{
-			check = -1;
-			break;
-		}
-		p++;
-	}
-	if (*(eq + 1) == '$' && check != -1)
-		return (1);
-	if (str[0] == '\'' || str[0] == '"')
-		return (0);
-	if (*(eq + 1) == '\"' || *(eq + 1) == '\'')
-		return (1);
-	if (*(eq + 1) == '\"' && *(eq + 2) == '$')
-		return (1);
-	return (0);
+            eq_pos = i;
+            break;
+        }
+        i++;
+    }
+    if (eq_pos < 0 || str[eq_pos + 1] == '\0')
+        return (0);
+    if (str[eq_pos + 1] == '$')
+        return (1);
+    return (0);
 }
 
 int	is_export_assignment(t_token *head, t_token *current)
@@ -59,12 +78,12 @@ int	is_export_assignment(t_token *head, t_token *current)
 			return (0);
 	}
 	if (ft_strcmp(prev->value, "export") == 0 && current->was_quoted != 0 \
-		&& is_var_exp_assignment(current->value) == 1)
-		return (printf("alaa1\n"),1);
+		&& is_exp(current->value) != 1)
+		return (1);
 	if (prev && prev->was_quoted == 0)
 	{
 		if(is_var_exp_assignment(current->value) == 1)
-			return (printf("alaa2\n"),1);
+			return (1);
 	}
 	return (0);
 }

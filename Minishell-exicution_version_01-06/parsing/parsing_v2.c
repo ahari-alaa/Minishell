@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/09 18:07:47 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 17:09:54 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ int process_token(t_token *current, t_token **head, t_env_list *env_list)
 	char	*new_val;
 	int		is_export_var;
 
+	printf("hello alaa\n");
 	is_export_var = is_export_assignment(*head, current);
 	if (current->type != TOKEN_WORD)
 		return (1);
