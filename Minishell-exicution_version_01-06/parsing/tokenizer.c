@@ -50,12 +50,13 @@ t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *she
     if (!val)
         return (NULL);    
     t_token *new = new_token(val, TOKEN_WORD);
+    if (!new)
+        return (free(val), NULL);
+
     if (has_quotes(new->value) == 1 || has_quotes(new->value) == 2)
         new->was_quoted = 1;
     else
         new->was_quoted = 0;
-    if (!new)
-        return (free(val), NULL);
     add_token(head, new);
     return (*head);
 }
@@ -70,6 +71,8 @@ t_token *handle_operator(char *str, int *i, t_token **head)
     if ((str[*i] == '>' || str[*i] == '<') && str[*i] == str[*i+1])
     {
         val = ft_strndup(&str[*i], 2);
+        if (!val)
+            return (NULL);
         *i += 2;
     }
     else
@@ -139,34 +142,39 @@ static int validate_syntax(char *str, t_shell *shell_ctx)
     return 1;
 }
 
-t_token	*string_tokens(char *str, t_shell *shell_ctx)
-{
-	t_token	*head;
-	int		i;
 
-	head = NULL;
-	i = 0;
+
+t_token *string_tokens(char *str, t_shell *shell_ctx)
+{
+	t_token *head = NULL;
+	int i = 0;
+
+	// If initial syntax check fails, nothing is allocated
 	if (!validate_syntax(str, shell_ctx))
-		return (NULL);
+		return NULL;
+
 	while (str[i])
 	{
 		while (ft_isspace(str[i]))
 			i++;
 		if (!str[i])
-			break ;
+			break;
+		// If check_syntax_errors fails, nothing is allocated yet
 		if (!check_syntax_errors(str, i, shell_ctx))
-			return (NULL);
+			return NULL;
 		if (is_operator(str[i]))
 		{
+			// If handle_operator fails, free all allocated tokens
 			if (!handle_operator(str, &i, &head))
 				return (free_tokens(head, NULL), NULL);
 		}
 		else
 		{
+			// If handle_word_with_quotes fails, free all allocated tokens
 			if (!handle_word_with_quotes(str, &i, &head, shell_ctx))
 				return (free_tokens(head, NULL), NULL);
 		}
 	}
-	return (head);
+	// On success, caller owns head and must free it
+	return head;
 }
-

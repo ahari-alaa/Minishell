@@ -22,7 +22,8 @@ void    free_files(t_file *files, int file_count)
     i = 0;
     while (i < file_count)
     {
-        free(files[i].name);
+        if(files[i].name)
+            free(files[i].name);
         files[i].name = NULL;
         i++;
     }

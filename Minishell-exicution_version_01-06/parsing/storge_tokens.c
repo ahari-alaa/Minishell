@@ -68,6 +68,7 @@ static int parse_arguments(t_cmd *cmd, t_token *tokens)
             if (!tmp)
                 return (0);
             cmd->cmd[arg_i] = remove_char(tmp, '\2');
+            free(tmp); // FIX: free intermediate buffer to prevent leak
             if (!cmd->cmd[arg_i])
             {
                 while (--arg_i >= 0)
@@ -152,6 +153,7 @@ static int count_redirections(t_token *start)
     }
     return count;
 }
+// --- in parse_single_command ---
 static t_cmd *parse_single_command(t_token **tokens)
 {
     t_cmd *cmd;
@@ -169,9 +171,11 @@ static t_cmd *parse_single_command(t_token **tokens)
     int redir_count = count_redirections(start);
     cmd->files = malloc(sizeof(t_file) * (redir_count + 1));
     if (!cmd->files)
-        return (free(cmd->cmd), free(cmd), NULL);
-    if (!parse_arguments(cmd, *tokens) || !parse_redirections(cmd, &start))
-        return (free(cmd),NULL);
+        return (free_array(cmd->cmd), free(cmd), NULL);
+    if (!parse_arguments(cmd, *tokens))
+        return(free(cmd->files), free(cmd), NULL);
+    if (!parse_redirections(cmd, &start))
+        return (free_array(cmd->cmd), free(cmd->files), free(cmd), NULL);
     while (*tokens && (*tokens)->type != TOKEN_PIPE)
         *tokens = (*tokens)->next;
     cmd->next = NULL;
@@ -189,9 +193,9 @@ t_cmd *parse_commands(t_token *tokens, t_shell *shell_ctx)
     while (i < cmd_count)
     {
         new_cmd = parse_single_command(&tokens);
-       
+        printf("token %p\n", tokens);
         if (!new_cmd)
-            return (free_cmd_list(cmd_head),shell_ctx->exit_status = 258, NULL);
+            return (free_cmd_list(cmd_head), shell_ctx->exit_status = 258, NULL);
         if (!cmd_head)
             cmd_head = new_cmd;
         else

@@ -60,7 +60,7 @@ int	is_export_assignment(t_token *head, t_token *current)
 	}
 	if (ft_strcmp(prev->value, "export") == 0 && current->was_quoted != 0 \
 		&& is_var_exp_assignment(current->value) == 1)
-		return (printf("alaa1\n"),1, free(prev->value));
+		return (printf("alaa1\n"),1);
 	if (prev && prev->was_quoted == 0)
 	{
 		if(is_var_exp_assignment(current->value) == 1)
