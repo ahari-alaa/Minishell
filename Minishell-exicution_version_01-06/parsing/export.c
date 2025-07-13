@@ -63,6 +63,32 @@ static int is_exp(const char *str)
     return (0);
 }
 
+static char *ft_strremovechar(const char *str)
+{
+    int i = 0, j = 0;
+    char *new_str;
+
+    if (!str)
+        return NULL;
+
+    new_str = malloc(ft_strlen(str) + 1);
+    if (!new_str)
+        return NULL;
+
+    while (str[i])
+    {
+        if (str[i] != '\'' || str[i] != '\"')
+        {
+            new_str[j] = str[i];
+            j++;
+        }
+        i++;
+    }
+    new_str[j] = '\0';
+    return new_str;
+}
+
+
 int	is_export_assignment(t_token *head, t_token *current)
 {
 	t_token	*prev;
@@ -77,13 +103,18 @@ int	is_export_assignment(t_token *head, t_token *current)
 		else
 			return (0);
 	}
-	if (ft_strcmp(prev->value, "export") == 0 && current->was_quoted != 0 \
+    char *tmp = ft_strremovechar(prev->value);
+    if (!tmp)
+        return (0);
+    if (ft_strcmp(tmp, "export") == 0 && current->was_quoted == 0)
+            return (free(tmp), 1);    
+	if (ft_strcmp(tmp, "export") == 0 && current->was_quoted != 0 \
 		&& is_exp(current->value) != 1)
-		return (1);
+		return (free(tmp),1);
 	if (prev && prev->was_quoted == 0)
 	{
 		if(is_var_exp_assignment(current->value) == 1)
-			return (1);
+			return (free(tmp), 1);
 	}
-	return (0);
+	return (free(tmp), 0);
 }
