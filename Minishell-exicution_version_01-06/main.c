@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/13 20:53:24 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 21:15:52 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ int main(int ac, char **av, char **env)
             free_array(env_table);
             continue;
         }
-
         commands = parse_commands(tokens, shell_ctx);
 
         if (!commands)

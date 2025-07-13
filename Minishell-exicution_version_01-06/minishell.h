@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 19:15:11 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 21:21:50 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,8 +172,6 @@ t_token			*new_token(char *val, t_token_type type);
 char	*process_quoted_value(char *val, t_token *head,t_env_list *env_list);
 
 
-
-
 /*---------------exicution_util-----------------------*/
 // char	*ft_itoa(int n);
 char	**ft_split_up(char const *s, char c);
@@ -196,17 +194,17 @@ char	*ft_strtrim(char const *s1, char const *set);
 /*---------------exicution_util-----------------------*/
 int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx);
 // int execute_single_command(t_cmd **cmd, char **envp);
-int redirections(t_cmd *cmd, char **env, t_shell *shell_ctx);
+int redirections(t_cmd *cmd,int last_heredoc_index);
 char	*find_path(char *cmd, char **env);
 
 /*---------------------builtins-----------------------*/
-t_env *execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell);
+t_env *execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell, int i);
 int is_builtin(char *command);
 t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx);
 void ft_echo(t_cmd **cmd, t_shell *shell_ctx);
 void ft_env(t_env *env_list, t_shell *shell_ctx);
-void ft_exit(t_cmd **cmd, t_shell *shell);
-void ft_pwd(t_shell *shell_ctx);
+void ft_exit(t_cmd **cmd, t_shell *shell, int j);
+void ft_pwd(t_shell *shell_ctx, t_env *env_list);
 t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx);
 void ft_export(t_cmd **cmd, t_env **envp, t_shell *shell);
 
@@ -219,5 +217,8 @@ void free_env_list(t_env *env_list);
 
 /*---------------signals-----------------------*/
 void handler_sig(int signal);
+
+int function_herdoc(t_file *file, char ** env, t_shell *shell_ctx);
+
 
 #endif
