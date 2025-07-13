@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/11 22:56:33 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/13 20:49:16 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ static char *get_rundem_name(char *file_name) {
     char *count_str;
     char *tmp;
 
-    // Use /tmp directory (no need to check, always exists)
     filename = ft_strjoin("/tmp/minishell_", file_name);
     if (!filename) return NULL;
     fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
@@ -138,7 +137,6 @@ static int cleanup_stdio(int original_stdin, int original_stdout)
 
 int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
 {
-    // Generate the temp filename BEFORE fork
     char *filename = get_rundem_name(file->name);
     if (!filename) {
         perror("minishell: cannot create temp file");
@@ -154,7 +152,6 @@ int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
     signal(SIGINT, SIG_IGN);
     if (pid == 0)
     {
-        // Child process: set default signal handling
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
 
@@ -170,14 +167,10 @@ int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
         while (1)
         {
             line = readline("> ");
-            if (!line) // EOF (Ctrl+D)
+            if (!line)
             {
-                // Print warning about EOF without delimiter
-                // ft_putstr_fd_up("minishell: warning: here-document delimited by end-of-file (wanted `", 2);
-                // ft_putstr_fd_up(file->name, 2);
-                // ft_putstr_fd_up("')\n", 2);
                 close(fd);
-                free(filename); // Exit normally on EOF
+                free(filename);
                 exit(2);
             }
 

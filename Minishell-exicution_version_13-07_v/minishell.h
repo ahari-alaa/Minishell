@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 20:00:12 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/13 21:09:28 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,6 @@ typedef struct s_env
 	struct s_env *next; /* data */
 }t_env;
 //export
-//export
 typedef struct s_env_list
 {
 	char	**env_table;
@@ -130,7 +129,7 @@ int				count_herdoc(t_cmd *cmd);
 int				process_token(t_token *current, t_token **head, t_env_list *env_list);
 char	*herdoc_parsing(char *val);
 char *remove_char(const char *str, char to_remove);
-char	*remove_dollar_before_quotes(char *str);
+char	*remove_dollar_before_quotes(char *str, char **temp);
 /*------------ tools for parsing ----------------*/
 int				is_quote(char c);
 void			*ft_realloc(void *ptr, size_t old_size, size_t new_size);

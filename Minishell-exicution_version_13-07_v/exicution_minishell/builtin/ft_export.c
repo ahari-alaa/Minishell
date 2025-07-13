@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:50:12 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/11 22:51:09 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/13 20:33:11 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ static t_env	*sort_env(t_env *env)
 	if (!env || !env->next) 
 		return env;
 	lptr = NULL;
+	swapped = 1;
 	while (swapped) 
 	{
 		swapped = 0;

@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 17:09:54 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 20:48:20 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int split_and_process_tokens(t_token *current, t_token **head, char *new_val)
 	int		i;
 
 	i = 1;
-	split = ft_split(new_val); // assume this NULL-terminates
+	split = ft_split(new_val);
 	if (!split)
 		return (free(new_val), 0);
 	free(current->value);
@@ -80,15 +80,14 @@ int process_token(t_token *current, t_token **head, t_env_list *env_list)
 	char	*new_val;
 	int		is_export_var;
 
-	printf("hello alaa\n");
 	is_export_var = is_export_assignment(*head, current);
 	if (current->type != TOKEN_WORD)
-		return (1);
+		return (printf("jfhhf\n"),1);
 	new_val = process_quoted_value(current->value, *head, env_list);
 	if (!new_val)
 		return (0);
 	if (is_export_var == 1 || ft_strspaces(new_val))
-	{
+	{ 
 		free(current->value);
 		current->value = ft_strdup(new_val);
 		if(!current->value)
@@ -99,7 +98,7 @@ int process_token(t_token *current, t_token **head, t_env_list *env_list)
 	else
 	{
 		if(split_and_process_tokens(current, head, new_val) == 0)
-			return (print_error(*head, NULL, NULL), 0);
+			return (print_error(*head, new_val, NULL), 0);
 	}
 	return (1);
 }

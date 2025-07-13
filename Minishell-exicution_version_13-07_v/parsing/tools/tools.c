@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 22:21:04 by maskour           #+#    #+#             */
-/*   Updated: 2025/06/27 21:27:21 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 19:14:09 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ char	*ft_strcpy(char *dest, const char *src)
 	return (dest);
 }
 
-char	*remove_dollar_before_quotes(char *str)
+char	*remove_dollar_before_quotes(char *str, char **temp)
 {
 	char	*result;
 	int		i;
@@ -140,5 +140,6 @@ char	*remove_dollar_before_quotes(char *str)
 		result[j++] = str[i++];
 	}
 	result[j] = '\0';
+	*temp = result;
 	return (result);
 }

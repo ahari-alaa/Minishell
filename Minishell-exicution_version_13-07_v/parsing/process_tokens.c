@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 17:17:31 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/08 18:19:32 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 20:41:45 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,27 @@
 
 static char *realloc_result(char *result, size_t *capacity, size_t new_len)
 {
-    char *new_result;
-    size_t old_capacity;
+    char    *new_result;
+    size_t  old_capacity;
+
     if (new_len <= *capacity)
         return (result);
     old_capacity = *capacity;
     *capacity = new_len * 2;
     new_result = ft_realloc(result, old_capacity, *capacity);
+    if (!new_result)
+    {
+        free(result);
+        return (NULL);
+    }
     return (new_result);
 }
 
 // Helper function to append string to result with reallocation
 static char *append_to_result(char *result, char *tmp, size_t *capacity)
 {
-    size_t result_len;
-    char *new_result;
+    size_t  result_len;
+    char    *new_result;
     
     if (!tmp)
         return (result);
@@ -48,7 +54,7 @@ static char *process_quoted_section(char *val, int *i, t_env_list *env)
     int start;
     char *tmp;
     char *expanded;
-    
+
     quote = val[(*i)++];
     start = *i;
     while (val[*i] && val[*i] != quote)
@@ -64,6 +70,7 @@ static char *process_quoted_section(char *val, int *i, t_env_list *env)
     }
     if (val[*i] == quote)
         (*i)++;
+    // printf("tmp: %p\n", tmp);
     return (tmp);
 }
 
@@ -113,10 +120,12 @@ char *process_quoted_value(char *val, t_token *head, t_env_list *env)
     char *tmp;
     int i;
     size_t result_capacity;
-    
+    char *temp;
+
+    temp = NULL;
     i = 0;
     if (ft_strchr(val, '=') != NULL)
-        val = remove_dollar_before_quotes(val);
+        val = remove_dollar_before_quotes(val, &temp);
     if(!val)
         return NULL;
     result = init_result_buffer(val, head, &result_capacity);
@@ -129,10 +138,15 @@ char *process_quoted_value(char *val, t_token *head, t_env_list *env)
         else
             tmp = process_unquoted_section(val, &i, env);
         if (!tmp)
-            return (free(result), NULL);   
+            return (free(result), free(temp), NULL);
         result = append_to_result(result, tmp, &result_capacity);
         if (!result)
-            return (NULL);
+            return (free(val),free(temp), NULL);
     }
-    return (result);
+    if (ft_strcmp(result, "\1") == 0)
+    {
+        free(result);
+        result = ft_strdup("$");
+    }
+    return (free(temp), result);
 }
