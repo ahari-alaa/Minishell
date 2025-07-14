@@ -1,5 +1,5 @@
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/maskour/.brew/opt/readline/include -g3 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/maskour/.brew/opt/readline/include #-g3 -fsanitize=address
 LDFLAGS = -L /mnt/homes/maskour/.brew/opt/readline/lib
 SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c   ./parsing/tools/token_tools.c\
 			./parsing/tools/string_tools.c  ./parsing/tools/free_tools.c    ./parsing/tools/print_file.c   ./parsing/tools/tools.c\
@@ -16,7 +16,8 @@ SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./pa
 			./exicution_minishell/builtin/ft_exit.c ./exicution_minishell/builtin/ft_export.c \
 			./exicution_minishell/builtin/ft_pwd.c ./exicution_minishell/builtin/ft_unset.c \
 			./exicution_minishell/builtin/env_utils.c ./exicution_minishell/utils/ft_strtrim.c \
-			./exicution_minishell/signals/signals.c
+			./exicution_minishell/signals/signals.c ./exicution_minishell/execut_singal_cmd.c \
+			./exicution_minishell/execut_multiple_pipe.c ./exicution_minishell/herdoc.c
 
 FLAGS= -lreadline 
 OBJ_PARSING = $(SRC_PARSING:.c=.o)

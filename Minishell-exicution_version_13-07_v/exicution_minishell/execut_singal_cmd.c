@@ -11,8 +11,35 @@
 /* ************************************************************************** */
 
 #include "../minishell.h"
+static void ignore_sigint(void)
+{
+    signal(SIGINT, SIG_IGN);
+}
 
-static int process_heredocs(t_cmd *cmd, char **env, t_shell *shell, int *last_heredoc_index, int original_stdin, int original_stdout)
+static void restore_sigint(void)
+{
+    signal(SIGINT, handler_sig);
+}
+static void handle_cmd_errors(char *cmd_path)
+{
+    if(cmd_path)
+	{
+	    ft_putstr_fd_up("minishell: 1", 2);
+        ft_putstr_fd_up(cmd_path, 2);
+        ft_putstr_fd_up(": execution failed\n", 2);
+	}
+}
+static void cleanup_stdio(t_cmd *cmd)
+{
+	int k = -1;
+	while (++k < cmd->file_count)
+    {
+    	if (cmd->files[k].type == TOKEN_HEREDOC)
+        unlink(cmd->files[k].name);
+    }
+}
+
+static int process_heredocs(t_cmd *cmd, char **env, t_shell *shell, int *last_heredoc_index)
 {
 	int i = -1;
 	while (++i < cmd->file_count)
@@ -22,7 +49,7 @@ static int process_heredocs(t_cmd *cmd, char **env, t_shell *shell, int *last_he
 			int hd_status = function_herdoc(&cmd->files[i], env, shell);
 			if (hd_status == 130 || hd_status != 0)
 			{
-				cleanup_stdio(original_stdin, original_stdout);
+				cleanup_stdio(cmd);
 				exit(hd_status);
 			}
 			*last_heredoc_index = i;
@@ -46,21 +73,41 @@ static void handle_empty_cmd(t_cmd *cmd)
 	}
 }
 
+static int	ft_check_dir(char *path)
+{
+	int fd;
+
+	fd = open(path, O_DIRECTORY);
+	if (fd < 0)
+		return (0);
+	close(fd);
+	return (1);
+}
+
 static char *resolve_cmd_path(t_cmd *cmd, char **env)
 {
 	char *cmd_path = find_path(cmd->cmd[0], env);
 	if (!cmd_path)
 	{
-		if (access(cmd->cmd[0], F_OK) == 0)
+		if (access(cmd->cmd[0], F_OK) == 0 && !ft_check_dir(cmd->cmd[0]))
 		{
 			ft_putstr_fd_up("minishell: ", 2);
 			ft_putstr_fd_up(cmd->cmd[0], 2);
 			ft_putstr_fd_up(": Permission denied\n", 2);
 			exit(126);
 		}
-		ft_putstr_fd_up("minishell:", 2);
-		ft_putstr_fd_up(cmd->cmd[0], 2);
-		ft_putstr_fd_up(": command not found\n", 2);
+        if (ft_strstr(cmd->cmd[0], "./") != NULL) 
+        {
+            ft_putstr_fd_up("minishell:", 2);
+            ft_putstr_fd_up(cmd->cmd[0], 2);
+            ft_putstr_fd_up(":No such file or directory\n", 2);
+        }
+        else
+        {
+            ft_putstr_fd_up("minishell:", 2);
+            ft_putstr_fd_up(cmd->cmd[0], 2);
+            ft_putstr_fd_up(": command not found\n", 2);
+        }
 		exit(127);
 	}
 	return cmd_path;
@@ -76,7 +123,14 @@ static void execute_command(char *cmd_path, t_cmd *cmd, char **env)
 			ft_putstr_fd_up(" command not found\n", 2);
 			exit(127);
 		}
-		handle_cmd_errors(cmd_path);
+        if (ft_strstr(cmd->cmd[0], "./") != NULL) 
+        {
+            ft_putstr_fd_up("minishell:", 2);
+            ft_putstr_fd_up(cmd->cmd[0], 2);
+            ft_putstr_fd_up(":Is a directory\n", 2);
+        }
+        else 
+            handle_cmd_errors(cmd_path);
 		free(cmd_path);
 		exit(126);
 	}
@@ -85,11 +139,9 @@ static void execute_command(char *cmd_path, t_cmd *cmd, char **env)
 static int cmd_process(t_cmd *cmd, char **env, t_shell *shell)
 {
 	char *cmd_path;
-	int original_stdin = dup(STDIN_FILENO);
-	int original_stdout = dup(STDOUT_FILENO);
 	int last_heredoc_index = -1;
 
-	process_heredocs(cmd, env, shell, &last_heredoc_index, original_stdin, original_stdout);
+	process_heredocs(cmd, env, shell, &last_heredoc_index);
 	handle_empty_cmd(cmd);
 
 	if (redirections(cmd, last_heredoc_index) != 0)
@@ -142,7 +194,7 @@ static void handle_child_exit_status(int status, t_shell *shell_ctx)
 		shell_ctx->exit_status = 0;
 }
 
-static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
+void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
 {
 	pid_t id;
 	int status;

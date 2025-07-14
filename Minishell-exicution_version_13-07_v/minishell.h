@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 21:09:28 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/13 23:23:07 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,7 @@ void free_env_list(t_env *env_list);
 void handler_sig(int signal);
 
 int function_herdoc(t_file *file, char ** env, t_shell *shell_ctx);
-
+void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx);
+void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env_list, t_shell *shell_ctx);
 
 #endif
