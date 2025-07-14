@@ -152,7 +152,7 @@ static int cmd_process(t_cmd *cmd, t_env **env_list, char **env, t_shell *shell)
 	handle_empty_cmd(cmd);
 
 	if (redirections(cmd, last_heredoc_index) != 0)
-		exit(0);
+		return(0);
 	if (is_builtin(cmd->cmd[0]))
         *env_list = execut_bultin(&cmd,*env_list, shell, 1);
 	cmd_path = resolve_cmd_path(cmd, env);

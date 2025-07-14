@@ -221,8 +221,6 @@ static void update_exit_status(int wstatus, t_shell *shell_ctx)
 {
     if (WIFEXITED(wstatus))
         shell_ctx->exit_status = WEXITSTATUS(wstatus);
-    else if (WIFSIGNALED(wstatus) == 12)
-        shell_ctx->exit_status = 1;
     else if (WIFSIGNALED(wstatus))
         shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
     else
@@ -282,9 +280,10 @@ void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env_list, 
             handle_parent_process(i, &prev_pipe, pipes, pid, cmd_count, shell_ctx);
             last_pid = pid;
         }
-        else
+       else
         {
             perror("minishell: fork");
+            shell_ctx->exit_status = 1;
             cleanup_heredoc_files(cmds, cmd_count);
             break ;
         }

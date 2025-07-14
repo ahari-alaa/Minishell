@@ -4,10 +4,6 @@ herdoc_parsing()
 --------------------------------------------
 + we add checkdir function in execut_singal_cmd.c and pipex_util.c
 ********************************************
-minishell$ minishell
-minishell: minishell: Permission denied
-minishell$ $?
-minishell:126: command not found
 ********************************************
 
 ********************************************
@@ -54,7 +50,7 @@ minishell:0: command not found
 ********************************************
 minishell$ export < no_exist
 minishell: open input: No such file or directory
-********************************************
+*********************************************
 
 ********************************************
 minishell$ echo qwerty$>o|| -> leaks
@@ -69,11 +65,7 @@ minishell$ unset PWD
 minishell$ ./minishell
 minishell$ env | grep PWD
 ********************************************
-minishell$ export =
-minishell: export: =: not a valid identifier2
-: Undefined error: 0
-minishell$ echo $?
-0
+
 ********************************************
 minishell$ export HOME=
 minishell$ cd

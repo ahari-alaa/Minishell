@@ -1,5 +1,5 @@
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/maskour/.brew/opt/readline/include #-g3 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/maskour/.brew/opt/readline/include -g3 -fsanitize=address
 LDFLAGS = -L /mnt/homes/maskour/.brew/opt/readline/lib
 SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c   ./parsing/tools/token_tools.c\
 			./parsing/tools/string_tools.c  ./parsing/tools/free_tools.c    ./parsing/tools/print_file.c   ./parsing/tools/tools.c\
