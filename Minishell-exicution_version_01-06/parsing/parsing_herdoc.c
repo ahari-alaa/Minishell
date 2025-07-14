@@ -12,42 +12,6 @@
 
 #include "../minishell.h"
 
-// Helper function to safely concatenate strings
-static char	*safe_strcat_heredoc(char *dest, char *src)
-{
-	char	*new_str;
-	size_t	dest_len;
-	size_t	src_len;
-
-	if (!dest || !src)
-		return (dest);
-	dest_len = ft_strlen(dest);
-	src_len = ft_strlen(src);
-	new_str = malloc(dest_len + src_len + 1);
-	if (!new_str)
-		return (NULL);
-	ft_strcpy(new_str, dest);
-	ft_strcat(new_str, src);
-	free(dest);
-	return (new_str);
-}
-
-// Process quoted section
-static char	*process_quoted_heredoc(char *val, int *i)
-{
-	char	quote;
-	int		start;
-
-	quote = val[(*i)++];
-	start = *i;
-	while (val[*i] && val[*i] != quote)
-		(*i)++;
-	if (val[*i] == quote)
-		(*i)++;
-	return (ft_strndup(val + start, (*i) - start - 1));
-}
-
-// Process unquoted section
 static char	*process_unquoted_heredoc(char *val, int *i)
 {
 	int		start;
@@ -67,7 +31,6 @@ static char	*process_unquoted_heredoc(char *val, int *i)
 	return (tmp);
 }
 
-// Handle quoted section processing
 static char	*handle_quoted_heredoc(char *result, char *val, int *i)
 {
 	char	*tmp;
@@ -81,7 +44,6 @@ static char	*handle_quoted_heredoc(char *result, char *val, int *i)
 	return (new_result);
 }
 
-// Handle unquoted section processing
 static char	*handle_unquoted_heredoc(char *result, char *val, int *i)
 {
 	char	*tmp;
@@ -95,40 +57,45 @@ static char	*handle_unquoted_heredoc(char *result, char *val, int *i)
 	return (new_result);
 }
 
-// Main heredoc parsing function
-char    *herdoc_parsing(char *val)
+char	*herdoc_parsing_sections(char *val, char **result_ptr)
 {
-    char    *result;
-    char    *tmp;
-    int        i;
+	char	*tmp;
+	int		i;
 
-    i = 0;
-    if (!val)
-        return (NULL);
-    result = ft_strdup("");
-    if (!result)
-        return (NULL);
-    while (val[i])
-    {
-        if (val[i] == '\'' || val[i] == '\"')
-            tmp = handle_quoted_heredoc(result, val, &i);
-        else
-            tmp = handle_unquoted_heredoc(result, val, &i);
-        if (!tmp)
-        {
-            free(result);
-            return (NULL);
-        }
-        result = tmp;
-    }
-    if (ft_strcmp(result, "\1") == 0)
-    {
-        free(result);
-        result = ft_strdup("$");
-        if (!result)
-            return (NULL);
-    }
-    tmp = remove_char(result, '\1');
-    free(result);
-    return tmp;
+	i = 0;
+	while (val[i])
+	{
+		if (val[i] == '\'' || val[i] == '\"')
+			tmp = handle_quoted_heredoc(*result_ptr, val, &i);
+		else
+			tmp = handle_unquoted_heredoc(*result_ptr, val, &i);
+		if (!tmp)
+			return (free(*result_ptr), NULL);
+		*result_ptr = tmp;
+	}
+	return (*result_ptr);
+}
+
+char	*herdoc_parsing(char *val)
+{
+	char	*result;
+	char	*tmp;
+
+	if (!val)
+		return (NULL);
+	result = ft_strdup("");
+	if (!result)
+		return (NULL);
+	result = herdoc_parsing_sections(val, &result);
+	if (!result)
+		return (NULL);
+	if (ft_strcmp(result, "\1") == 0)
+	{
+		free(result);
+		result = ft_strdup("$");
+		if (!result)
+			return (NULL);
+	}
+	tmp = remove_char(result, '\1');
+	return (free(result), tmp);
 }

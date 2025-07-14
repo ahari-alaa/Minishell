@@ -1,22 +1,22 @@
-// /* ************************************************************************** */
-// /*                                                                            */
-// /*                                                        :::      ::::::::   */
-// /*   token_tools.c                                      :+:      :+:    :+:   */
-// /*                                                    +:+ +:+         +:+     */
-// /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
-// /*                                                +#+#+#+#+#+   +#+           */
-// /*   Created: 2025/06/27 21:11:58 by ahari             #+#    #+#             */
-// /*   Updated: 2025/06/27 21:12:28 by ahari            ###   ########.fr       */
-// /*                                                                            */
-// /* ************************************************************************** */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   token_tools.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/27 21:11:58 by ahari             #+#    #+#             */
+/*   Updated: 2025/07/14 06:14:41 by ahari            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../../minishell.h"
 
-int has_quotes(char *str)
+int	has_quotes(char *str)
 {
-	int i;
+	int	i;
 
-    i = 0;
+	i = 0;
 	while (str[i])
 	{
 		if (str[i] == '\'')
@@ -32,35 +32,20 @@ int has_quotes(char *str)
 	return (0);
 }
 
-t_token	*get_cmd_token(t_token *head, t_token *current)
+int	count_herdoc(t_cmd *cmd)
 {
-	t_token *temp;
-	t_token *cmd_token;
+	int	count;
+	int	i;
 
-    temp = head;
-    cmd_token = NULL;
-	while (temp && temp != current)
+	count = 0;
+	i = 0;
+	while (i < cmd->file_count)
 	{
-		if (temp->type == TOKEN_PIPE || temp->type == TOKEN_SEMICOLON)
-			cmd_token = NULL;
-		else if (temp->type == TOKEN_WORD && !cmd_token)
-			cmd_token = temp;
-		temp = temp->next;
+		if (cmd->files->type == TOKEN_HEREDOC)
+			count++;
+		i++;
 	}
-	return (cmd_token);
-}
-
-int count_herdoc(t_cmd *cmd)
-{
-    int count = 0;
-    int i= 0;
-    while (i < cmd->file_count) 
-    {
-        if (cmd->files->type == TOKEN_HEREDOC)
-                count++;
-        i++;
-    }
-    return count;
+	return (count);
 }
 
 void	*ft_memcpy(void *dst, const void *src, size_t n)
@@ -82,23 +67,23 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 	return (dst);
 }
 
-void *ft_realloc(void *ptr, size_t old_size, size_t new_size)
+void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
 {
-    void *new_ptr;
-    if (new_size == 0)
-    {
-        free(ptr);
-        return NULL;
-    }
-    if (!ptr)
-        return malloc(new_size);
+	void	*new_ptr;
 
-    new_ptr = malloc(new_size);
-    if (!new_ptr)
-        return NULL;
-    if (old_size > new_size)
-        old_size = new_size;
-    ft_memcpy(new_ptr, ptr, old_size);
-    free(ptr);
-    return new_ptr;
+	if (new_size == 0)
+	{
+		free(ptr);
+		return (NULL);
+	}
+	if (!ptr)
+		return (malloc(new_size));
+	new_ptr = (malloc(new_size));
+	if (!new_ptr)
+		return (NULL);
+	if (old_size > new_size)
+		old_size = new_size;
+	ft_memcpy(new_ptr, ptr, old_size);
+	free(ptr);
+	return (new_ptr);
 }

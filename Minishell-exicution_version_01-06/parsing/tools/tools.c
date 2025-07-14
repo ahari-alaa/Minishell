@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 22:21:04 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/13 19:14:09 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/14 03:23:27 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,6 @@ void	print_error(t_token *head, char *val, t_shell *shell_ctx)
 		free_tokens(head, NULL);
 	if (val)
 		free(val);
-}
-
-int	is_quote(char c)
-{
-	return (c == '\'' || c == '"');
 }
 
 static int	ft_intlen(int n)
@@ -44,21 +39,12 @@ static int	ft_intlen(int n)
 	return (len);
 }
 
-char	*ft_itoa(int n)
+static void	fill_number_string(char *str, long nb, int len)
 {
-	int		len;
-	char	*str;
-	long	nb = (long)n;
-
-	len = ft_intlen(n);
-	str = (char *)malloc(sizeof(char) * (len + 1));
-	if (!str)
-		return (NULL);
-	str[len] = '\0';
 	if (nb == 0)
 	{
 		str[0] = '0';
-		return (str);
+		return ;
 	}
 	if (nb < 0)
 	{
@@ -70,76 +56,47 @@ char	*ft_itoa(int n)
 		str[--len] = (nb % 10) + '0';
 		nb /= 10;
 	}
+}
+
+char	*ft_itoa(int n)
+{
+	int		len;
+	char	*str;
+	long	nb;
+
+	nb = (long)n;
+	len = ft_intlen(n);
+	str = (char *)malloc(sizeof(char) * (len + 1));
+	if (!str)
+		return (NULL);
+	str[len] = '\0';
+	fill_number_string(str, nb, len);
 	return (str);
 }
-char *ft_strjoin(char const *s1, char const *s2)
-{
-    char *result;
-    int i, j;
 
-    if (!s1 || !s2)
-        return (NULL);
-    
-    result = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-    if (!result)
-        return (NULL);
-    
-    i = 0;
-    while (s1[i])
-    {
-        result[i] = s1[i];
-        i++;
-    }
-    
-    j = 0;
-    while (s2[j])
-    {
-        result[i + j] = s2[j];
-        j++;
-    }
-    result[i + j] = '\0';
-    return (result);
-}
-char	*ft_strcpy(char *dest, const char *src)
-{
-	size_t	i;
-
-	i = 0;
-	while (src[i] != '\0')
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
-
-char	*remove_dollar_before_quotes(char *str, char **temp)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*result;
 	int		i;
 	int		j;
-	int		len;
 
-	if (!str)
+	if (!s1 || !s2)
 		return (NULL);
-	len = ft_strlen(str);
-	result = malloc(sizeof(char) * (len + 1));
+	result = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!result)
 		return (NULL);
 	i = 0;
-	j = 0;
-	while (str[i])
+	while (s1[i])
 	{
-		if (str[i] == '$' && str[i + 1] && 
-			(str[i + 1] == '"' || str[i + 1] == '\''))
-		{
-			i++;
-			continue ;
-		}
-		result[j++] = str[i++];
+		result[i] = s1[i];
+		i++;
 	}
-	result[j] = '\0';
-	*temp = result;
+	j = 0;
+	while (s2[j])
+	{
+		result[i + j] = s2[j];
+		j++;
+	}
+	result[i + j] = '\0';
 	return (result);
 }

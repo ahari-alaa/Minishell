@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 21:48:32 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/04 00:02:08 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/14 03:50:35 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,16 +40,24 @@ int	ft_strspace(char *str)
 
 char	*ft_delete_spaces(char *str)
 {
-	int	i;
+	int		start;
+	int		end;
+	char	*result;
 
 	if (!str)
 		return (NULL);
-	i = 0;
-	while (str[i] && ft_isspace(str[i]))
-		i++;
-	if (str[i] == '\0')
+	start = 0;
+	while (str[start] && ft_isspace(str[start]))
+		start++;
+	if (str[start] == '\0')
 		return (NULL);
-	return (ft_strdup(str + i));
+	end = ft_strlen(str) - 1;
+	while (end >= start && ft_isspace(str[end]))
+		end--;
+	result = ft_substr(str, start, end - start + 1);
+	if (!result)
+		return (NULL);
+	return (result);
 }
 
 int	get_var_name_length(char *str, int start)

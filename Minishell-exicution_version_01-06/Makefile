@@ -1,9 +1,11 @@
 CC = cc 
 CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/ahari/.brew/opt/readline/include #-g3 -fsanitize=address
 LDFLAGS = -L /mnt/homes/ahari/.brew/opt/readline/lib
-SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c   ./parsing/tools/token_tools.c\
+SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c	./parsing/tools/expand_tools_3.c	\
+			./parsing/tools/expand_tools_2.c	./parsing/tools/expand_tools.c ./parsing/tools/tools_string2.c ./parsing/tools/token_tools.c  \
+			./parsing/tools/storge_tools.c  ./parsing/tools/process_tools.c\
 			./parsing/tools/string_tools.c  ./parsing/tools/free_tools.c    ./parsing/tools/print_file.c   ./parsing/tools/tools.c\
-			./parsing/parsing.c             ./parsing/storge_tokens.c       ./parsing/tokenizer.c          ./parsing/expand.c \
+			./parsing/parsing.c             ./parsing/storge_tokens.c    ./parsing/storge_tokens_3.c   ./parsing/tokenizer.c  ./parsing/expand_3.c      ./parsing/expand.c ./parsing/storge_tokens_2.c\
 			./parsing/parsing_v2.c          ./parsing/export.c    ./parsing/parsing_herdoc.c           ./parsing/process_tokens.c      main.c\
 			./exicution_minishell/execution.c ./exicution_minishell/redirections.c ./exicution_minishell/pipex_util.c\
 			./exicution_minishell/utils/ft_split.c\

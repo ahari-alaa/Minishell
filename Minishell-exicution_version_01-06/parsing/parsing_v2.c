@@ -6,38 +6,22 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 22:24:54 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/14 05:01:22 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	ft_strspaces(char *str)
-{
-	int	i;
-
-	if (!str)
-		return (1);
-	i = 0;
-	while (str[i])
-	{
-		if (!ft_isspace(str[i]))
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-void append_token(t_token **head, t_token *new_token)
+void	append_token(t_token **head, t_token *new_token)
 {
 	t_token	*current;
 
 	if (!head || !new_token)
-		return;
+		return ;
 	if (*head == NULL)
 	{
 		*head = new_token;
-		return;
+		return ;
 	}
 	current = *head;
 	while (current->next)
@@ -45,7 +29,7 @@ void append_token(t_token **head, t_token *new_token)
 	current->next = new_token;
 }
 
-int split_and_process_tokens(t_token *current, t_token **head, char *new_val)
+int	split_and_process_tokens(t_token *current, t_token **head, char *new_val)
 {
 	char	**split;
 	t_token	*new_tokens;
@@ -70,12 +54,10 @@ int split_and_process_tokens(t_token *current, t_token **head, char *new_val)
 		append_token(head, new_tokens);
 		i++;
 	}
-	free_array(split);
-	free(new_val);
-	return 1;
+	return (free_array(split), free(new_val), 1);
 }
 
-int process_token(t_token *current, t_token **head, t_env_list *env_list)
+int	process_token(t_token *current, t_token **head, t_env_list *env_list)
 {
 	char	*new_val;
 	int		is_export_var;
@@ -87,19 +69,18 @@ int process_token(t_token *current, t_token **head, t_env_list *env_list)
 	if (!new_val)
 		return (0);
 	if (is_export_var == 1 || ft_strspaces(new_val))
-	{ 
+	{
 		free(current->value);
 		current->value = ft_strdup(new_val);
-		if(!current->value)
+		if (!current->value)
 			return (free(new_val),
 				print_error(*head, NULL, NULL), 0);
 		free(new_val);
 	}
 	else
 	{
-		if(split_and_process_tokens(current, head, new_val) == 0)
+		if (split_and_process_tokens(current, head, new_val) == 0)
 			return (print_error(*head, new_val, NULL), 0);
 	}
 	return (1);
 }
-

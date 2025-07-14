@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 22:05:02 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/04 00:02:16 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/14 06:19:42 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,31 +84,4 @@ char	*restore_dollar_signs(char *cmd)
 	}
 	result = ft_strdup(cmd);
 	return (result);
-}
-
-char	*replace_double_dollar(char *cmd)
-{
-	int		len;
-	char	*new_cmd;
-	int		i;
-	int     j;
-
-	j = 0;
-	i = 0;
-	len = ft_strlen(cmd);
-	new_cmd = malloc(len + 1);
-	if (!new_cmd)
-		return (NULL);
-	while (cmd[i])
-	{
-		if (cmd[i] == '$' && cmd[i + 1] == '$')
-		{
-			new_cmd[j++] = '\x01';
-			i += 2;
-		}
-		else
-			new_cmd[j++] = cmd[i++];
-	}
-	new_cmd[j] = '\0';
-	return (new_cmd);
 }

@@ -6,169 +6,111 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 16:04:38 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 21:14:55 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/14 06:07:53 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *shell_ctx)
+static int	parse_word_boundaries(char *str, int *i,
+	int *in_quotes, char *quote_type)
 {
-    int start = *i;
-    int in_quotes = 0;
-    char quote_type = 0;
-    char *val = NULL;
-    
-    while (str[*i])
-    {
-        if (is_quote(str[*i]))
-        {
-            if (!in_quotes)
-            {
-                in_quotes = 1;
-                quote_type = str[*i];
-            }
-            else if (str[*i] == quote_type)
-            {
-                in_quotes = 0;
-                quote_type = 0;
-            }
-            (*i)++;
-            continue ;
-        }
-        if (!in_quotes && (ft_isspace(str[*i]) || is_operator(str[*i])))
-            break;
-            
-        (*i)++;
-    }
-    if (in_quotes)
-    {
-        print_error(*head, val, shell_ctx);
-        return (NULL);
-    }
-    val = ft_strndup(&str[start], *i - start);
-    if (!val)
-        return (NULL);    
-    t_token *new = new_token(val, TOKEN_WORD);
-    if (!new)
-        return (free(val), NULL);
-    if (has_quotes(new->value) == 1 || has_quotes(new->value) == 2)
-        new->was_quoted = 1;
-    else
-        new->was_quoted = 0;
-    add_token(head, new);
-    return (free(val), *head);
+	while (str[*i])
+	{
+		if (is_quote(str[*i]))
+		{
+			process_quote_parsing(str, i, quote_type, in_quotes);
+			continue ;
+		}
+		if (!*in_quotes && (ft_isspace(str[*i]) || is_operator(str[*i])))
+			break ;
+		(*i)++;
+	}
+	return (*in_quotes);
 }
 
-t_token *handle_operator(char *str, int *i, t_token **head)
+t_token	*handle_word_with_quotes(char *str, int *i,
+	t_token **head, t_shell *shell_ctx)
 {
-    char            *val;
-    t_token_type    type;
-    t_token         *new;
+	int		start;
+	int		in_quotes;
+	char	quote_type;
+	char	*val;
+	t_token	*result;
 
-    val = NULL;
-    if ((str[*i] == '>' || str[*i] == '<') && str[*i] == str[*i+1])
-    {
-        val = ft_strndup(&str[*i], 2);
-        if (!val)
-            return (NULL);
-        *i += 2;
-    }
-    else
-        val = ft_strndup(&str[(*i)++], 1);
-    if (!val)
-        return (NULL);
-    type = get_token_type(val);
-    new = new_token(val, type);
-    if (!new)
-        return (free(val), NULL);
-    add_token(head, new);
-    return (free(val), *head);
-}
-void ft_putstr(char *s)
-{
-    if (s)
-        write(2, s, ft_strlen(s));
-}
-int check_syntax_errors(char *str, int i, t_shell *shell_ctx)
-{
-    if (str[0] == '|')
-        return (write(2, "syntax error near unexpected token `|'\n", 40),
-                shell_ctx->exit_status = 258, 0);
-    else if (i >= 1 && str[i - 1] == '|' && str[i] == '|')
-        return (write(2, "syntax error near unexpected token `|'\n", 40),
-            shell_ctx->exit_status = 258, 0);
-    else if (i >= 1 && str[i - 1] == ';' && str[i] == ';')
-        return (write(2, "syntax error near unexpected token `;;'\n", 41),
-            shell_ctx->exit_status = 258, 0);
-    else if (str[i] == '\\')
-        return (write(2, "syntax error near unexpected token `\\'\n", 40),
-            shell_ctx->exit_status = 258, 0);
-    else if (str[i] == ';')
-        return (write(2, "syntax error near unexpected token `;'\n", 40),
-            shell_ctx->exit_status = 258, 0);
-    else if (str[i] == '!')
-        return (write(2, "syntax error near unexpected token `!'\n", 40),
-            shell_ctx->exit_status = 258, 0);
-    else if (i >= 1 && str[i - 1] == ':' && str[i] == ':')
-        return (write(2, "syntax error near unexpected token `::'\n", 41),
-            shell_ctx->exit_status = 258, 0);
-    else if (str[i] == '(' || str[i] == ')')
-        return (write(2, "syntax error near unexpected token `()'\n", 41),
-            shell_ctx->exit_status = 258, 0);
-    return (1);
+	start = *i;
+	in_quotes = 0;
+	quote_type = 0;
+	if (parse_word_boundaries(str, i, &in_quotes, &quote_type))
+		return (print_error(*head, NULL, shell_ctx), NULL);
+	val = extract_word_token(str, start, *i);
+	if (!val)
+		return (NULL);
+	result = create_and_add_token(val, head);
+	return (free(val), result);
 }
 
-static int validate_syntax(char *str, t_shell *shell_ctx)
+t_token	*handle_operator(char *str, int *i, t_token **head)
 {
-    int i = 0;
-    char quote = 0;
+	char			*val;
+	t_token_type	type;
+	t_token			*new;
 
-    while (str[i])
-    {
-        if ((str[i] == '\'' || str[i] == '"') && !quote)
-            quote = str[i];
-        else if (str[i] == quote)
-            quote = 0;
-        i++;
-    }
-    if (quote)
-    {
-        write(2, "syntax error: unmatched quote\n", 31);
-        shell_ctx->exit_status = 258;
-        return 0;
-    }
-    return 1;
+	val = NULL;
+	if ((str[*i] == '>' || str[*i] == '<') && str[*i] == str[*i + 1])
+	{
+		val = ft_strndup(&str[*i], 2);
+		if (!val)
+			return (NULL);
+		*i += 2;
+	}
+	else
+		val = ft_strndup(&str[(*i)++], 1);
+	if (!val)
+		return (NULL);
+	type = get_token_type(val);
+	new = new_token(val, type);
+	if (!new)
+		return (free(val), NULL);
+	add_token(head, new);
+	return (free(val), *head);
 }
 
-
-
-t_token *string_tokens(char *str, t_shell *shell_ctx)
+static t_token	*process_token_logic(char *str, int *i,
+	t_token **head, t_shell *shell_ctx)
 {
-	t_token *head = NULL;
-	int i = 0;
-    
+	if (!check_syntax_errors(str, *i, shell_ctx))
+		return (free_tokens(*head, NULL), NULL);
+	if (is_operator(str[*i]))
+	{
+		if (!handle_operator(str, i, head))
+			return (free_tokens(*head, NULL), NULL);
+	}
+	else
+	{
+		if (!handle_word_with_quotes(str, i, head, shell_ctx))
+			return (free_tokens(*head, NULL), NULL);
+	}
+	return (*head);
+}
+
+t_token	*string_tokens(char *str, t_shell *shell_ctx)
+{
+	t_token	*head;
+	int		i;
+
+	i = 0;
+	head = NULL;
 	if (!validate_syntax(str, shell_ctx))
-		return NULL;
+		return (NULL);
 	while (str[i])
 	{
 		while (ft_isspace(str[i]))
 			i++;
 		if (!str[i])
 			break ;
-		if (!check_syntax_errors(str, i, shell_ctx))
-			return (free_tokens(head, NULL),NULL);
-		if (is_operator(str[i]))
-		{
-			if (!handle_operator(str, &i, &head))
-				return (free_tokens(head, NULL), NULL);
-		}
-		else
-		{
-			if (!handle_word_with_quotes(str, &i, &head, shell_ctx))
-				return (free_tokens(head, NULL), NULL);
-		}
+		if (!process_token_logic(str, &i, &head, shell_ctx))
+			return (NULL);
 	}
-	// On success, caller owns head and must free it
-	return head;
+	return (head);
 }
