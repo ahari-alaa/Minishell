@@ -9,15 +9,7 @@ minishell: minishell: Permission denied
 minishell$ $?
 minishell:126: command not found
 ********************************************
-minishell$ minishell/
-minishell:minishell/: command not found
-minishell$ $?
-minishell:127: command not found
 
-bash-3.2$ minishell/
-bash: minishell/: Not a directory
-bash-3.2$ $?
-bash: 126: command not found
 ********************************************
 minishell$ echo "$ytgfd q"
 q // missing space
@@ -58,34 +50,16 @@ exit
 minishell$ $?
 minishell:0: command not found
 ********************************************
-maskour@e3r4p16 Minishell-exicution_version_13-07_v % ./minishell
-minishell$  exit 1 2 3 4
-exit
-maskour@e3r4p16 Minishell-exicution_version_13-07_v % $?
-zsh: command not found: 1
 
-bash-3.2$ exit 1 2 4
-exit
-bash: exit: too many arguments
-bash-3.2$ $?
-bash: 1: command not found
-********************************************
-minishell$ exit -9223372036854775809
-exit
-maskour@e3r4p16 Minishell-exicution_version_13-07_v % $?
-zsh: command not found: 0
 ********************************************
 minishell$ export < no_exist
 minishell: open input: No such file or directory
 ********************************************
-minishell$ exit > l
-maskour@e3r4p16 Minishell-exicution_version_13-07_v % cat l
-exit
+
 ********************************************
 minishell$ echo qwerty$>o|| -> leaks
 ********************************************
-add th PATH env -i
-/usr/gnu/bin:/usr/local/bin:/bin:/usr/bin:.
+
 ********************************************
 env -i ./minishell
 minishell$ export
@@ -132,10 +106,7 @@ minishell:0: command not found
 if fork fail not exit
 bash: fork: Resource temporarily unavailable 
 ********************************************
-minishell$ << a cat| ls
-> 
-minishell$ 
-// don't stop compalition, and don't exit 1
+
 ********************************************
 leaks minishell$ <<a
 > werty

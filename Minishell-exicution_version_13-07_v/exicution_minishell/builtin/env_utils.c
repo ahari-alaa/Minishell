@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 17:39:24 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/09 16:28:14 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/14 12:19:35 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ t_env	*default_env(t_env *env_list)
 	tail = push_env_node(&tail, env_list, "_=/usr/bin/env");
 	if (!tail)
 		return (NULL);
-	tail = push_env_node(&tail, env_list, "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin");
+	tail = push_env_node(&tail, env_list, "PATH=/usr/gnu/bin:/usr/local/bin:/bin:/usr/bin:.");
 	if (!tail)
 		return (NULL);
 	return (env_list);

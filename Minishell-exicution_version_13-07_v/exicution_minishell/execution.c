@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/14 08:23:17 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/14 12:16:22 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,10 @@ static t_cmd **convert_lit_arr(t_cmd *cmd, int cmd_count)
 }
 static void execute_single(t_cmd **cmd, char **env, t_env **env_list, t_shell *shell_ctx)
 {
-        if (is_builtin((*cmd)->cmd[0]))
-            *env_list = execut_bultin(cmd,*env_list, shell_ctx, 1);
-        else
-            execute_single_command(cmd, env,shell_ctx);
+    if (is_builtin((*cmd)->cmd[0]))
+        *env_list = execut_bultin(cmd,*env_list, shell_ctx, 1);
+    else
+        execute_single_command(cmd,env_list, env, shell_ctx);
 }
 int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
 {

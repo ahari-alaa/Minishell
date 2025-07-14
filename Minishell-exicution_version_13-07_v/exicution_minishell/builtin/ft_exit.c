@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 19:01:03 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/09 16:50:50 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/14 12:17:47 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static long	ft_atol(const char *str)
 		result = nb;
 		i++;
 	}
-	return (result * sign);
+	return (nb * sign);
 }
 static int	is_valid_exit(char *arg)
 {
@@ -88,15 +88,20 @@ void	ft_exit(t_cmd **cmd, t_shell *shell, int j)
 	status = shell->exit_status;
 	current_cmd = *cmd;
 	arg = current_cmd->cmd[1];
-	if (j == 1)
-		printf("exit\n");
 	if (!arg)
 		exit(shell->exit_status);
-	if (!is_valid_exit(arg) || ft_atol(arg) == -1)
+	if (current_cmd->cmd[2] != NULL)
+	{
+		ft_putstr_fd_up("minishell: exit: too many arguments\n",2);
+		shell->exit_status = 1;
+		return ;
+	}
+	if (j == 1)
+		printf("exit\n");
+	if (!is_valid_exit(arg) || ft_atol(arg) == -1 || ft_atoi(arg) == 0)
 		exit_number_error(arg);
 	status = ft_atoi(arg) % 256;
 	if (status < 0) 
 		status +=256;
 	exit(status);
 }
-
