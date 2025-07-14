@@ -1,8 +1,8 @@
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -fsanitize=address -Wno-unused-function
 SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c \
 			./parsing/tools/string_tools.c  ./parsing/tools/free_tools.c    ./parsing/tools/print_file.c ./parsing/tools/tools.c\
-			./parsing/parsing.c             ./parsing/storge_tokens.c     ./parsing/tokenizer.c ./parsing/expand.c ./parsing/command.c main.c\
+			./parsing/parsing.c             ./parsing/storge_tokens.c     ./parsing/tokenizer.c ./parsing/command.c main.c\
 			./exicution_minishell/execution.c ./exicution_minishell/redirections.c ./exicution_minishell/pipex_util.c\
 			./exicution_minishell/utils/ft_split.c\
 			./exicution_minishell/utils/ft_strchr.c ./exicution_minishell/utils/ft_strjoin.c\

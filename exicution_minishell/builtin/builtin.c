@@ -25,38 +25,28 @@ int	is_builtin(char *command)
 		ft_strcmp(command, "pwd") == 0);
 }
 
-t_env	*execut_bultin(t_cmd **cmd, t_env *env_list, t_shell *shell, int i)
+t_env	*execut_bultin(t_cmd **cmd, t_env *env_list)
 {
 	int stdin_copy = dup(STDIN_FILENO);
     	int stdout_copy = dup(STDOUT_FILENO);
-	if (redirections(*cmd) != 0)
-        {
-        	dup2(stdin_copy, STDIN_FILENO);
-        	dup2(stdout_copy, STDOUT_FILENO);
-        	close(stdin_copy);
-        	close(stdout_copy);
-        	shell->exit_status = 1;
-        	return env_list;
-        }
+	redirections(*cmd);
 	if (ft_strcmp(cmd[0]->cmd[0], "cd") == 0)
-		env_list = ft_cd(cmd, env_list, shell);
+		env_list = ft_cd(cmd, env_list);
 	else if (ft_strcmp(cmd[0]->cmd[0], "echo") == 0)
-		ft_echo(cmd, shell);
+		ft_echo(cmd);
 	else if(ft_strcmp(cmd[0]->cmd[0], "exit") == 0)
-		ft_exit(cmd, shell, i);
+		ft_exit(cmd);
 	else if (ft_strcmp(cmd[0]->cmd[0], "export") == 0)
-	 ft_export(cmd, &env_list, shell);
+	 ft_export(cmd, env_list);
 	else if (ft_strcmp(cmd[0]->cmd[0], "unset") == 0)
-		env_list = ft_unset(cmd, env_list, shell);
+		ft_unset(cmd, env_list);
 	else if (ft_strcmp(cmd[0]->cmd[0], "env") == 0)
-		ft_env(env_list, shell);
+		ft_env(env_list);
 	else if (ft_strcmp(cmd[0]->cmd[0], "pwd") == 0)
-		ft_pwd(shell, env_list);
-     if (i)	
-    {
-        dup2(stdin_copy, STDIN_FILENO);
-        dup2(stdout_copy, STDOUT_FILENO);
-    }
+		ft_pwd();
+    // Restore stdin and stdout
+    dup2(stdin_copy, STDIN_FILENO);
+    dup2(stdout_copy, STDOUT_FILENO);
     close(stdin_copy);
     close(stdout_copy);
 	return(env_list);

@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *shell_ctx)
+static t_token *handle_word_with_quotes(char *str, int *i, t_token **head)
 {
     int start = *i;
     int in_quotes = 0;
@@ -43,7 +43,7 @@ t_token *handle_word_with_quotes(char *str, int *i, t_token **head, t_shell *she
     }
     if (in_quotes)
     {
-        print_error(*head, val, shell_ctx);
+        print_error(*head, val);
         return (NULL);
     }
     val = ft_strndup(&str[start], *i - start);
@@ -84,36 +84,36 @@ void ft_putstr(char *s)
     if (s)
         write(2, s, ft_strlen(s));
 }
-int check_syntax_errors(char *str, int i, t_shell *shell_ctx)
+static int check_syntax_errors(char *str, int i)
 {
     if (str[0] == '|')
         return (write(2, "syntax error near unexpected token `|'\n", 40),
-                shell_ctx->exit_status = 258, 0);
+                0);
     else if (i >= 1 && str[i - 1] == '|' && str[i] == '|')
         return (write(2, "syntax error near unexpected token `|'\n", 40),
-            shell_ctx->exit_status = 258, 0);
+            0);
     else if (i >= 1 && str[i - 1] == ';' && str[i] == ';')
         return (write(2, "syntax error near unexpected token `;;'\n", 41),
-            shell_ctx->exit_status = 258, 0);
+            0);
     else if (str[i] == '\\')
         return (write(2, "syntax error near unexpected token `\\'\n", 40),
-            shell_ctx->exit_status = 258, 0);
+            0);
     else if (str[i] == ';')
         return (write(2, "syntax error near unexpected token `;'\n", 40),
-            shell_ctx->exit_status = 258, 0);
+            0);
     else if (str[i] == '!')
         return (write(2, "syntax error near unexpected token `!'\n", 40),
-            shell_ctx->exit_status = 258, 0);
+            0);
     else if (i >= 1 && str[i - 1] == ':' && str[i] == ':')
         return (write(2, "syntax error near unexpected token `::'\n", 41),
-            shell_ctx->exit_status = 258, 0);
+            0);
     else if (str[i] == '(' || str[i] == ')')
         return (write(2, "syntax error near unexpected token `()'\n", 41),
-            shell_ctx->exit_status = 258, 0);
+            0);
     return (1);
 }
 
-static int validate_syntax(char *str, t_shell *shell_ctx)
+static int validate_syntax(char *str)
 {
     int i = 0;
     char quote = 0;
@@ -129,20 +129,20 @@ static int validate_syntax(char *str, t_shell *shell_ctx)
     if (quote)
     {
         write(2, "syntax error: unmatched quote\n", 31);
-        shell_ctx->exit_status = 258;
+        
         return 0;
     }
     return 1;
 }
 
-t_token	*string_tokens(char *str, t_shell *shell_ctx)
+t_token	*string_tokens(char *str)
 {
 	t_token	*head;
 	int		i;
 
 	head = NULL;
 	i = 0;
-	if (!validate_syntax(str, shell_ctx))
+	if (!validate_syntax(str))
 		return (NULL);
 
 	while (str[i])
@@ -151,7 +151,7 @@ t_token	*string_tokens(char *str, t_shell *shell_ctx)
 			i++;
 		if (!str[i])
 			break ;
-		if (!check_syntax_errors(str, i, shell_ctx))
+		if (!check_syntax_errors(str, i))
 			return (NULL);
 		if (is_operator(str[i]))
 		{
@@ -160,7 +160,7 @@ t_token	*string_tokens(char *str, t_shell *shell_ctx)
 		}
 		else
 		{
-			if (!handle_word_with_quotes(str, &i, &head, shell_ctx))
+			if (!handle_word_with_quotes(str, &i, &head))
 				return (free_tokens(head, NULL), NULL);
 		}
 	}

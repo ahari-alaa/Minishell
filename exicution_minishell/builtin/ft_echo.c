@@ -35,7 +35,7 @@ static int check_new_line(char *cmd)
     }
     return 1;
 }
-void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
+void ft_echo(t_cmd **cmd)
 {
     int i = 1;
     int n_nb = 0;
@@ -62,5 +62,5 @@ void ft_echo(t_cmd **cmd, t_shell *shell_ctx)
     if (n_nb == 0)
         write(STDOUT_FILENO, "\n", 1);
 
-    shell_ctx->exit_status = 0;
+    
 }

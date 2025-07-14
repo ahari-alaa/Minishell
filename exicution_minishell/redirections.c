@@ -138,16 +138,16 @@ int function_herdoc(t_file *file)
     return WEXITSTATUS(status);
 }
 // ----- Redirection logic -----
-int redirections(t_cmd *cmd)
+void redirections(t_cmd *cmd)
 {
     if (!cmd || cmd->file_count <= 0)
-        return 0;
+        return;
 
     int original_stdin = dup(STDIN_FILENO);
     int original_stdout = dup(STDOUT_FILENO);
     if (original_stdin == -1 || original_stdout == -1) {
         perror("minishell: dup");
-        return 1;
+        return;
     }
     int last_in_fd = -1;
     int last_out_fd = -1;
@@ -163,12 +163,12 @@ int redirections(t_cmd *cmd)
             if (status == 130)
             {
                 cleanup_stdio(original_stdin, original_stdout);
-                return 130;
+                return;
             }
             else if (status != 0)
             {
                 cleanup_stdio(original_stdin, original_stdout);
-                return 2;
+                return;
             }
             last_heredoc_index = i;
         }
@@ -183,7 +183,7 @@ int redirections(t_cmd *cmd)
             if (last_in_fd == -1) {
                 perror("minishell: open_file input");
                 cleanup_stdio(original_stdin, original_stdout);
-                return 1;
+                return;
             }
         }
         else if (file->type == TOKEN_HEREDOC && i == last_heredoc_index) {
@@ -192,7 +192,7 @@ int redirections(t_cmd *cmd)
             if (last_in_fd == -1) {
                 perror("minishell: open heredoc file");
                 cleanup_stdio(original_stdin, original_stdout);
-                return 1;
+                return;
             }
         }
         else if (file->type == TOKEN_REDIRECT_OUT) {
@@ -201,7 +201,7 @@ int redirections(t_cmd *cmd)
             if (last_out_fd == -1) {
                 perror("minishell: open_file output");
                 cleanup_stdio(original_stdin, original_stdout);
-                return 1;
+                return;
             }
         }
         else if (file->type == TOKEN_APPEND) {
@@ -210,7 +210,7 @@ int redirections(t_cmd *cmd)
             if (last_out_fd == -1) {
                 perror("minishell: open_file append");
                 cleanup_stdio(original_stdin, original_stdout);
-                return 1;
+                return;
             }
         }
     }
@@ -221,7 +221,7 @@ int redirections(t_cmd *cmd)
             perror("minishell: dup2 input");
             close(last_in_fd);
             cleanup_stdio(original_stdin, original_stdout);
-            return 1;
+            return;
         }
         close(last_in_fd);
     }
@@ -232,11 +232,11 @@ int redirections(t_cmd *cmd)
             perror("minishell: dup2 output");
             close(last_out_fd);
             cleanup_stdio(original_stdin, original_stdout);
-            return 1;
+            return;
         }
         close(last_out_fd);
     }
     close(original_stdin);
     close(original_stdout);
-    return 0;
+    return;
 }

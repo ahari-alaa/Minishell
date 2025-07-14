@@ -12,7 +12,7 @@
 
 #include "../../minishell.h"
 
-void ft_pwd(t_shell *shell_ctx, t_env *env_list)
+void ft_pwd() t_env *env_list)
 {
     char cwd[PATH_MAX];//the path max is in inlude <limits.h>
     t_env *env;
@@ -20,7 +20,7 @@ void ft_pwd(t_shell *shell_ctx, t_env *env_list)
     if (getcwd(cwd, sizeof(cwd)))// getcwd in include<unistd.h>
     {
             printf("%s\n",cwd);
-            shell_ctx->exit_status = 0;
+            
     }
     else
     {
@@ -29,12 +29,12 @@ void ft_pwd(t_shell *shell_ctx, t_env *env_list)
         if (strncmp(env->data_env, "PWD=", 4) == 0)
         {
             printf("%s\n", env->data_env + 4);
-            shell_ctx->exit_status = 0;
+            
             return ;
         }
         env = env->next;
     }
-    shell_ctx->exit_status = 1;
+    
     perror("PWD not found in environment\n");  
     }
 }   

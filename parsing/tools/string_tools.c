@@ -159,3 +159,31 @@ int	ft_isalnum(int c)
 	return (0);
 }
 
+char	*remove_char(char *str, char c)
+{
+	char	*result;
+	int		i;
+	int		j;
+	int		len;
+
+	if (!str)
+		return (NULL);
+	len = ft_strlen(str);
+	result = malloc(len + 1);
+	if (!result)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (str[i])
+	{
+		if (str[i] != c)
+		{
+			result[j] = str[i];
+			j++;
+		}
+		i++;
+	}
+	result[j] = '\0';
+	return (result);
+}
+

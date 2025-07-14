@@ -50,6 +50,7 @@ typedef struct s_token
 	char            *value;         // the actual string (e.g. "ls", ">", "file.txt")
 	t_token_type    type;           // type of token
 	char            quote_type;  // '\"', '\'', or 0 (no quotes)
+	int             was_quoted;     // 1 if token was quoted, 0 otherwise
 	struct s_token  *next;          // pointer to next token
 }   t_token;
 
@@ -57,6 +58,7 @@ typedef struct s_file
 {
 	char			*name; // name of the file
 	t_token_type	type;// file type
+	int             check_expand; // 1 if should check for expansion, 0 otherwise
 }	t_file;
 
 typedef struct s_cmd
@@ -122,6 +124,8 @@ char			*ft_substr(const char *s, unsigned int start, size_t len);
 char			*ft_itoa(int n);
 char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strcpy(char *dest, const char *src);
+char			*remove_char(char *str, char c);
+void			print_syntax_error(t_token *token);
 
 /*--------------this function for tockens------------*/
 void			add_token(t_token **head, t_token *new);

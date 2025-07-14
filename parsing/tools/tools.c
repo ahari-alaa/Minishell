@@ -12,10 +12,9 @@
 
 #include "../../minishell.h"
 
-void	print_error(t_token *head, char *val, t_shell *shell_ctx)
+void	print_error(t_token *head, char *val)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token`'\n", 2, 0);
-	shell_ctx->exit_status = 258;
 	if (head)
 		free_tokens(head, NULL);
 	if (val)
@@ -112,4 +111,14 @@ char	*ft_strcpy(char *dest, const char *src)
 	}
 	dest[i] = '\0';
 	return (dest);
+}
+
+void	print_syntax_error(t_token *token)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `", 2, 0);
+	if (token && token->next && token->next->value)
+		ft_putstr_fd(token->next->value, 2, 0);
+	else
+		ft_putstr_fd("newline", 2, 0);
+	ft_putstr_fd("'\n", 2, 0);
 }

@@ -60,18 +60,18 @@ static long	ft_atol(const char *str)
 	}
 	return (result * sign);
 }
-void ft_exit(t_cmd **cmd, t_shell *shell, int j)
+void ft_exit(t_cmd **cmd)
 {
 	int		status;
 	int		i;
 	t_cmd	*current_cmd;
 
-	status = shell->exit_status;
+	status = 0;
 	i = 0;
 	current_cmd = *cmd;
 	if (j == 1)
 		printf("exit\n");
-	if (!current_cmd->cmd[1]){ exit(shell->exit_status);}
+	if (!current_cmd->cmd[1]){ exit(0);}
 	if (current_cmd->cmd[1][i] == '+' || current_cmd->cmd[1][i] == '-')
 		i++;
 	if (!current_cmd->cmd[1][i] )
@@ -85,7 +85,7 @@ void ft_exit(t_cmd **cmd, t_shell *shell, int j)
 	if (current_cmd->cmd[2] != NULL)
 	{
 		ft_putstr_fd_up("minishell: exit: too many arguments\n",2);
-		shell->exit_status = 1;
+		0 = 1;
 		return ;
 	}
 	status = ft_atoi(current_cmd->cmd[1]) % 256;

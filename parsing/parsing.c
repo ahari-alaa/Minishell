@@ -69,7 +69,7 @@ char *join_export_tokens(char **split)
     return result;
 }
 
-char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx)
+static char **process_quoted_value(char *val, t_token *head)
 {
     char    **strings = NULL;
     int     i = 0, start, count = 0;
@@ -77,10 +77,10 @@ char **process_quoted_value(char *val, t_token *head, t_shell *shell_ctx)
     char    *tmp;
     
     if (!val)
-        return (print_error(head, NULL, shell_ctx), NULL);
+        return (print_error(head, NULL), NULL);
     strings = malloc(sizeof(char *) * (ft_strlen(val) + 1));
     if (!strings)
-        return (print_error(head, NULL, shell_ctx), NULL);
+        return (print_error(head, NULL), NULL);
     while (val[i])
     {
         if (val[i] == '\'' || val[i] == '\"')
@@ -294,31 +294,35 @@ int handle_token_splitting(t_token *current, t_token **head, char **split)
     return (free(current->value), free(current), 1);
 }
 
-int process_env_expansion(char **new_val, int i, char **env_table, t_shell *shell_ctx)
+static int process_env_expansion(char **new_val, int i, char **env_table)
 {
-    char *expanded = found_env(new_val[i], env_table, shell_ctx);
-    if (!expanded)
-        return (0);
-    free(new_val[i]);
-    new_val[i] = expanded;
+    // char *expanded = found_env(new_val[i], env_table, shell_ctx);
+    // if (!expanded)
+    //     return (0);
+    // free(new_val[i]);
+    // new_val[i] = expanded;
+    (void)new_val;
+    (void)i;
+    (void)env_table;
     return (1);
 }
 
-t_token *check_quoted(char *str, t_shell *shell_ctx, char **env_table)
+t_token *check_quoted(char *str)
 {
     t_token *head;
     t_token *current;
     t_token *next;
     int process_result;
 
-    head = string_tokens(str, shell_ctx);
+    head = string_tokens(str);
     if (!head)
         return (NULL);
     current = head;
     while (current)
     {
         next = current->next;
-        process_result = process_token(current, &head, shell_ctx, env_table);
+        // process_result = process_token(current, &head, shell_ctx, env_table);
+        process_result = 1; // Simplified for now
         if (process_result == 0)
         {
             free_tokens(head, str);

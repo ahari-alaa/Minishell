@@ -34,7 +34,7 @@ static void update_env_var(t_env *data_env, char *key, char *dest)
     }
 }
 
-t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
+t_env *ft_cd(t_cmd **cmd, t_env *data_env)
 {
     char pwd_update[PATH_MAX];
     char oldpwd_update[PATH_MAX];
@@ -45,13 +45,13 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
     if (access(".", F_OK | X_OK) != 0)
     {
         perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
-        shell_ctx->exit_status = 1;
+        
         return data_env;
     }
 
     if (!cmd_path->cmd[1])
     {
-        shell_ctx->exit_status = 0;
+        
         return data_env;
     }
 
@@ -66,7 +66,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
                 perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
             }
         }
-        shell_ctx->exit_status = 1;
+        
         // return data_env;
     }
     // update PWD/OLDPWD as needed
@@ -77,7 +77,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
         if (!path)
         {
             ft_putstr_fd_up("minishell: cd: HOME not set\n", 2);
-            shell_ctx->exit_status = 1;
+            
             return data_env;
         }
     }
@@ -87,7 +87,7 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
         if (!path)
         {
             ft_putstr_fd_up("minishell: cd: OLDPWD not set\n", 2);
-            shell_ctx->exit_status = 1;
+            
             return data_env;
         }
     }
@@ -99,21 +99,21 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
         ft_putstr_fd_up("minishell: cd1: ", 2);
         ft_putstr_fd_up(path, 2);
         ft_putstr_fd_up(": No such file or directory\n", 2);
-        shell_ctx->exit_status = 1;
+        
         return data_env;
     }
     if (chdir(path) != 0)
     {
         ft_putstr_fd_up("minishell: cd: ", 2);
         perror(path);
-        shell_ctx->exit_status = 1;
+        
         return data_env;
     }
 
     if (!getcwd(pwd_update, PATH_MAX))
     {
         // perror("minishell: cd: getcwd error");
-        shell_ctx->exit_status = 1;
+        
         return data_env;
     }
 
@@ -126,6 +126,6 @@ t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
         ft_putstr_fd_up("\n", 1);
     }
 
-    shell_ctx->exit_status = 0;
+    
     return data_env;
 }

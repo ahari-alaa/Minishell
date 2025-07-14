@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-void ft_env(t_env *env_list, t_shell *shell_ctx)
+void ft_env(t_env *env_list)
 {
     t_env *env = env_list;
     while (env != NULL)
@@ -20,5 +20,5 @@ void ft_env(t_env *env_list, t_shell *shell_ctx)
             printf("%s\n",env->data_env);
         env = env->next;
     }
-    shell_ctx->exit_status = 0;
+    
 }

@@ -72,40 +72,39 @@ static int parse_arguments(t_cmd *cmd, t_token **tokens)
 
 static int parse_redirections(t_cmd *cmd, t_token **tokens)
 {
-    t_token *current = *tokens;
-    t_file *file;
+	t_token	*current;
+	t_file	*file;
+	char	*tmp;
 
-    while (current && current->type != TOKEN_PIPE)
-    {
-        if (ft_isredirect(current->type))
-        {
-            if (!current->next || current->next->type != TOKEN_WORD)
-            {
-                ft_putstr_fd("./minishell: syntax error near unexpected token `", 2, 0);
-                if (current->next && current->next->value)
-                    ft_putstr_fd(current->next->value, 2, 0);
-                else
-                    ft_putstr_fd("newline", 2, 0);
-                ft_putstr_fd("'\n", 2, 0);
-                
-                return 0;
-            }
-            file = init_mfile();
-            if (!file)
-                return 0;
-            file->name = ft_strdup(current->next->value);
-            if(!file->name)
-                return (free(file), 0);
-            file->type = current->type;
-            if (!file->name)
-                return (free(file), 0);
-            cmd->files[cmd->file_count++] = *file;
-            free(file);
-            current = current->next;
-        }
-        current = current->next;
-    }
-    return 1;
+	current = *tokens;
+	while (current && current->type != TOKEN_PIPE)
+	{
+		if (ft_isredirect(current->type))
+		{
+			if (!current->next || current->next->type != TOKEN_WORD)
+			{
+				print_syntax_error(current);
+				return 0;
+			}
+			file = init_mfile();
+			if (!file)
+				return 0;
+			tmp = ft_strdup(current->next->value);
+			if (!tmp)
+				 return (free(file), 0);
+			file->name = remove_char(tmp , '\2');
+			if(!file->name)
+				return (free(file), 0);
+			file->type = current->type;
+			file->check_expand = current->next->was_quoted;
+			cmd->files[cmd->file_count++] = *file;
+			free(tmp);
+			free(file);
+			current = current->next;
+		}
+		current = current->next;
+	}
+	return 1;
 }
 //add this just to test it 
 static int count_redirections(t_token *start)
@@ -146,7 +145,7 @@ static t_cmd *parse_single_command(t_token **tokens)
     return cmd;
 }
 
-t_cmd *parse_commands(t_token *tokens, t_shell *shell_ctx)
+t_cmd *parse_commands(t_token *tokens)
 {
     t_cmd *cmd_head = NULL;
     t_cmd *current = NULL;
@@ -158,7 +157,7 @@ t_cmd *parse_commands(t_token *tokens, t_shell *shell_ctx)
     {
         new_cmd = parse_single_command(&tokens);
         if (!new_cmd)
-            return (free_cmd_list(cmd_head),shell_ctx->exit_status = 258, NULL);
+            return (free_cmd_list(cmd_head), NULL);
         if (!cmd_head)
             cmd_head = new_cmd;
         else
@@ -169,7 +168,6 @@ t_cmd *parse_commands(t_token *tokens, t_shell *shell_ctx)
             if (!tokens->next)
             {
                 ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2, 0);
-                shell_ctx->exit_status = 258;
                 return (free_cmd_list(cmd_head), NULL);
             }
             tokens = tokens->next;

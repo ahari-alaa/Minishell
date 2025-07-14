@@ -25,7 +25,7 @@ int is_valid_identifier(const char *str)
     return 1;
 }
 
-t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
+void ft_unset(t_cmd **cmd, t_env *env) 
 {
     t_env *current;
     t_env *prev;
@@ -68,6 +68,6 @@ t_env *ft_unset(t_cmd **cmd, t_env *env, t_shell *shell_ctx)
         }
         i++;
     }
-    shell_ctx->exit_status = error;
-    return (env);
+    
+    return;
 }

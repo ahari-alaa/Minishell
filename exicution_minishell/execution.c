@@ -30,7 +30,7 @@ static void ignore_sigint(void)
 static void restore_sigint(void)
 {
     // write(1,"\n",1);
-    signal(SIGINT, handler_sig);
+    // signal(SIGINT, handler_sig); // Commented out for now
 }
 // static void restore_sigint_1(void)
 // {
@@ -116,14 +116,14 @@ static void handle_cmd_errors(char *cmd_path)
 static int cmd_process(t_cmd *cmd, char **env)
 {
     char *cmd_path;
-    int status;
+    int status = 0;
     if (!cmd || !cmd->cmd) 
     {
         ft_putstr_fd_up("minishell:", 2);
         ft_putstr_fd_up(" command not found\n", 2);
         exit(127);
     }
-    status = redirections(cmd);
+    redirections(cmd);
     if (status == 130)
         return (2);
     else if (status == 2)
@@ -166,7 +166,7 @@ static int cmd_process(t_cmd *cmd, char **env)
     exit(0); // Should never reach here
 }
 
-static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
+static void execute_single_command(t_cmd **cmd, char **envp)
 {
     pid_t id;
     int status;
@@ -209,10 +209,12 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
         restore_sigint();  // Restore SIGINT handler in parent
 
         if (WIFEXITED(status))
-            shell_ctx->exit_status = WEXITSTATUS(status);
+        {
+            // Handle exit status
+        }
         else if (WIFSIGNALED(status))
         {
-            shell_ctx->exit_status = 128 + WTERMSIG(status);
+            
             if (WTERMSIG(status) == SIGINT)
             {
                 write(1, "\n", 2); // Always print newline for SIGINT
@@ -223,7 +225,9 @@ static void execute_single_command(t_cmd **cmd, char **envp, t_shell *shell_ctx)
             }
         }
         else
-            shell_ctx->exit_status = 0;
+        {
+            // Handle other cases
+        }
     }
     else
     {
@@ -287,7 +291,7 @@ static int handle_redirections(t_cmd *cmd)
     return 0;
 }
 
-static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env_list, t_shell *shell_ctx)
+static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env_list)
 {
     if (!cmds || cmd_count <= 0)
         return;
@@ -300,10 +304,11 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         {
             if (cmds[h]->files[f].type == TOKEN_HEREDOC)
             {
-                int hd_status = function_herdoc(&cmds[h]->files[f]);
+                // int hd_status = function_herdoc(&cmds[h]->files[f]);
+                int hd_status = 0; // Commented out for now
                 if (hd_status == 130)
                 {
-                    shell_ctx->exit_status = 130; // Set to 130 instead of 1
+                     // Set to 130 instead of 1
                     // Clean up any temp files created so far
                     cleanup_heredoc_files(cmds, cmd_count);
                     signal(SIGINT, SIG_IGN);
@@ -311,7 +316,7 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
                 }
                 else if (hd_status != 0)
                 {
-                    shell_ctx->exit_status = 1;
+                    
                     cleanup_heredoc_files(cmds, cmd_count);
                     signal(SIGINT, SIG_IGN);
                     return; // Other heredoc failure
@@ -382,9 +387,9 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
             // Handle builtins in child process (pipeline)
             if (is_builtin(cmds[i]->cmd[0]))
             {
-                env_list = execut_bultin(&cmds[i], env_list, shell_ctx, 0);
+                env_list = execut_bultin(&cmds[i], env_list);
                 free_env(env);
-                exit(shell_ctx->exit_status);
+                exit(0);
             }
 
             // External command
@@ -455,11 +460,17 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
         if (wpid == last_pid)
         {
             if (WIFEXITED(wstatus))
-                shell_ctx->exit_status = WEXITSTATUS(wstatus);
+            {
+                // Handle exit status
+            }
             else if (WIFSIGNALED(wstatus))
-                shell_ctx->exit_status = 128 + WTERMSIG(wstatus);
+            {
+                // Handle signal
+            }
             else
-                shell_ctx->exit_status = 1;
+            {
+                // Handle other cases
+            }
         }
     }
 
@@ -469,13 +480,13 @@ static void execute_pipeline(t_cmd **cmds, int cmd_count, char **env, t_env *env
     cleanup_heredoc_files(cmds, cmd_count);
     restore_sigint();
 }
-int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
+int exicut(t_cmd **cmd, t_env *env_list)
 {
     int cmd_count = 0;
     if (!cmd || !*cmd || !env_list)
         return (1);
     t_cmd *current = *cmd;
-    char **env = convert(*env_list);
+    char **env = convert(env_list);
     if (!env)
         return (1);
     // Count commands
@@ -489,11 +500,11 @@ int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
     {
         if (is_builtin((*cmd)->cmd[0]))
         {
-            *env_list = execut_bultin(cmd, *env_list, shell_ctx, 1);
+            env_list = execut_bultin(cmd, env_list);
             free_env(env);
             return (0);
         }
-        execute_single_command(cmd, env,shell_ctx);
+        execute_single_command(cmd, env);
     }
     else
     {// Convert linked list to array
@@ -510,7 +521,7 @@ int exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)
             current = current->next;
         }
         cmd_arr[cmd_count] = NULL;
-        execute_pipeline(cmd_arr, cmd_count, env, *env_list,shell_ctx);
+        execute_pipeline(cmd_arr, cmd_count, env, env_list);
         free(cmd_arr);
     }
     free_env(env);

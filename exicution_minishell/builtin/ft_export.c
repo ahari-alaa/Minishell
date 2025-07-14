@@ -266,32 +266,32 @@ static void handle_export(t_env **env, char *cmd)
     free(key);
 }
 
-void ft_export(t_cmd **cmd_ptr, t_env **envp, t_shell *shell) // NOTE: envp is a pointer to pointer!
+void ft_export(t_cmd **cmd, t_env *envp)  // NOTE: envp is a pointer to pointer!
 {
-    t_cmd *cmd;
+    t_cmd *cmd_ptr;
     int i;
     char *assignment;
     char *append;
 
     i = 1;
-    cmd = *cmd_ptr;
-    if (cmd->cmd[0] && cmd->cmd[1] == NULL) 
+    cmd_ptr = *cmd;
+    if (cmd_ptr->cmd[0] && cmd_ptr->cmd[1] == NULL) 
     {
-        if (!cmd->cmd[1])
+        if (!cmd_ptr->cmd[1])
             sort_and_display_env(envp);
         shell->exit_status = 0;
  // pass pointer value
         return;
     }
-    while (cmd->cmd[i]) {
-        assignment = ft_strchr(cmd->cmd[i], '=');
-        append = ft_strstr(cmd->cmd[i], "+=");
+    while (cmd_ptr->cmd[i]) {
+        assignment = ft_strchr(cmd_ptr->cmd[i], '=');
+        append = ft_strstr(cmd_ptr->cmd[i], "+=");
         if (append)
-            handel_append(envp, cmd->cmd[i]);
+            handel_append(envp, cmd_ptr->cmd[i]);
         else if (assignment)
-            handle_assigmnet(envp, cmd->cmd[i]);
+            handle_assigmnet(envp, cmd_ptr->cmd[i]);
         else
-            handle_export(envp, cmd->cmd[i]);
+            handle_export(envp, cmd_ptr->cmd[i]);
         i++;
     }
     shell->exit_status = 0;
