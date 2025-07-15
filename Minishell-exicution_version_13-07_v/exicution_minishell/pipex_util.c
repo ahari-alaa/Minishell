@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:59 by maskour           #+#    #+#             */
-/*   Updated: 2025/05/23 20:29:07 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/15 16:08:29 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,17 @@ static char	*get_executable_path(char *cmd)
 	return (NULL);
 }
 
+static int	ft_check_dir(char *path)
+{
+	int fd;
+
+	fd = open(path, O_DIRECTORY);
+	if (fd < 0)
+		return (0);
+	close(fd);
+	return (1);
+}
+
 static char	*search_path_dirs(char *cmd, char **direct)
 {
 	char	*full_path;
@@ -77,7 +88,7 @@ static char	*search_path_dirs(char *cmd, char **direct)
 		free(dir_with_slash);
 		if (!full_path)
 			return (NULL);
-		if (access(full_path, F_OK | X_OK) == 0)
+		if (access(full_path, F_OK | X_OK) == 0 && !ft_check_dir(full_path))
 			return (full_path);
 		free(full_path);
 	}

@@ -15,7 +15,7 @@
 static char *build_tmp_path(char *prefix, char *file_name)
 {
     char *tmp = ft_strjoin(prefix, file_name);
-    return tmp; // caller must check NULL
+    return tmp;
 }
 static int try_create_file(char *filename)
 {
@@ -45,7 +45,7 @@ static char *build_numbered_name(char *file_name, int count)
 static char *build_full_numbered_path(char *numbered_name)
 {
     char *tmp = ft_strjoin("/tmp/minishell_", numbered_name);
-    return tmp; // caller must check NULL
+    return tmp;
 }
 static char *get_rundem_name(char *file_name)
 {
@@ -88,14 +88,12 @@ static void heredoc_child_loop(t_file *file, char **env, t_shell *shell_ctx, int
             free(line);
             break;
         }
-        char *tmp = ft_strjoin("$", file->name);
-        if (file->check_expand == 0 && ft_strcmp(line, tmp) != 0)
+        if (file->check_expand == 0 && ft_strcmp(line, file->name) != 0)
         {
             char *expanded_line = found_env(line, env, shell_ctx);
             if (!expanded_line)
             {
                 free(line);
-                free(tmp);
                 close(fd);
                 unlink(file->name);
                 exit(1);
@@ -109,7 +107,6 @@ static void heredoc_child_loop(t_file *file, char **env, t_shell *shell_ctx, int
             write(fd, line, strlen(line));
             write(fd, "\n", 1);
         }
-        free(tmp);
         free(line);
     }
 }
@@ -165,6 +162,7 @@ int function_herdoc(t_file *file, char **env, t_shell *shell_ctx)
     if (!filename)
     {
         perror("minishell: cannot create temp file");
+        free(filename);
         return 1;
     }
     pid_t pid = fork();

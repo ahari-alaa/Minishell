@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 18:49:15 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/09 16:04:38 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/13 22:47:56 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ static int check_path_2(char * path, char *pwd_update, t_shell *shell_ctx)
 }
 static void check_update_pwd(t_cmd *cmd_path, char *pwd_update)
 {
-	if (!ft_strcmp(cmd_path->cmd[1], "-"))
+	if (cmd_path->cmd[1] && !ft_strcmp(cmd_path->cmd[1], "-"))
 	{
 		ft_putstr_fd_up(pwd_update, 1);
 		ft_putstr_fd_up("\n", 1);
@@ -198,106 +198,3 @@ t_env	*ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
 	shell_ctx->exit_status = 0;
 	return data_env;
 }
-
-
-
-
-//this not norm
-// t_env *ft_cd(t_cmd **cmd, t_env *data_env, t_shell *shell_ctx)
-// {
-// 	char pwd_update[PATH_MAX];
-// 	char oldpwd_update[PATH_MAX];
-// 	char *path = NULL;
-// 	t_cmd *cmd_path = *cmd;
-
-// 	if (!cmd_path || !cmd_path->cmd || !cmd_path->cmd[0])
-// 	{
-// 		shell_ctx->exit_status = 1;
-// 		return data_env;
-// 	}
-// 	if (ft_strcmp(cmd_path->cmd[0], "cd") != 0)
-// 		return data_env;
-// 	if (access(".", F_OK | X_OK) != 0)
-// 	{
-// 		perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
-// 		shell_ctx->exit_status = 1;
-// 		return data_env;
-// 	}
-// 	if (!cmd_path->cmd[1])
-// 	{
-// 		shell_ctx->exit_status = 0;
-// 		return data_env;
-// 	}
-// 	if (!getcwd(oldpwd_update, PATH_MAX))
-// 	{
-// 		if (ft_strncmp(cmd_path->cmd[1],".",2) == 0)
-// 		{
-			
-// 			if (access(".", F_OK | X_OK) == 0)
-// 			{
-// 				perror("minishell: cd: error retrieving current directory: getcwd: cannot access parent directories");
-// 			}
-// 		}
-// 		shell_ctx->exit_status = 1;
-// 	}
-// 	if (!ft_strcmp(cmd_path->cmd[1], "~") || !cmd_path->cmd[1])
-// 	{
-// 		path = search_env(data_env, "HOME");
-// 		if (!path)
-// 		{
-// 			ft_putstr_fd_up("minishell: cd: HOME not set\n", 2);
-// 			shell_ctx->exit_status = 1;
-// 			return data_env;
-// 		}
-// 	}
-// 	else if (!ft_strcmp(cmd_path->cmd[1], "-"))
-// 	{
-// 		path = search_env(data_env, "OLDPWD");
-// 		if (!path)
-// 		{
-// 			ft_putstr_fd_up("minishell: cd: OLDPWD not set\n", 2);
-// 			shell_ctx->exit_status = 1;
-// 			return data_env;
-// 		}
-// 	}
-// 	else
-// 		path = cmd_path->cmd[1];
-// 	if (access(path, F_OK) != 0)
-// 	{
-// 		ft_putstr_fd_up("minishell: cd2: ", 2);
-// 		ft_putstr_fd_up(path, 2);
-// 		ft_putstr_fd_up(": No such file or directory\n", 2);
-// 		shell_ctx->exit_status = 1;
-// 		return data_env;
-// 	}
-// 	if (access(path,X_OK) != 0)
-// 	{
-// 		ft_putstr_fd_up("minishell: cd1: ", 2);
-// 		ft_putstr_fd_up(path, 2);
-// 		ft_putstr_fd_up(": Permission denied\n", 2);
-// 		shell_ctx->exit_status = 1;
-// 		return data_env;
-// 	}
-// 	if (chdir(path) != 0)
-// 	{
-// 		ft_putstr_fd_up("minishell: cd: ", 2);
-// 		perror(path);
-// 		shell_ctx->exit_status = 1;
-// 		return data_env;
-// 	}
-// 	if (!getcwd(pwd_update, PATH_MAX))
-// 	{
-// 		shell_ctx->exit_status = 1;
-// 		return data_env;
-// 	}
-// 	add_oldpwd(data_env);
-// 	update_env_var(data_env, "OLDPWD=", oldpwd_update);
-// 	update_env_var(data_env, "PWD=", pwd_update);
-// 	if (!ft_strcmp(cmd_path->cmd[1], "-"))
-// 	{
-// 		ft_putstr_fd_up(pwd_update, 1);
-// 		ft_putstr_fd_up("\n", 1);
-// 	}
-// 	shell_ctx->exit_status = 0;
-// 	return data_env;
-// }

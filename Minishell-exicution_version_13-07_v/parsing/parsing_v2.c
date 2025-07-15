@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_v2.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 23:15:00 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 20:48:20 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 22:19:24 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ int process_token(t_token *current, t_token **head, t_env_list *env_list)
 
 	is_export_var = is_export_assignment(*head, current);
 	if (current->type != TOKEN_WORD)
-		return (printf("jfhhf\n"),1);
+		return (1);
 	new_val = process_quoted_value(current->value, *head, env_list);
 	if (!new_val)
 		return (0);

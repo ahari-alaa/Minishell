@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:51:33 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/09 16:38:24 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/13 22:19:00 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	ft_pwd(t_shell *shell_ctx, t_env *env_list)
 	{
 	while (env)
 	{
-		if (strncmp(env->data_env, "PWD=", 4) == 0)
+		if (ft_strncmp(env->data_env, "PWD=", 4) == 0)
 		{
 			printf("%s\n", env->data_env + 4);
 			shell_ctx->exit_status = 0;

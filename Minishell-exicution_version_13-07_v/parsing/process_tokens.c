@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process_tokens.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 17:17:31 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/13 20:41:45 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/13 22:19:31 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ static char *process_quoted_section(char *val, int *i, t_env_list *env)
     }
     if (val[*i] == quote)
         (*i)++;
-    // printf("tmp: %p\n", tmp);
     return (tmp);
 }
 
