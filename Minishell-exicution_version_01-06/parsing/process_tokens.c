@@ -83,6 +83,8 @@ char	*process_quoted_value_sections(char *val, t_token *head,
 	size_t	result_capacity;
 
 	i = 0;
+	if (ft_strchr(val, '\1') != NULL)
+		return (remove_char(val, '\1'));
 	result = init_result_buffer(val, head, &result_capacity);
 	if (!result)
 		return (NULL);

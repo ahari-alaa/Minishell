@@ -46,7 +46,7 @@ int	split_and_process_tokens(t_token *current, t_token **head, char *new_val)
 		return (free_array(split), free(new_val), 0);
 	while (split[i])
 	{
-		tmp = ft_strdup(split[i]);
+		tmp = ft_strjoin(split[i], "\1");
 		new_tokens = new_token(tmp, TOKEN_WORD);
 		free(tmp);
 		if (!new_tokens)
@@ -68,7 +68,7 @@ int	process_token(t_token *current, t_token **head, t_env_list *env_list)
 	new_val = process_quoted_value(current->value, *head, env_list);
 	if (!new_val)
 		return (0);
-	if (is_export_var == 1 || ft_strspaces(new_val) || \
+	if (is_export_var == 1 || ft_strspaces(new_val) ||
 		(has_quotes(current->value) == 1 && ft_strchr(new_val, '=') == NULL))
 	{
 		free(current->value);
