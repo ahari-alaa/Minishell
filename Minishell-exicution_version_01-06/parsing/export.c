@@ -101,7 +101,7 @@ int	is_export_assignment(t_token *head, t_token *current)
 	prev = find_previous_token(head, current);
 	if (!prev)
 	{
-		if (has_quotes(current->value) == 2 || current->was_quoted == 0)
+		if (current->was_quoted == 0)
 			return (0);
 		else
 			return (1);

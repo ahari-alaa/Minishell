@@ -83,7 +83,6 @@ t_token	*check_quoted(char *str, t_shell *shell_ctx, char **env_tab)
 	env_list->env_table = env_tab;
 	env_list->exit_status = shell_ctx;
 	head = string_tokens(str, shell_ctx);
-	print_tokens(head);
 	if (!head)
 	{
 		free(env_list);
