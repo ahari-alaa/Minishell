@@ -52,7 +52,7 @@ int main(int ac, char **av, char **env)
         
         env_table = convert(env_list);
         tokens = check_quoted(input, shell_ctx, env_table);
-        // print_tokens(tokens);
+        
         free(input);
         if (!tokens)
         {
