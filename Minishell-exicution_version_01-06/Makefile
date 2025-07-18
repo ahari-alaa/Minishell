@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/ahari/.brew/opt/readline/include -g
 
 LDFLAGS = -L /mnt/homes/ahari/.brew/opt/readline/lib
 
-SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c	./parsing/tools/expand_tools_3.c	\
+SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/main_tools.c ./parsing/tools/init_tools.c	./parsing/tools/expand_tools_3.c	\
 			./parsing/tools/expand_tools_2.c	./parsing/tools/expand_tools.c ./parsing/tools/tools_string2.c ./parsing/tools/token_tools.c  \
 			./parsing/tools/storge_tools.c  ./parsing/tools/process_tools.c\
 			./parsing/tools/string_tools.c  ./parsing/tools/free_tools.c    ./parsing/tools/print_file.c   ./parsing/tools/tools.c\
