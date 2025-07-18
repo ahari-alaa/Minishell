@@ -1,6 +1,9 @@
-CC = cc 
+CC = cc
+
 CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/ahari/.brew/opt/readline/include -g3 -fsanitize=address
+
 LDFLAGS = -L /mnt/homes/ahari/.brew/opt/readline/lib
+
 SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c	./parsing/tools/expand_tools_3.c	\
 			./parsing/tools/expand_tools_2.c	./parsing/tools/expand_tools.c ./parsing/tools/tools_string2.c ./parsing/tools/token_tools.c  \
 			./parsing/tools/storge_tools.c  ./parsing/tools/process_tools.c\
@@ -20,7 +23,8 @@ SRC_PARSING=./parsing/tools/split.c         ./parsing/tools/string_pasing.c ./pa
 			./exicution_minishell/builtin/env_utils.c ./exicution_minishell/utils/ft_strtrim.c \
 			./exicution_minishell/signals/signals.c
 
-FLAGS= -lreadline 
+FLAGS= -lreadline
+
 OBJ_PARSING = $(SRC_PARSING:.c=.o)
 
 NAME = minishell

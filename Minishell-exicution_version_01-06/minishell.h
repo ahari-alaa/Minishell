@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/14 06:18:03 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/18 20:21:08 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,11 @@ t_token			*find_previous_token(t_token *head, t_token *target);
 /*-----------------parsing --------------------------*/
 int				is_export_assignment(t_token *head, t_token *current);
 char			*process_quoted_value(char *val, t_token *head, t_env_list *env);
+
+///---------------main tools--------------------------*/
+int				handle_here_docs(t_cmd *commands, t_shell *shell_ctx, t_token *tokens, char **env_table);
+int				handle_input(char *input, char **env_table, t_token **tokens, t_shell *shell_ctx);
+int				handle_commands(t_token *tokens, t_shell *shell_ctx, char **env_table, t_cmd **commands);
 
 /*-----------------for print--------------------------*/
 void			print_tokens(t_token *head);
