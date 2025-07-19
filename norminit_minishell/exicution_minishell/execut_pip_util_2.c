@@ -59,34 +59,34 @@ int	find_last_heredoc_index(t_cmd *cmd)
 	return (last);
 }
 
-int	process_all_heredocs(t_cmd **cmds, int cmd_count, char **env,
-				t_shell *shell_ctx)
+int	process_all_heredocs(t_cmd **cmds, int cmd_count, char **env, 
+			t_shell *shell_ctx)
 {
-	int	h;
-	int	f;
-	int	hd_status;
+	t_herdoc_arg	arg;
+	struct termios original_termios;
 
-	h = -1;
-	while (++h < cmd_count)
+	setup_terminal_and_signals(&original_termios);
+	arg.h = -1;
+	while (++(arg.h) < cmd_count)
 	{
-		f = -1;
-		while (++f < cmds[h]->file_count)
+		arg.f = -1;
+		while (++(arg.f) < cmds[arg.h]->file_count)
 		{
-			if (cmds[h]->files[f].type == TOKEN_HEREDOC)
+			if (cmds[arg.h]->files[arg.f].type == TOKEN_HEREDOC)
 			{
-				hd_status = function_herdoc(&cmds[h]->files[f], env, shell_ctx);
-				if (hd_status == 130)
+				arg.hd_status = function_herdoc(&cmds[arg.h]->files[arg.f], env,
+					shell_ctx);
+				if (arg.hd_status == 130)
 				{
 					shell_ctx->exit_status = 1;
 					cleanup_heredoc_files(cmds, cmd_count);
-					signal(SIGINT, SIG_IGN);
-					return (0);
+					restore_terminal_and_signals(&original_termios);
+					return (write(STDOUT_FILENO, "\n", 1), 0);
 				}
 			}
-			signal(SIGINT, SIG_IGN);
 		}
 	}
-	return (1);
+	return (restore_terminal_and_signals(&original_termios), 1);
 }
 
 void	setup_pipes_in_child(int i, int cmd_count, int prev_pipe,
