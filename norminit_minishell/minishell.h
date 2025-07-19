@@ -97,7 +97,14 @@ typedef struct s_exec_ctx
 	pid_t		*last_pid;
 	t_shell		*shell_ctx;
 }	t_exec_ctx;
-
+typedef struct s_herdoc_arg
+{
+	char	*line;
+	int		fd;
+	int		h;
+	int		f;
+	int		hd_status;
+}	t_herdoc_arg;
 /*---------------function for free--------------------*/
 void			free_tokens(t_token *tokens, char *input);
 void			free_char_array(char **array);
