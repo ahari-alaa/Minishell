@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/18 20:49:43 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/21 18:55:34 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,11 @@ void	handler_sig_1(int signal)
 
 static int	validate_terminal(void)
 {
-	char	*ptr;
-
 	if (!isatty(1) || !isatty(0))
 	{
 		write(2, "minishell: not a terminal\n", 26);
 		return (0);
 	}
-	ptr = getcwd(NULL, 0);
-	if (!ptr)
-	{
-		write(2, "minishell: getcwd failed\n", 26);
-		return (0);
-	}
-	free(ptr);
 	return (1);
 }
 
@@ -67,7 +58,7 @@ static void	start_program(t_env *env_list, t_shell *shell_ctx)
 
 	while (1)
 	{
-		(signal(SIGINT, handler_sig), signal(SIGQUIT, handler_sig));
+		(signal(SIGINT, handler_sig_1), signal(SIGQUIT, handler_sig));
 		input = readline("minishell$ ");
 		if (!input)
 			return (ft_putstr_fd_up("exit\n", 2));

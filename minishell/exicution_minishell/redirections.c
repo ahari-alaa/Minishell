@@ -6,122 +6,135 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:02:07 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/18 03:22:27 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/21 18:43:15 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static int	check_and_open_input_file(t_file *file, int *last_in_fd)
+static int backup_stdio(int *original_stdin, int *original_stdout)
 {
-	int	fd;
-
-	if (*last_in_fd != -1)
-		close(*last_in_fd);
-	if (file->type == TOKEN_REDIRECT_IN || file->type == TOKEN_HEREDOC)
+	*original_stdin = dup(STDIN_FILENO);
+	*original_stdout = dup(STDOUT_FILENO);
+	if (*original_stdin == -1 || *original_stdout == -1)
 	{
-		fd = open_file(file->name, 0);
-		if (fd == -1)
+		perror("minishell: dup");
+		return 1;
+	}
+	return (0);
+}
+
+
+static int handle_input_redirect(t_file *file, int i, int last_heredoc_index, 
+						 int *last_in_fd, int or_stdin, int or_stdout)
+{
+	if (file->type == TOKEN_REDIRECT_IN)
+	{
+		if (*last_in_fd != -1) close(*last_in_fd);
+		*last_in_fd = open_file(file->name, 0);
+		if (*last_in_fd == -1)
 		{
-			perror("minishell: open input");
+			perror("minishell: open_file input");
+			cleanup_stdio(or_stdin, or_stdout);
 			return (1);
 		}
-		*last_in_fd = fd;
 	}
-	return (0);
-}
-
-static int	process_input_files(t_cmd *cmd, int last_heredoc_index,
-				int *last_in_fd)
-{
-	int		i;
-	t_file	*file;
-
-	*last_in_fd = -1;
-	i = -1;
-	while (++i < cmd->file_count)
-	{
-		file = &cmd->files[i];
-		if (is_ambiguous_redirect(file->name))
-			return (put_error_ambig(file->name));
-		if (file->type == TOKEN_REDIRECT_IN || \
-			(file->type == TOKEN_HEREDOC && i == last_heredoc_index))
+	else if (file->type == TOKEN_HEREDOC && i == last_heredoc_index) {
+		if (*last_in_fd != -1)
+			close(*last_in_fd);
+		*last_in_fd = open(file->name, O_RDONLY);
+		if (*last_in_fd == -1)
 		{
-			if (check_and_open_input_file(file, last_in_fd))
-				return (1);
+			perror("minishell: open heredoc file");
+			cleanup_stdio(or_stdin, or_stdout);
+			return (1);
 		}
 	}
 	return (0);
 }
 
-static int	process_output_files(t_cmd *cmd, int *last_out_fd)
+static int handle_output_redirect(t_file *file, int *last_out_fd, 
+						  int original_stdin, int original_stdout)
 {
-	int		i;
-	int		mode;
-	int		fd;
-	t_file	*file;
-
-	*last_out_fd = -1;
-	i = -1;
-	while (++i < cmd->file_count)
+	if (file->type == TOKEN_REDIRECT_OUT)
 	{
-		file = &cmd->files[i];
-		if (file->type == TOKEN_REDIRECT_OUT || file->type == TOKEN_APPEND)
-		{
-			if (is_ambiguous_redirect(file->name))
-				return (put_error_ambig(file->name));
-			if (*last_out_fd != -1)
-				close(*last_out_fd);
-			mode = mode_file_type(file);
-			fd = open_file(file->name, mode);
-			if (fd == -1)
-				return (handle_err_file(file));
-			*last_out_fd = fd;
+		if (*last_out_fd != -1) close(*last_out_fd);
+		*last_out_fd = open_file(file->name, 1);
+		if (*last_out_fd == -1) {
+			perror("minishell: open_file output");
+			cleanup_stdio(original_stdin, original_stdout);
+			return (1);
+		}
+	}
+	else if (file->type == TOKEN_APPEND)
+	{
+		if (*last_out_fd != -1)
+			close(*last_out_fd);
+		*last_out_fd = open_file(file->name, 2);
+		if (*last_out_fd == -1) {
+			perror("minishell: open_file append");
+			cleanup_stdio(original_stdin, original_stdout);
+			return (1);
 		}
 	}
 	return (0);
 }
 
-static int	setup_redirections(t_cmd *cmd, int last_heredoc_index,
-							int original_stdin, int original_stdout)
+static int apply_final_redirections(int last_in_fd, int last_out_fd, 
+						   int original_stdin, int original_stdout)
 {
-	int	last_in_fd;
-	int	last_out_fd;
-
-	last_in_fd = -1;
-	last_out_fd = -1;
-	if (process_input_files(cmd, last_heredoc_index, &last_in_fd))
+	if (last_in_fd != -1)
 	{
-		cleanup_stdio(original_stdin, original_stdout);
-		return (2);
-	}
-	if (process_output_files(cmd, &last_out_fd))
-	{
-		if (last_in_fd != -1)
+		if (dup2(last_in_fd, STDIN_FILENO) == -1)
+		{
+			perror("minishell: dup2 input");
 			close(last_in_fd);
-		cleanup_stdio(original_stdin, original_stdout);
-		return (2);
+			cleanup_stdio(original_stdin, original_stdout);
+			return (1);
+		}
+		close(last_in_fd);
 	}
-	if (apply_input_redirection(last_in_fd, original_stdin, original_stdout))
-		return (1);
-	if (apply_output_redirection(last_out_fd, original_stdin, original_stdout))
-		return (1);
-	return (0);
-}
-
-int	redirections(t_cmd *cmd, int last_heredoc_index)
-{
-	int	original_stdin;
-	int	original_stdout;
-	int	result;
-
-	if (!cmd || cmd->file_count <= 0)
-		return (0);
-	if (dup_original_fds(&original_stdin, &original_stdout))
-		return (1);
-	result = setup_redirections(cmd, last_heredoc_index,
-			original_stdin, original_stdout);
+	if (last_out_fd != -1)
+	{
+		if (dup2(last_out_fd, STDOUT_FILENO) == -1)
+		{
+			perror("minishell: dup2 output");
+			close(last_out_fd);
+			cleanup_stdio(original_stdin, original_stdout);
+			return (1);
+		}
+		close(last_out_fd);
+	}
 	close(original_stdin);
 	close(original_stdout);
-	return (result);
+	return (0);
+}
+
+int redirections(t_cmd *cmd, int last_heredoc_index)
+{
+	int or_stdin;
+	int or_stdout;
+	int lastinfd;
+	int lastoutfd;
+	int i;
+	t_file *file;
+
+	if (!cmd || cmd->file_count <= 0)
+		return 0;
+	if (backup_stdio(&or_stdin, &or_stdout))
+		return 1;
+	lastinfd = -1;
+	lastoutfd = -1;
+	i = -1;
+	while (++i < cmd->file_count)
+	{
+		file = &cmd->files[i];
+		handle_ambiguous_redirect(file, or_stdin, or_stdout);
+		if (handle_input_redirect(file, i, last_heredoc_index, &lastinfd, 
+								 or_stdin, or_stdout))
+			return (1);	
+		if (handle_output_redirect(file, &lastoutfd, or_stdin, or_stdout))
+			return (1);
+	}
+	return (apply_final_redirections(lastinfd, lastoutfd, or_stdin, or_stdout));
 }

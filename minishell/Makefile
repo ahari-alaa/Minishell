@@ -1,5 +1,5 @@
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/maskour/.brew/opt/readline/include
+CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/maskour/.brew/opt/readline/include -g3 -fsanitize=address
 LDFLAGS = -L /mnt/homes/maskour/.brew/opt/readline/lib
 SRC_PARSING=./parsing/tools/split.c   ./parsing/tools/main_tools.c ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c	./parsing/tools/expand_tools_3.c	\
 			./parsing/tools/expand_tools_2.c	./parsing/tools/expand_tools.c ./parsing/tools/tools_string2.c ./parsing/tools/token_tools.c  \
@@ -19,7 +19,7 @@ SRC_PARSING=./parsing/tools/split.c   ./parsing/tools/main_tools.c ./parsing/too
 			./exicution_minishell/builtin/ft_pwd.c ./exicution_minishell/builtin/ft_unset.c ./exicution_minishell/execut_pip_util.c\
 			./exicution_minishell/builtin/env_utils.c ./exicution_minishell/utils/ft_strtrim.c ./exicution_minishell/free_file.c\
 			./exicution_minishell/signals/signals.c ./exicution_minishell/execut_singal_cmd.c ./exicution_minishell/herdoc_util.c\
-			./exicution_minishell/execut_multiple_pipe.c ./exicution_minishell/herdoc.c ./exicution_minishell/redirection_util_2.c\
+			./exicution_minishell/execut_multiple_pipe.c ./exicution_minishell/herdoc.c \
 			./exicution_minishell/conv_env_char.c ./exicution_minishell/redirection_util.c ./exicution_minishell/setup_and_restore.c \
 			./exicution_minishell/singal_cmd_utils.c ./exicution_minishell/utils/ft_check_direc.c
 

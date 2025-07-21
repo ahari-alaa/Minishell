@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 17:11:57 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/20 15:38:37 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/21 18:51:56 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ char	*resolve_cmd_path(t_cmd *cmd, char **env)
 			erro_handle(cmd->cmd[0], ": Not a directory\n");
 			exit(126);
 		}
-		if (ft_strstr(cmd->cmd[0], "./") != NULL)
+		if (ft_strstr(cmd->cmd[0], "/") != NULL)
 			erro_handle(cmd->cmd[0], ": No such file or directory\n");
 		else
 			erro_handle(cmd->cmd[0], ": command not found\n");

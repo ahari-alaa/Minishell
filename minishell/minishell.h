@@ -6,13 +6,15 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/19 22:58:34 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/21 18:42:25 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+#include <signal.h>
+#include <wait.h>
 # include <limits.h>
 # include <fcntl.h>
 # include <stdio.h>
@@ -302,10 +304,10 @@ void			execute_pipeline(t_cmd **cmds, char **env, t_env *env_list,
 int				open_file(char *file, int mode);
 int				cleanup_stdio(int original_stdin, int original_stdout);
 int				is_ambiguous_redirect(const char *filename);
-int				dup_original_fds(int *orig_stdin, int *orig_stdout);
-int				mode_file_type(t_file *file);
 int				apply_input_redirection(int last_in_fd, int orig_stdin,
 					int orig_stdout);
+int				handle_ambiguous_redirect(t_file *file, int original_stdin,
+					int original_stdout);
 int				apply_output_redirection(int last_out_fd, int orig_stdin,
 					int orig_stdout);
 void			setup_terminal_and_signals(struct termios *original_termios);

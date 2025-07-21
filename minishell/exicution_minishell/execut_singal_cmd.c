@@ -45,7 +45,7 @@ static void	execute_command(char *cmd_path, t_cmd *cmd, char **env)
 			ft_putstr_fd_up(" command not found\n", 2);
 			exit(127);
 		}
-		if (ft_strstr(cmd->cmd[0], "./") != NULL)
+		if (ft_strstr(cmd->cmd[0], "/") != NULL)
 		{
 			ft_putstr_fd_up("minishell:", 2);
 			ft_putstr_fd_up(cmd->cmd[0], 2);

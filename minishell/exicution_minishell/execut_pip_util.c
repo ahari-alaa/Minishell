@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 21:41:13 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/18 03:13:22 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/21 18:51:04 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static void	handle_cmd_not_found(char *cmd, int i)
 	}
 	if (i == 0)
 	{
-		if (ft_strstr(cmd, "./") != NULL)
+		if (ft_strstr(cmd, "/") != NULL)
 			erro_handle(cmd, ": No such file or directory\n");
 		else
 		{
