@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 17:01:55 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/18 03:17:19 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/23 16:24:31 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,29 @@ static t_cmd	**convert_lit_arr(t_cmd *cmd, int cmd_count)
 	cmd_arr[cmd_count] = NULL;
 	return (cmd_arr);
 }
+// static int has_redirections_or_heredocs(t_cmd *cmd)
+// {
+//     int i = 0;
+    
+//     while (i < cmd->file_count)
+//     {
+//         if (cmd->files[i].type == TOKEN_HEREDOC || 
+//             cmd->files[i].type == TOKEN_REDIRECT_OUT ||
+//             cmd->files[i].type == TOKEN_APPEND)
+//             return (1);
+//         i++;
+//     }
+//     return (0);
+// }
 
 static void	execute_single(t_cmd **cmd, char **env,
 				t_env **env_list, t_shell *shell_ctx)
 {
-	if (is_builtin((*cmd)->cmd[0]))
+	if (is_builtin((*cmd)->cmd[0]) && (*cmd)->file_count == 0)
+	{
 		*env_list = execut_bultin(cmd,*env_list, shell_ctx, 1);
-	else
-		execute_single_command(cmd, env_list, env, shell_ctx);
+	}
+	execute_single_command(cmd, env_list, env, shell_ctx);
 }
 
 int	exicut(t_cmd **cmd, t_env **env_list, t_shell *shell_ctx)

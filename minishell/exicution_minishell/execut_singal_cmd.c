@@ -58,14 +58,12 @@ static void	execute_command(char *cmd_path, t_cmd *cmd, char **env)
 	}
 }
 
-static int	cmd_process(t_cmd *cmd, t_env **env_list,
-				char **env, t_shell *shell)
+static int	cmd_process(t_cmd *cmd,t_env **env_list,
+				char **env, t_shell *shell, int last_heredoc_index)
 {
 	char	*cmd_path;
-	int		last_heredoc_index;
+	// int		last_heredoc_index;
 
-	last_heredoc_index = -1;
-	process_heredocs(cmd, env, shell, &last_heredoc_index);
 	if (redirections(cmd, last_heredoc_index) == 2)
 	{
 		cleanup_herdoc(cmd);
@@ -73,7 +71,11 @@ static int	cmd_process(t_cmd *cmd, t_env **env_list,
 	}
 	handle_empty_cmd(cmd);
 	if (is_builtin(cmd->cmd[0]))
+	{
 		*env_list = execut_bultin(&cmd,*env_list, shell, 1);
+		cleanup_herdoc(cmd);
+		exit(shell->exit_status);
+	}
 	cmd_path = resolve_cmd_path(cmd, env);
 	execute_command(cmd_path, cmd, env);
 	cleanup_herdoc(cmd);
@@ -107,20 +109,21 @@ static void	handle_child_exit_status(int status, t_shell *shell_ctx)
 		shell_ctx->exit_status = 0;
 }
 
-void	execute_single_command(t_cmd **cmd, t_env **env_list,
+void	execute_single_command(t_cmd **cmd,t_env **env_list,
 				char **envp, t_shell *shell_ctx)
 {
 	pid_t			id;
 	int				status;
 	struct termios	original_termios;
-
+	int last_heredoc_index = -1;
+	process_heredocs(*cmd, envp, shell_ctx, &last_heredoc_index);
 	setup_terminal_and_signals(&original_termios);
 	id = fork();
 	if (id == 0)
 	{
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
-		cmd_process(*cmd, env_list, envp, shell_ctx);
+		cmd_process(*cmd, env_list, envp, shell_ctx, last_heredoc_index);
 		exit(0);
 	}
 	else if (id > 0)
