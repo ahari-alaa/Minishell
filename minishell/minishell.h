@@ -6,15 +6,13 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/23 15:21:06 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/23 19:17:25 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-#include <signal.h>
-#include <wait.h>
 # include <limits.h>
 # include <fcntl.h>
 # include <stdio.h>
@@ -109,6 +107,15 @@ typedef struct s_herdoc_arg
 	int		f;
 	int		hd_status;
 }	t_herdoc_arg;
+
+typedef struct s_redirction_arg
+{
+	int		or_stdin;
+	int		or_stdout;
+	int		lastinfd;
+	int		lastoutfd;
+	int		i;
+}	t_redirction_arg;
 
 /*---------------function for free--------------------*/
 void			free_tokens(t_token *tokens, char *input);

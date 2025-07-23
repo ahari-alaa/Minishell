@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 16:04:38 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/14 06:07:53 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/23 20:03:11 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,12 @@ t_token	*string_tokens(char *str, t_shell *shell_ctx)
 			i++;
 		if (!str[i])
 			break ;
+		if (str[i] == '|')
+		{
+			printf("syntax error near unexpected token `|'\n");
+			shell_ctx->exit_status = 258;
+			return (NULL);
+		}
 		if (!process_token_logic(str, &i, &head, shell_ctx))
 			return (NULL);
 	}
