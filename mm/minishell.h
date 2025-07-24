@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/20 20:03:02 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/24 11:10:27 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void			free_array(char **array);
 /*-----------------Tokenizer --------------------------*/
 t_token			*string_tokens(char *str, t_shell *shell_ctx);
 t_token			*find_previous_token(t_token *head, t_token *target);
-
+int				check_pipe_syntax(t_token *head, t_shell *shell_ctx);
 /*-----------------parsing --------------------------*/
 int				is_export_assignment(t_token *head, t_token *current);
 char			*process_quoted_value(char *val, t_token *head,
@@ -318,8 +318,5 @@ void			execute_child(t_cmd **cmds, char **env, t_env *env_list,
 void			handle_parent_process(int i, int *prev_pipe, int pipes[2],
 					int cmd_count);
 int				first_sort_env(t_cmd *cmd, t_env **envp, t_shell *shell);
-
-
-void print_tokens(t_token *head);
 
 #endif

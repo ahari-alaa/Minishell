@@ -1,5 +1,5 @@
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/ahari/.brew/opt/readline/include -g3 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -I /mnt/homes/ahari/.brew/opt/readline/include
 LDFLAGS = -L /mnt/homes/ahari/.brew/opt/readline/lib
 SRC_PARSING=./parsing/tools/split.c   ./parsing/tools/main_tools.c ./parsing/tools/string_pasing.c ./parsing/tools/init_tools.c	./parsing/tools/expand_tools_3.c ./parsing/tools/print_file.c	\
 			./parsing/tools/expand_tools_2.c	./parsing/tools/expand_tools.c ./parsing/tools/tools_string2.c ./parsing/tools/token_tools.c  \

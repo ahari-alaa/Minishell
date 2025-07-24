@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 16:04:38 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/20 19:52:06 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/24 10:57:39 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,15 +109,8 @@ t_token	*string_tokens(char *str, t_shell *shell_ctx)
 			i++;
 		if (!str[i])
 			break ;
-		if (str[i] == '|')
-		{
-			printf("syntax error near unexpected token `|'\n");
-			shell_ctx->exit_status = 258;
-			return (NULL);
-		}
 		if (!process_token_logic(str, &i, &head, shell_ctx))
 			return (NULL);
 	}
-	print_tokens(head);
 	return (head);
 }

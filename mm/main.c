@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 15:08:30 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/20 16:14:43 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/24 11:10:55 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ static void	start_program(t_env *env_list, t_shell *shell_ctx)
 		(signal(SIGINT, handler_sig), signal(SIGQUIT, handler_sig));
 		input = readline("minishell$ ");
 		if (!input)
-			return (ft_putstr_fd_up("exit\n", 2)); 
+			return (ft_putstr_fd_up("exit\n", 2));
 		if (input[0])
 			add_history(input);
 		env_table = convert(env_list);

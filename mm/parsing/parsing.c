@@ -6,7 +6,7 @@
 /*   By: ahari <ahari@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 03:04:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/20 19:33:16 by ahari            ###   ########.fr       */
+/*   Updated: 2025/07/24 11:04:44 by ahari            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ t_token	*check_quoted(char *str, t_shell *shell_ctx, char **env_tab)
 			free_tokens(head, str);
 		return (NULL);
 	}
+	if (check_pipe_syntax(head, shell_ctx) == 0)
+		return (free(env_list), free_tokens(head, NULL), NULL);
 	head = check_quoted_process_tokens(head, str, env_list);
 	free(env_list);
 	return (head);
