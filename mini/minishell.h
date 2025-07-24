@@ -6,13 +6,15 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 04:59:25 by ahari             #+#    #+#             */
-/*   Updated: 2025/07/24 11:18:55 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/24 20:08:59 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+#include <signal.h>
+#include <wait.h>
 # include <limits.h>
 # include <fcntl.h>
 # include <stdio.h>

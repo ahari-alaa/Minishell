@@ -6,7 +6,7 @@
 /*   By: maskour <maskour@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 16:50:12 by maskour           #+#    #+#             */
-/*   Updated: 2025/07/24 14:57:13 by maskour          ###   ########.fr       */
+/*   Updated: 2025/07/24 20:27:17 by maskour          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ static int	handle_export(t_env **env, char *cmd)
 	return (free(key), 0);
 }
 
+
 void	ft_export(t_cmd **cmd_ptr, t_env **envp, t_shell *shell)
 {
 	t_cmd	*cmd;
@@ -104,7 +105,7 @@ void	ft_export(t_cmd **cmd_ptr, t_env **envp, t_shell *shell)
 	char	*assignment;
 	char	*append;
 	int		stat;
-
+	
 	i = 1;
 	stat = 0;
 	cmd = *cmd_ptr;
@@ -112,12 +113,12 @@ void	ft_export(t_cmd **cmd_ptr, t_env **envp, t_shell *shell)
 		return ;
 	while (cmd->cmd[i])
 	{
-		assignment = ft_strchr(cmd->cmd[i], '=');
 		append = ft_strstr(cmd->cmd[i], "+=");
-		if (assignment)
-			stat = handle_assigmnet(envp, cmd->cmd[i]);
-		if (append)
+		assignment = ft_strchr(cmd->cmd[i], '=');
+		if (append && append < assignment)
 			stat = handel_append(envp, cmd->cmd[i]);
+		else if (assignment)
+			stat = handle_assigmnet(envp, cmd->cmd[i]);
 		else
 			stat = handle_export(envp, cmd->cmd[i]);
 		i++;
