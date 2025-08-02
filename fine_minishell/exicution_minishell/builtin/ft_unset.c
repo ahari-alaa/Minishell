@@ -28,17 +28,29 @@ int	is_valid_identifier(const char *str)
 	return (1);
 }
 
-static t_env	*remove_env_var(t_env *env, char *var)
+static int	env_equals(char *data_env, char *var)
 {
-	t_env	*to_free;
-	t_env	*prev;
-	t_env	*current;
+	int	len;
+
+	if (!data_env || !var)
+		return (0);
+	len = ft_strlen(var);
+	if (data_env[len] == '\0' || data_env[len] == '=')
+		return (1);
+	return (0);
+}
+
+static t_env *remove_env_var(t_env *env, char *var)
+{
+	t_env *to_free;
+	t_env *prev;
+	t_env *current;
 
 	current = env;
 	prev = NULL;
 	while (current != NULL)
 	{
-		if (ft_strstr(current->data_env, var) != NULL)
+		if (env_equals(current->data_env, var))
 		{
 			to_free = current;
 			if (prev == NULL)
@@ -46,14 +58,12 @@ static t_env	*remove_env_var(t_env *env, char *var)
 			else
 				prev->next = current->next;
 			current = current->next;
-			(free(to_free->data_env), free(to_free));
+			free(to_free->data_env);
+			free(to_free);
 			continue ;
 		}
-		else
-		{
-			prev = current;
-			current = current->next;
-		}
+		prev = current;
+		current = current->next;
 	}
 	return (env);
 }
