@@ -90,6 +90,8 @@ void	ft_exit(t_cmd **cmd, t_shell *shell, int j)
 	status = shell->exit_status;
 	current_cmd = *cmd;
 	arg = current_cmd->cmd[1];
+	if (j == 1)
+		printf("exit\n");
 	if (!arg)
 		exit(shell->exit_status);
 	if (current_cmd->cmd[2] != NULL)
@@ -98,8 +100,6 @@ void	ft_exit(t_cmd **cmd, t_shell *shell, int j)
 		shell->exit_status = 1;
 		return ;
 	}
-	if (j == 1)
-		printf("exit\n");
 	if (!is_valid_exit(arg) || ft_atol(arg) == -1 || ft_atoi(arg) == 0)
 		exit_number_error(arg);
 	status = ft_atoi(arg) % 256;
